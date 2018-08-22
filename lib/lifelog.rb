@@ -7,6 +7,9 @@ class Lifelog
       Birth.new(parts)
     elsif parts.first == 'D'
       Death.new(parts)
+    else
+      p line
+      raise "unknown line type #{parts.first}"
     end
   end
 
@@ -25,7 +28,7 @@ class Lifelog
       super
       @gender = parts[4]
       @coords = parts[5]
-      if parts[6] == 'noParent'
+      if parts[6].nil? or parts[6] == 'noParent'
         @parent = NoParent
       else
         @parent = parts[6][7..-1].to_i
@@ -69,18 +72,26 @@ class Life
   attr_accessor :birth, :death
 end
 
-lines = File.open("cache/lifeLog_server1.onehouronelife.com/2018_03March_09_Friday.txt", "r") {|f| f.readlines}
-
 lives = Hash.new {|h,k| h[k] = Life.new(k)}
 
-lines.each do |line|
-  log = Lifelog.create(line)
+dir = "cache/lifeLog_server1.onehouronelife.com"
+Dir.foreach(dir) do |path|
+  next unless path.match(/\d{4}_\d{2}/) and not path.match('_names.txt')
 
-  if log.kind_of?(Lifelog::Birth)
-    lives[log.player].birth = log
-  else
-    lives[log.player].death = log
+  p path
+
+  lines = File.open(File.join(dir, path), "r", :external_encoding => 'ASCII-8BIT') {|f| f.readlines}
+
+  lines.each do |line|
+    log = Lifelog.create(line)
+
+    if log.kind_of?(Lifelog::Birth)
+      lives[log.player].birth = log
+    else
+      lives[log.player].death = log
+    end
   end
 end
+#lines = File.open("cache/lifeLog_server1.onehouronelife.com/2018_03March_09_Friday.txt", "r") {|f| f.readlines}
 
 p lives.length
