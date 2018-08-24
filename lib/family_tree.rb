@@ -34,6 +34,28 @@ p lives.length
 
 p lives[lives.keys.first].id
 
-# 1110120
+#target = 1110120
+target = 1114108
 
-Graph.graph(lives).output('family_tree.gv', 'dot')
+cursor = lives[target]
+
+while cursor && lives[cursor.parent] && cursor.parent != Lifelog::NoParent
+  cursor = lives[cursor.parent]
+end
+
+focus = {}
+focus[cursor.id] = lives[target]
+
+count = 0
+while focus.length > count
+  count = focus.length
+  lives.values.each do |life|
+    if focus.include?(life.parent)
+      focus[life.id] = life
+    end
+  end
+end
+
+p focus.length
+
+Graph.graph(focus).output('family_tree.gv', 'dot')
