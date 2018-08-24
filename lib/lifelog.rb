@@ -1,5 +1,9 @@
 class Lifelog
-  module NoParent; end
+  module NoParent
+    def self.to_s
+      'noParent'
+    end
+  end
 
   def self.create(line)
     parts = line.split(' ')
@@ -70,28 +74,8 @@ class Life
   attr_reader :id
 
   attr_accessor :birth, :death
-end
 
-lives = Hash.new {|h,k| h[k] = Life.new(k)}
-
-dir = "cache/lifeLog_server1.onehouronelife.com"
-Dir.foreach(dir) do |path|
-  next unless path.match(/\d{4}_\d{2}/) and not path.match('_names.txt')
-
-  p path
-
-  lines = File.open(File.join(dir, path), "r", :external_encoding => 'ASCII-8BIT') {|f| f.readlines}
-
-  lines.each do |line|
-    log = Lifelog.create(line)
-
-    if log.kind_of?(Lifelog::Birth)
-      lives[log.player].birth = log
-    else
-      lives[log.player].death = log
-    end
+  def parent
+    birth.parent
   end
 end
-#lines = File.open("cache/lifeLog_server1.onehouronelife.com/2018_03March_09_Friday.txt", "r") {|f| f.readlines}
-
-p lives.length
