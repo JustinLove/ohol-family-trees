@@ -76,6 +76,10 @@ class Life
   attr_accessor :birth, :death
 
   def parent
-    birth.parent
+    (birth && birth.parent) || Lifelog::NoParent
+  end
+
+  def gender
+    (birth && birth.gender) || (death && death.gender)
   end
 end
