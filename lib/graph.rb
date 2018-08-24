@@ -4,26 +4,28 @@ module Graph
   def self.graph(lives)
     g = GraphvizR.new 'familytree'
     lives.values.each do |life|
-      us = g[life.id.to_s]
-      us [:label => life.name]
-      us = g[life.id.to_s]
+      us = life.id.to_s
+      g[us] [:label => [life.name, life.age.to_i, life.cause].join("\n")]
+
+      if life.cause.match('killer')
+        killer = life.cause.sub('killer_', '')
+        (g[us] >> g[killer]) [:color => 'red', :constraint => 'false']
+      end
 
       if life.gender == "F"
-        us [:shape => :ellipse]
+        g[us] [:shape => :ellipse]
       else
-        us [:shape => :box]
+        g[us] [:shape => :box]
       end
-      us = g[life.id.to_s]
 
       if life.parent == Lifelog::NoParent
-        us [:shape => :egg]
+        g[us] [:shape => :egg]
       elsif life.parent.nil?
-        us [:shape => :polygon]
+        g[us] [:shape => :polygon]
       else
-        parent = g[life.parent.to_s]
-        parent [:label => lives[life.parent].name]
-        parent = g[life.parent.to_s]
-        parent >> us
+        parent = life.parent.to_s
+        #g[parent] [:label => lives[life.parent].name]
+        g[parent] >> g[us]
       end
     end
 

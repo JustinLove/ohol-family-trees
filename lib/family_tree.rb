@@ -42,6 +42,28 @@ def load_dir(dir, lives)
   end
 end
 
+def add_family(target, lives)
+  cursor = target
+  while cursor && lives[cursor.parent] && cursor.parent != Lifelog::NoParent
+    cursor = lives[cursor.parent]
+  end
+
+  focus = {}
+  focus[cursor.id] = target
+
+  count = 0
+  while focus.length > count
+    count = focus.length
+    lives.values.each do |life|
+      if focus.include?(life.parent)
+        focus[life.id] = life
+      end
+    end
+  end
+
+  return focus
+end
+
 lives = Hash.new {|h,k| h[k] = Life.new(k)}
 #load_dir(dir, lives)
 load_log(dir+"/2018_08August_19_Sunday.txt", lives)
@@ -51,28 +73,24 @@ p lives.length
 
 p lives[lives.keys.first].id
 
+focus = {}
+
 #target = 1110120
 target = 1114108
+focus = add_family(lives[target], lives)
 
-cursor = lives[target]
+=begin
 
-while cursor && lives[cursor.parent] && cursor.parent != Lifelog::NoParent
-  cursor = lives[cursor.parent]
-end
-
-focus = {}
-focus[cursor.id] = lives[target]
-
-count = 0
-while focus.length > count
-  count = focus.length
-  lives.values.each do |life|
-    if focus.include?(life.parent)
-      focus[life.id] = life
-    end
+lives.values.select do |life|
+  if life.name == 'LILLY'
+    p life
+    family = add_family(life, lives)
+    p family.length
+    focus.merge!(family)
   end
 end
+=end
 
 p focus.length
 
-Graph.graph(focus).output('family_tree.gv', 'dot')
+Graph.graph(focus).output('test.gv', 'dot')
