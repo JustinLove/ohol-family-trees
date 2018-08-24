@@ -17,18 +17,35 @@ def load_log(path, lives)
   end
 end
 
+def load_names(path, lives)
+  lines = File.open(path, "r", :external_encoding => 'ASCII-8BIT') {|f| f.readlines}
+
+  lines.each do |line|
+    namelog = Namelog.new(line)
+
+    lives[namelog.id].name = namelog.name
+  end
+end
+
 def load_dir(dir, lives)
   Dir.foreach(dir) do |path|
-    next unless path.match(/\d{4}_\d{2}/) and not path.match('_names.txt')
+    next unless path.match(/\d{4}_\d{2}/)
+
     p path
 
-    load_log(File.join(dir, path), lives)
+    if path.match('_names.txt')
+      load_names(File.join(dir, path), lives)
+    else
+      load_log(File.join(dir, path), lives)
+    end
+
   end
 end
 
 lives = Hash.new {|h,k| h[k] = Life.new(k)}
 #load_dir(dir, lives)
 load_log(dir+"/2018_08August_19_Sunday.txt", lives)
+load_names(dir+"/2018_08August_19_Sunday_names.txt", lives)
 
 p lives.length
 

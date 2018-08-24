@@ -66,6 +66,16 @@ class Lifelog
   end
 end
 
+class Namelog
+  def initialize(line)
+    parts = line.split(' ')
+    @id = parts.shift.to_i
+    @name = parts.join(' ')
+  end
+
+  attr_reader :id, :name
+end
+
 class Life
   def initialize(id)
     @id = id
@@ -74,6 +84,14 @@ class Life
   attr_reader :id
 
   attr_accessor :birth, :death
+
+  def name=(text)
+    @name = text
+  end
+
+  def name
+    @name || ('p' + id.to_s)
+  end
 
   def parent
     (birth && birth.parent) || Lifelog::NoParent
