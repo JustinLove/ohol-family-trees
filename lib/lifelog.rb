@@ -84,6 +84,7 @@ class Life
   attr_reader :id
 
   attr_accessor :birth, :death
+  attr_accessor :highlight
 
   def name=(text)
     @name = text
@@ -95,6 +96,10 @@ class Life
 
   def time
     (birth && birth.time) || (death && death.time) || 0
+  end
+
+  def hash
+    (birth && birth.hash) || (death && death.hash)
   end
 
   def parent

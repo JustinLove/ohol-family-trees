@@ -1,5 +1,5 @@
 - resolve id resets on server 1
 - process multiple servers
-- life details on the graph
+- date updates
 - search method to narrow down life for graph
 - more user friendly?

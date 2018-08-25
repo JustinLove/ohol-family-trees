@@ -9,7 +9,15 @@ module Graph
 
       if life.cause.match('killer')
         killer = life.cause.sub('killer_', '')
-        (g[us] >> g[killer]) [:color => 'red', :constraint => 'false']
+        if lives.include?(killer.to_i)
+          #(g[us] >> g[killer]) [:color => 'red', :constraint => 'false']
+        else
+          (g[us] >> g[killer]) [:color => 'red']
+        end
+      end
+
+      if life.highlight
+        g[us] [:color => 'blue', :style => 'filled', :fontcolor => 'white']
       end
 
       if life.gender == "F"

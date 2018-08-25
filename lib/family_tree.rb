@@ -2,8 +2,6 @@ require 'lifelog'
 require 'graph'
 require 'date'
 
-dir = "cache/lifeLog_server1.onehouronelife.com"
-
 def load_log(path, lives)
   lines = File.open(path, "r", :external_encoding => 'ASCII-8BIT') {|f| f.readlines}
 
@@ -76,10 +74,18 @@ def ancestors(target, lives)
   return lineage
 end
 
-lives = Hash.new {|h,k| h[k] = Life.new(k)}
+# boots family
+#dir = "cache/lifeLog_server7.onehouronelife.com"
 #load_dir(dir, lives)
-load_log(dir+"/2018_08August_19_Sunday.txt", lives)
-load_names(dir+"/2018_08August_19_Sunday_names.txt", lives)
+#target = 6897
+#focus = add_family(lives[target], lives)
+
+dir = "cache/lifeLog_server1.onehouronelife.com"
+#dir = "cache/lifeLog_server7.onehouronelife.com"
+lives = Hash.new {|h,k| h[k] = Life.new(k)}
+load_dir(dir, lives)
+#load_log(dir+"/2018_08August_19_Sunday.txt", lives)
+#load_names(dir+"/2018_08August_19_Sunday_names.txt", lives)
 
 p lives.length
 
@@ -89,8 +95,8 @@ focus = {}
 
 # larger family
 #target = 1110120
-target = 1114108
-focus = add_family(lives[target], lives)
+#target = 1114108
+#focus = add_family(lives[target], lives)
 
 # small family
 #target = 1109187
@@ -99,6 +105,8 @@ focus = add_family(lives[target], lives)
 # small named family
 #target = 1110334
 #focus = add_family(lives[target], lives)
+
+wondible = 'e45aa4e489b35b6b0fd9f59f0049c688237a9a86'
 
 #focus = lives
 
@@ -122,14 +130,41 @@ lives.values.select do |life|
     lineage = ancestors(life, lives)
     if lineage[1] && lineage[1].name == 'ANA' && lineage[-1].name == 'EVE WEST'
       p life
+      p Time.at(life.time)
+      p Time.at(lineage[-1].time)
+      p life.id
       p lineage.map(&:name).join(', ')
       family = add_family(life, lives)
-      p family.length
+      #p family.length
+      focus.merge!(family)
+    end
+  end
+end
+
+lives.values.select do |life|
+  if life.hash == wondible
+    life.highlight = true
+    p [life.id, life.name, Time.at(life.time)]
+    if life.parent == Lifelog::NoParent
+      family = add_family(life, lives)
       focus.merge!(family)
     end
   end
 end
 =end
+
+from = (Date.today - 8).to_time.to_i
+
+lives.values.select do |life|
+  if life.hash == wondible
+    life.highlight = true
+    p [life.id, life.name, Time.at(life.time)]
+    if life.time > from
+      family = add_family(life, lives)
+      focus.merge!(family)
+    end
+  end
+end
 
 p focus.length
 
