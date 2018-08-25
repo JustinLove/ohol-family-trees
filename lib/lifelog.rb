@@ -51,7 +51,7 @@ class Lifelog
   class Death < Lifelog
     def initialize(parts)
       super
-      @age = parts[4][4..-1].to_f
+      @age = parts[4] && parts[4][4..-1].to_f
       @gender = parts[5]
       @coords = parts[6]
       @cause = parts[7]
@@ -91,6 +91,10 @@ class Life
 
   def name
     @name || ('p' + id.to_s)
+  end
+
+  def time
+    (birth && birth.time) || (death && death.time) || 0
   end
 
   def parent

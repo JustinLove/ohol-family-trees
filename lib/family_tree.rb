@@ -1,5 +1,6 @@
 require 'lifelog'
 require 'graph'
+require 'date'
 
 dir = "cache/lifeLog_server1.onehouronelife.com"
 
@@ -64,6 +65,17 @@ def add_family(target, lives)
   return focus
 end
 
+def ancestors(target, lives)
+  cursor = target
+  lineage = [target]
+  while cursor && lives[cursor.parent] && cursor.parent != Lifelog::NoParent
+    cursor = lives[cursor.parent]
+    lineage << cursor
+  end
+
+  return lineage
+end
+
 lives = Hash.new {|h,k| h[k] = Life.new(k)}
 #load_dir(dir, lives)
 load_log(dir+"/2018_08August_19_Sunday.txt", lives)
@@ -79,6 +91,9 @@ focus = {}
 target = 1114108
 focus = add_family(lives[target], lives)
 
+#target = 1109187
+#focus = add_family(lives[target], lives)
+
 =begin
 
 lives.values.select do |life|
@@ -89,8 +104,25 @@ lives.values.select do |life|
     focus.merge!(family)
   end
 end
+
+from = (Date.today << 4).to_time.to_i
+to = (Date.today << 2).to_time.to_i
+
+
+lives.values.select do |life|
+  if life.time > from && life.time < to && life.name == 'LILLY'
+    lineage = ancestors(life, lives)
+    if lineage[1] && lineage[1].name == 'ANA' && lineage[-1].name == 'EVE WEST'
+      p life
+      p lineage.map(&:name).join(', ')
+      family = add_family(life, lives)
+      p family.length
+      focus.merge!(family)
+    end
+  end
+end
 =end
 
 p focus.length
 
-Graph.graph(focus).output('test.gv', 'dot')
+Graph.graph(focus).output('family_tree.gv', 'dot')
