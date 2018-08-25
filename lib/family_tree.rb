@@ -50,7 +50,7 @@ def add_family(target, lives)
   end
 
   focus = {}
-  focus[cursor.id] = target
+  focus[cursor.id] = cursor
 
   count = 0
   while focus.length > count
@@ -87,12 +87,20 @@ p lives[lives.keys.first].id
 
 focus = {}
 
+# larger family
 #target = 1110120
 target = 1114108
 focus = add_family(lives[target], lives)
 
+# small family
 #target = 1109187
 #focus = add_family(lives[target], lives)
+
+# small named family
+#target = 1110334
+#focus = add_family(lives[target], lives)
+
+#focus = lives
 
 =begin
 
