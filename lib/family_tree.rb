@@ -74,18 +74,20 @@ def ancestors(target, lives)
   return lineage
 end
 
+lives = Hash.new {|h,k| h[k] = Life.new(k)}
+
+dir = "cache/lifeLog_server1.onehouronelife.com"
+#dir = "cache/lifeLog_server7.onehouronelife.com"
+load_dir(dir, lives)
+#load_log(dir+"/2018_08August_19_Sunday.txt", lives)
+#load_names(dir+"/2018_08August_19_Sunday_names.txt", lives)
+
 # boots family
 #dir = "cache/lifeLog_server7.onehouronelife.com"
 #load_dir(dir, lives)
 #target = 6897
 #focus = add_family(lives[target], lives)
 
-dir = "cache/lifeLog_server1.onehouronelife.com"
-#dir = "cache/lifeLog_server7.onehouronelife.com"
-lives = Hash.new {|h,k| h[k] = Life.new(k)}
-load_dir(dir, lives)
-#load_log(dir+"/2018_08August_19_Sunday.txt", lives)
-#load_names(dir+"/2018_08August_19_Sunday_names.txt", lives)
 
 p lives.length
 
@@ -165,6 +167,27 @@ lives.values.select do |life|
     end
   end
 end
+
+=begin
+from = (Date.today << 4).to_time.to_i
+to = (Date.today << 2).to_time.to_i
+
+lives.values.select do |life|
+  if life.time > from && life.time < to && life.name == 'LITA BOOTS'
+    lineage = ancestors(life, lives)
+    if lineage[1] && lineage[1].name == 'KING BOOTS' && lineage[-1].name == 'EVE BOOTS'
+      p life
+      p Time.at(life.time)
+      p Time.at(lineage[-1].time)
+      p life.id
+      p lineage.map(&:name).join(', ')
+      family = add_family(life, lives)
+      #p family.length
+      focus.merge!(family)
+    end
+  end
+end
+=end
 
 p focus.length
 

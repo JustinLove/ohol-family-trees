@@ -10,7 +10,7 @@ module Graph
       if life.cause.match('killer')
         killer = life.cause.sub('killer_', '')
         if lives.include?(killer.to_i)
-          #(g[us] >> g[killer]) [:color => 'red', :constraint => 'false']
+          (g[us] >> g[killer]) [:color => 'red', :constraint => 'false']
         else
           (g[us] >> g[killer]) [:color => 'red']
         end
