@@ -25,7 +25,11 @@ module Graph
         cback = Color::RGB.from_html(sback)
         cfore = Color::RGB.from_html(sfore)
         palette = Color::Palette::MonoContrast.new(cback, cfore)
-        g[us] [:color => palette.background[0].html, :style => 'filled', :fontcolor => palette.foreground[0].html]
+        if life.age < 3
+          g[us] [:color => palette.background[5].html, :style => 'filled', :fontcolor => palette.foreground[-5].html]
+        else
+          g[us] [:color => palette.background[0].html, :style => 'filled', :fontcolor => palette.foreground[0].html]
+        end
       end
 
       if life.highlight
