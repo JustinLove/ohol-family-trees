@@ -30,39 +30,6 @@ focus = History.new
 
 #focus = lives
 
-=begin
-
-lives.select do |life|
-  if life.name == 'LILLY'
-    p life
-    family = lives.family(life)
-    p family.length
-    focus.merge!(family)
-  end
-end
-
-from = (Date.today << 4).to_time.to_i
-to = (Date.today << 2).to_time.to_i
-
-
-lives.select do |life|
-  if life.time > from && life.time < to && life.name == 'LILLY'
-    lineage = lives.ancestors(life)
-    if lineage[1] && lineage[1].name == 'ANA' && lineage[-1].name == 'EVE WEST'
-      p life
-      p Time.at(life.time)
-      p Time.at(lineage[-1].time)
-      p life.id
-      p lineage.map(&:name).join(', ')
-      family = lives.family(life)
-      #p family.length
-      focus.merge!(family)
-    end
-  end
-end
-
-=end
-
 p focus.length
 
 Graph.graph(focus).output('family_tree.gv', 'dot')
