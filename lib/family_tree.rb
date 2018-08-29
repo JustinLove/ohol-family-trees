@@ -28,8 +28,6 @@ focus = History.new
 #target = 1110334
 #focus = lives.family(lives[target])
 
-wondible = 'e45aa4e489b35b6b0fd9f59f0049c688237a9a86'
-
 #focus = lives
 
 =begin
@@ -63,30 +61,7 @@ lives.select do |life|
   end
 end
 
-lives.select do |life|
-  if life.hash == wondible
-    life.highlight = true
-    p [life.id, life.name, Time.at(life.time)]
-    if life.parent == Lifelog::NoParent
-      family = lives.family(life)
-      focus.merge!(family)
-    end
-  end
-end
 =end
-
-from = (Date.today - 8).to_time.to_i
-
-lives.select do |life|
-  if life.hash == wondible
-    life.highlight = true
-    p [life.id, life.name, Time.at(life.time)]
-    if life.time > from
-      family = lives.family(life)
-      focus.merge!(family)
-    end
-  end
-end
 
 p focus.length
 
