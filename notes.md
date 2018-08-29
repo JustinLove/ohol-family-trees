@@ -2,4 +2,4 @@
 - process multiple servers
 - search method to narrow down life for graph
 - more user friendly?
-- color code by player
+- position by time?

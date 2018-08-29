@@ -3,6 +3,7 @@ GEM
   specs:
     GraphvizR (0.5.1)
       hoe (>= 1.2.0)
+    color (1.8)
     hoe (3.17.0)
       rake (>= 0.8, < 13.0)
     httpclient (2.8.3)
@@ -16,6 +17,7 @@ PLATFORMS
 
 DEPENDENCIES
   GraphvizR
+  color
   httpclient
   nokogiri
 
