@@ -20,10 +20,6 @@ focus = History.new
 #target = 1114108
 #focus = lives.family(lives[target])
 
-# small family
-#target = 1109187
-#focus = lives.family(lives[target])
-
 #focus = lives
 
 p focus.length
