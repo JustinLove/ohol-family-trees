@@ -3,7 +3,7 @@ require 'graphviz_r'
 module Graph
   def self.graph(lives)
     g = GraphvizR.new 'familytree'
-    lives.values.each do |life|
+    lives.each do |life|
       us = life.id.to_s
       g[us] [:label => [life.name, life.age.to_i, life.cause].join("\n")]
 
