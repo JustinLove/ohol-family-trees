@@ -59,9 +59,13 @@ class History
     end
   end
 
-  def load_dir(dir)
+  def load_dir(dir, time_range = (Time.at(0)..Time.now))
     Dir.foreach(dir) do |path|
-      next unless path.match(/\d{4}_\d{2}/)
+      dateparts = path.match(/(\d{4})_(\d{2})\w+_(\d{2})/)
+      next unless dateparts
+
+      approx_log_time = Time.gm(dateparts[1], dateparts[2], dateparts[3])
+      next unless time_range.cover?(approx_log_time)
 
       p path
 

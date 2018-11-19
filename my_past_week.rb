@@ -6,16 +6,18 @@ require 'date'
 (1..15).each do |server|
   lives = History.new
 
+  wondible = 'e45aa4e489b35b6b0fd9f59f0049c688237a9a86'
+  from_time = (Date.today - 1).to_time
+  to_time = (Date.today - 0).to_time
+
   dir = "cache/lifeLog_server#{server}.onehouronelife.com"
-  lives.load_dir(dir)
+  lives.load_dir(dir, ((from_time - 60*60*24*3)..(to_time + 60*60*24*3)))
 
   p lives.length
 
   lines = {}
-
-  wondible = 'e45aa4e489b35b6b0fd9f59f0049c688237a9a86'
-  from = (Date.today - 1).to_time.to_i
-  to = (Date.today - 0).to_time.to_i
+  from = from_time.to_i
+  to = to_time.to_i
 
   lives.select do |life|
     if life.hash == wondible
