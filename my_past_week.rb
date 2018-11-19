@@ -36,6 +36,6 @@ require 'date'
 
   lines.each do |id,line|
     eve = line[id]
-    Graph.graph(line).output("output/#{eve.name}.gv", 'dot')
+    Graph.graph(line).output("output/#{Time.at(eve.time).strftime('%Y-%m-%d')}_#{line.length}_#{eve.name}.gv", 'dot')
   end
 end
