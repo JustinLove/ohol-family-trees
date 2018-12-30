@@ -10,6 +10,7 @@ def fetch_file(path, cache_path, date = Time.at(0))
   if File.exist?(cache_path) && date < File.mtime(cache_path)
     return File.open(cache_path, "r") {|f| f.read}
   else
+    p path
     contents = $http.get_content(BaseUrl + path)
 
     File.open(cache_path, "w") do |f|
@@ -43,7 +44,6 @@ server_list.each do |path,date|
 
   log_paths = extract_path_list(index)
   log_paths.each do |log_path,log_date|
-    p log_path
     fetch_file("#{path}#{log_path}", "cache/#{path}#{log_path}", log_date)
   end
 end

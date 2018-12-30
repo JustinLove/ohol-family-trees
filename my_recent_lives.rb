@@ -7,7 +7,7 @@ require 'date'
   lives = History.new
 
   wondible = 'e45aa4e489b35b6b0fd9f59f0049c688237a9a86'
-  from_time = (Date.today - 7).to_time
+  from_time = (Date.today - 1).to_time
   to_time = (Date.today - 0).to_time
 
   dir = "cache/lifeLog_server#{server}.onehouronelife.com"
@@ -23,13 +23,11 @@ require 'date'
     if life.hash == wondible
       life.highlight = true
       p [life.id, life.name, Time.at(life.time)]
-      if life.time > from && life.time < to
+      if life.time > from && life.time < to && life.age > 3
         eve = lives.ancestors(life).last
         unless lines[eve.id]
           lines[eve.id] = lives.family(eve)
         end
-        #family = lives.family(life)
-        #focus.merge!(family)
       end
     end
   end
