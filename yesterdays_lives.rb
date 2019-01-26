@@ -3,14 +3,15 @@ require 'history'
 require 'graph'
 require 'date'
 
-(1..15).each do |server|
+from_time = (Date.today - 1).to_time
+to_time = (Date.today - 0).to_time
+
+Dir.foreach("cache/") do |dir|
+  next unless dir.match(".onehouronelife.com")
+
   lives = History.new
 
-  from_time = (Date.today - 1).to_time
-  to_time = (Date.today - 0).to_time
-
-  dir = "cache/lifeLog_server#{server}.onehouronelife.com"
-  lives.load_dir(dir, ((from_time - 60*60*24*3)..(to_time + 60*60*24*3)))
+  lives.load_dir("cache/"+dir, ((from_time - 60*60*24*3)..(to_time + 60*60*24*3)))
 
   p lives.length
 
