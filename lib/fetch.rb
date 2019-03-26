@@ -2,7 +2,7 @@ require 'httpclient'
 require 'nokogiri'
 require 'fileutils'
 
-BaseUrl = "http://onehouronelife.com/publicLifeLogData/"
+BaseUrl = "http://publicdata.onehouronelife.com/publicLifeLogData/"
 
 $http = HTTPClient.new
 

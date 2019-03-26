@@ -8,8 +8,7 @@ from_time = (Date.today - 1).to_time
 to_time = (Date.today - 0).to_time
 
 Dir.foreach("cache/") do |dir|
-#(1..15).each do |server|
-  next unless dir.match(".onehouronelife.com")
+  next unless dir.match("lifeLog_")
 
   lives = History.new
 
