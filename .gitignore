@@ -1,3 +1,5 @@
 cache
 *.gv
 *.svg
+elm-stuff
+ui/public/family-tree-viewer.js
