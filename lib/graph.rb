@@ -55,4 +55,11 @@ module Graph
 
     return g
   end
+
+  def self.html(lives, filename)
+    @wrapper ||= File.read(File.dirname(__FILE__) + '/wrapper.html')
+    svg = graph(lives).data('svg')
+    html = @wrapper.sub('#svg#', svg)
+    File.write(filename, html)
+  end
 end

@@ -1,5 +1,7 @@
 cache
 *.gv
 *.svg
+*.png
+output/*.html
 elm-stuff
 ui/public/family-tree-viewer.js
