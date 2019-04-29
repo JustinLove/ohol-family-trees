@@ -31,14 +31,14 @@ class Lifelog
     def initialize(parts)
       super
       @gender = parts[4]
-      @coords = parts[5]
+      @coords = parts[5].gsub(/\(|\)/, '').split(',')
       if parts[6].nil? or parts[6] == 'noParent'
         @parent = NoParent
       else
         @parent = parts[6][7..-1].to_i
       end
       @population = parts[7]
-      @chain = parts[8]
+      @chain = parts[8][6..-1].to_i
     end
 
     attr_reader :gender,
@@ -53,7 +53,7 @@ class Lifelog
       super
       @age = parts[4] && parts[4][4..-1].to_f
       @gender = parts[5]
-      @coords = parts[6]
+      @coords = parts[6].gsub(/\(|\)/, '').split(',')
       @cause = parts[7]
       @population = parts[8]
     end
@@ -94,6 +94,10 @@ class Life
     @name || ('p' + id.to_s)
   end
 
+  def name_or_blank
+    @name
+  end
+
   def time
     (birth && birth.time) || (death && death.time) || 0
   end
@@ -104,6 +108,10 @@ class Life
 
   def parent
     (birth && birth.parent) || Lifelog::NoParent
+  end
+
+  def chain
+    (birth && birth.chain) || 0
   end
 
   def gender

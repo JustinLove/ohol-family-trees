@@ -3,5 +3,6 @@ cache
 *.svg
 *.png
 output/*.html
+output/*.csv
 elm-stuff
 ui/public/family-tree-viewer.js
