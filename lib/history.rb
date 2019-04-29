@@ -3,9 +3,11 @@ require 'lifelog'
 class History
   def initialize
     @lives = Hash.new {|h,k| h[k] = Life.new(k)}
+    @epoch = 0
   end
 
-  attr_reader :lives
+  attr_reader :lives,
+    :epoch
 
   def [](key)
     @lives[key]
@@ -39,12 +41,17 @@ class History
     lines = File.open(path, "r", :external_encoding => 'ASCII-8BIT') {|f| f.readlines}
 
     lines.each do |line|
-      log = Lifelog.create(line)
+      log = Lifelog.create(line, epoch)
 
       if log.kind_of?(Lifelog::Birth)
-        lives[log.player].birth = log
+        if log.playerid == 2
+          @epoch += 1
+          log.epoch = epoch
+          #p [epoch, path]
+        end
+        lives[log.key].birth = log
       else
-        lives[log.player].death = log
+        lives[log.key].death = log
       end
     end
   end
@@ -55,7 +62,13 @@ class History
     lines.each do |line|
       namelog = Namelog.new(line)
 
-      lives[namelog.id].name = namelog.name
+      (0..epoch).to_a.reverse.each do |e|
+        key = "e#{e}p#{namelog.playerid}"
+        if lives[key]
+          lives[key].name = namelog.name
+          break
+        end
+      end
     end
   end
 
@@ -67,7 +80,7 @@ class History
       approx_log_time = Time.gm(dateparts[1], dateparts[2], dateparts[3])
       next unless time_range.cover?(approx_log_time)
 
-      p path
+      #p path
 
       if path.match('_names.txt')
         load_names(File.join(dir, path))
@@ -96,14 +109,14 @@ class History
     end
 
     focus = History.new
-    focus[cursor.id] = cursor
+    focus[cursor.key] = cursor
 
     count = 0
     while focus.length > count
       count = focus.length
       lives.values.each do |life|
         if focus.include?(life.parent)
-          focus[life.id] = life
+          focus[life.key] = life
         end
       end
     end

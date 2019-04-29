@@ -22,14 +22,14 @@ Dir.foreach("cache/") do |dir|
   lives.select do |life|
     if life.time > from && life.time < to
       eve = lives.ancestors(life).last
-      unless lines[eve.id]
-        lines[eve.id] = lives.family(eve)
+      unless lines[eve.key]
+        lines[eve.key] = lives.family(eve)
       end
     end
   end
 
-  lines.each do |id,line|
-    eve = line[id]
+  lines.each do |key,line|
+    eve = line[key]
     Graph.graph(line).output("output/#{Time.at(eve.time).strftime('%Y-%m-%d')}_#{line.length}_#{eve.name}.gv", 'dot')
   end
 end

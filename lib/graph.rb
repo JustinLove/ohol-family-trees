@@ -6,12 +6,12 @@ module Graph
   def self.graph(lives)
     g = GraphvizR.new 'familytree'
     lives.each do |life|
-      us = life.id.to_s
+      us = life.key
       g[us] [:label => [life.name, life.age.to_i, life.cause].join("\n")]
 
-      if life.cause.match('killer')
-        killer = life.cause.sub('killer_', '')
-        if lives.include?(killer.to_i)
+      killer = life.killer
+      if killer
+        if lives.include?(killer)
           (g[us] >> g[killer]) [:color => 'red', :constraint => 'false']
         else
           (g[us] >> g[killer]) [:color => 'red']

@@ -20,6 +20,6 @@ Edit `my_recent_lives.rb` to put in your player hash. This outputs svg wrapped i
 
 `ruby -Ilib my_recent_lives.rb`
 
-There are a couple other scripts that work similarly, some left from testing. Notably, `boots.rb` is broken due to a player id reset, and `lives_export.rb` can be used to lives with births, deaths, and names combined for further analysis.
+There are a couple other scripts that work similarly, some left from testing. Notably `lives_export.rb` can be used to lives with births, deaths, and names combined for further analysis.
 
 

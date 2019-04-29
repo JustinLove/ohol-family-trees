@@ -5,55 +5,69 @@ class Lifelog
     end
   end
 
-  def self.create(line)
+  def self.create(line, epoch = 0)
     parts = line.split(' ')
     if parts.first == 'B'
-      Birth.new(parts)
+      Birth.new(parts, epoch)
     elsif parts.first == 'D'
-      Death.new(parts)
+      Death.new(parts, epoch)
     else
       p line
       raise "unknown line type #{parts.first}"
     end
   end
 
-  def initialize(parts)
+  def initialize(parts, epoch = 0)
+    @epoch = epoch
     @time = parts[1].to_i
-    @player = parts[2].to_i
+    @playerid = parts[2].to_i
     @hash = parts[3]
   end
 
   attr_reader :time,
-    :player,
-    :hash
+    :playerid,
+    :hash,
+    :epoch
+  attr_writer :epoch
+
+  def key
+    "e#{epoch}p#{playerid}"
+  end
 
   class Birth < Lifelog
-    def initialize(parts)
+    def initialize(parts, epoch = 0)
       super
       @gender = parts[4]
-      @coords = parts[5].gsub(/\(|\)/, '').split(',')
+      @coords = parts[5] && parts[5].gsub(/\(|\)/, '').split(',')
       if parts[6].nil? or parts[6] == 'noParent'
         @parent = NoParent
       else
         @parent = parts[6][7..-1].to_i
       end
       @population = parts[7]
-      @chain = parts[8][6..-1].to_i
+      @chain = parts[8] && parts[8][6..-1].to_i
     end
 
     attr_reader :gender,
       :coords,
-      :parent,
       :population,
       :chain
+
+    def parent
+      if @parent == NoParent
+        return NoParent
+      else
+        "e#{epoch}p#{@parent}"
+      end
+    end
   end
 
   class Death < Lifelog
-    def initialize(parts)
+    def initialize(parts, epoch = 0)
       super
       @age = parts[4] && parts[4][4..-1].to_f
       @gender = parts[5]
-      @coords = parts[6].gsub(/\(|\)/, '').split(',')
+      @coords = parts[6] && parts[6].gsub(/\(|\)/, '').split(',')
       @cause = parts[7]
       @population = parts[8]
     end
@@ -63,35 +77,46 @@ class Lifelog
       :coords,
       :cause,
       :population
+
+    def killer
+      if cause.match('killer')
+        pid = cause.sub('killer_', '')
+        "e#{epoch}p#{pid}"
+      end
+    end
   end
 end
 
 class Namelog
   def initialize(line)
     parts = line.split(' ')
-    @id = parts.shift.to_i
+    @playerid = parts.shift.to_i
     @name = parts.join(' ')
   end
 
-  attr_reader :id, :name
+  attr_reader :playerid, :name
 end
 
 class Life
-  def initialize(id)
-    @id = id
+  def initialize(key)
+    @key = key
   end
 
-  attr_reader :id
+  attr_reader :key
 
   attr_accessor :birth, :death
   attr_accessor :highlight
+
+  def playerid
+    (birth && birth.playerid) || (death && death.playerid) || 0
+  end
 
   def name=(text)
     @name = text
   end
 
   def name
-    @name || ('p' + id.to_s)
+    @name || ('p' + playerid.to_s)
   end
 
   def name_or_blank
@@ -124,5 +149,9 @@ class Life
 
   def cause
     (death && death.cause) || "unknown"
+  end
+
+  def killer
+    (death && death.killer)
   end
 end

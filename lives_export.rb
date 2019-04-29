@@ -43,7 +43,7 @@ Dir.foreach("cache/") do |dir|
       if life.time > from && life.time < to
         csv << [
           life.hash,
-          life.id,
+          life.playerid,
           life.gender,
           life.parent,
           life.chain,

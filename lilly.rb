@@ -25,7 +25,7 @@ lives.select do |life|
       p life
       p Time.at(life.time)
       p Time.at(lineage[-1].time)
-      p life.id
+      p life.key
       p lineage.map(&:name).join(', ')
       family = lives.family(life)
       #p family.length
