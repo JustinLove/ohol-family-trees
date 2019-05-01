@@ -38,10 +38,11 @@ class History
   end
 
   def load_log(path)
+    server = path.match(/lifeLog_(.*)\//)[1]
     lines = File.open(path, "r", :external_encoding => 'ASCII-8BIT') {|f| f.readlines}
 
     lines.each do |line|
-      log = Lifelog.create(line, epoch)
+      log = Lifelog.create(line, epoch, server)
 
       if log.kind_of?(Lifelog::Birth)
         if log.playerid == 2
@@ -57,13 +58,14 @@ class History
   end
 
   def load_names(path)
+    server = path.match(/lifeLog_(.*)\//)[1]
     lines = File.open(path, "r", :external_encoding => 'ASCII-8BIT') {|f| f.readlines}
 
     lines.each do |line|
       namelog = Namelog.new(line)
 
       (0..epoch).to_a.reverse.each do |e|
-        key = "e#{e}p#{namelog.playerid}"
+        key = Lifelog.key(namelog.playerid, e, server)
         if lives[key]
           lives[key].name = namelog.name
           break

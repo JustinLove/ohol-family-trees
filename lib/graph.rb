@@ -6,11 +6,11 @@ module Graph
   def self.graph(lives)
     g = GraphvizR.new 'familytree'
     lives.each do |life|
-      us = life.key
+      us = life.key.gsub('.', '')
       g[us] [:label => [life.name, life.age.to_i, life.cause].join("\n")]
 
-      killer = life.killer
-      if killer
+      if life.killer
+        killer = life.killer.gsub('.', '')
         if lives.include?(killer)
           (g[us] >> g[killer]) [:color => 'red', :constraint => 'false']
         else
@@ -47,7 +47,7 @@ module Graph
       elsif life.parent.nil?
         g[us] [:shape => :polygon]
       else
-        parent = life.parent.to_s
+        parent = life.parent.gsub('.', '')
         #g[parent] [:label => lives[life.parent].name]
         g[parent] >> g[us]
       end

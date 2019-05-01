@@ -5,37 +5,43 @@ class Lifelog
     end
   end
 
-  def self.create(line, epoch = 0)
+  def self.create(line, epoch = 0, server = '?')
     parts = line.split(' ')
     if parts.first == 'B'
-      Birth.new(parts, epoch)
+      Birth.new(parts, epoch, server)
     elsif parts.first == 'D'
-      Death.new(parts, epoch)
+      Death.new(parts, epoch, server)
     else
       p line
       raise "unknown line type #{parts.first}"
     end
   end
 
-  def initialize(parts, epoch = 0)
-    @epoch = epoch
+  def self.key(playerid, epoch, server)
+    "p#{playerid}e#{epoch}s#{server}"
+  end
+
+  def initialize(parts, epoch = 0, server = '?')
     @time = parts[1].to_i
     @playerid = parts[2].to_i
     @hash = parts[3]
+    @epoch = epoch
+    @server = server
   end
 
   attr_reader :time,
     :playerid,
     :hash,
-    :epoch
+    :epoch,
+    :server
   attr_writer :epoch
 
   def key
-    "e#{epoch}p#{playerid}"
+    Lifelog.key(playerid, epoch, server)
   end
 
   class Birth < Lifelog
-    def initialize(parts, epoch = 0)
+    def initialize(parts, epoch = 0, server = '?')
       super
       @gender = parts[4]
       @coords = parts[5] && parts[5].gsub(/\(|\)/, '').split(',')
@@ -57,13 +63,13 @@ class Lifelog
       if @parent == NoParent
         return NoParent
       else
-        "e#{epoch}p#{@parent}"
+        Lifelog.key(@parent, epoch, server)
       end
     end
   end
 
   class Death < Lifelog
-    def initialize(parts, epoch = 0)
+    def initialize(parts, epoch = 0, server = '?')
       super
       @age = parts[4] && parts[4][4..-1].to_f
       @gender = parts[5]
@@ -81,7 +87,7 @@ class Lifelog
     def killer
       if cause.match('killer')
         pid = cause.sub('killer_', '')
-        "e#{epoch}p#{pid}"
+        Lifelog.key(pid, epoch, server)
       end
     end
   end

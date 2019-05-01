@@ -1,4 +1,3 @@
-- resolve id resets on server 1
 - process multiple servers
 - search method to narrow down life for graph
 - more user friendly?
