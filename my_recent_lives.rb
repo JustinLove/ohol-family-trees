@@ -2,10 +2,16 @@ require 'lifelog'
 require 'history'
 require 'graph'
 require 'date'
+require 'csv'
 
 wondible = 'e45aa4e489b35b6b0fd9f59f0049c688237a9a86'
 from_time = (Date.today - 4).to_time
 to_time = (Date.today - 0).to_time
+
+known_players = {}
+CSV.foreach("known-players.csv") do |row|
+  known_players[row[0]] = row[1]
+end
 
 Dir.foreach("cache/") do |dir|
   next unless dir.match("lifeLog_")
@@ -24,10 +30,16 @@ Dir.foreach("cache/") do |dir|
     if life.hash == wondible
       life.highlight = true
       p [life.key, life.name, Time.at(life.time)]
-      if life.time > from && life.time < to && life.age > 3
+      if life.time > from && life.time < to && life.lifetime > 3
         eve = lives.ancestors(life).last
         unless lines[eve.key]
           lines[eve.key] = lives.family(eve)
+          lines[eve.key].each do |l|
+            l.player_name = known_players[l.hash]
+            if l.player_name
+              l.highlight
+            end
+          end
         end
       end
     end

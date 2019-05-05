@@ -112,6 +112,7 @@ class Life
 
   attr_accessor :birth, :death
   attr_accessor :highlight
+  attr_accessor :player_name
 
   def playerid
     (birth && birth.playerid) || (death && death.playerid) || 0
@@ -151,6 +152,14 @@ class Life
 
   def age
     (death && death.age) || 0.0
+  end
+
+  def lifetime
+    if birth && death
+      (death.time - birth.time).to_f / 60
+    else
+      0
+    end
   end
 
   def cause

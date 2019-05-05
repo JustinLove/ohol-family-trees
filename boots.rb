@@ -2,6 +2,7 @@ require 'lifelog'
 require 'history'
 require 'graph'
 require 'date'
+require 'csv'
 
 lives = History.new
 
@@ -11,6 +12,10 @@ lives.load_dir(dir)
 #target = 6897
 #focus = lives.family(lives[target])
 
+known_players = {}
+CSV.foreach("known-players.csv") do |row|
+  known_players[row[0]] = row[1]
+end
 
 p lives.length
 
@@ -35,6 +40,13 @@ lives.select do |life|
 end
 
 p focus.length
+
+focus.each do |l|
+  l.player_name = known_players[l.hash]
+  if l.player_name
+    l.highlight
+  end
+end
 
 filename = "output/boots.html"
 #Graph.graph(focus).output(filename, 'dot')

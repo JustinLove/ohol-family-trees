@@ -7,7 +7,7 @@ module Graph
     g = GraphvizR.new 'familytree'
     lives.each do |life|
       us = life.key.gsub('.', '')
-      g[us] [:label => [life.name, life.age.to_i, life.cause].join("\n")]
+      g[us] [:label => [life.name, life.age.to_i, life.cause, life.player_name].compact.join("\n")]
 
       if life.killer
         killer = life.killer.gsub('.', '')

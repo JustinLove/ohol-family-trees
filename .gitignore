@@ -2,6 +2,7 @@ cache
 *.gv
 *.svg
 *.png
+known-players.csv
 output/*.html
 output/*.csv
 elm-stuff
