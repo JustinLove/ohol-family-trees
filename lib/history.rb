@@ -33,8 +33,8 @@ class History
     @lives.values.each(&block)
   end
 
-  def include?(key)
-    @lives.include?(key)
+  def has_key?(key)
+    @lives.has_key?(key)
   end
 
   def load_log(path)
@@ -117,7 +117,7 @@ class History
     while focus.length > count
       count = focus.length
       lives.values.each do |life|
-        if focus.include?(life.parent)
+        if focus.has_key?(life.parent)
           focus[life.key] = life
         end
       end
@@ -131,7 +131,7 @@ class History
     while focus.length > count
       count = focus.length
       focus.each do |life|
-        if life.killer && !focus.include?(life.killer)
+        if life.killer && !focus.has_key?(life.killer)
           focus.merge!(family(lives[life.killer]))
         end
       end

@@ -6,15 +6,16 @@ module Graph
   def self.graph(lives)
     g = GraphViz.new(:G, :type => :digraph)
     lives.each do |life|
-      uskey = life.key.gsub('.', '')
-      us = g.get_node(uskey) || g.add_nodes(uskey)
+      ournodename = life.key.gsub('.', '')
+      us = g.get_node(ournodename) || g.add_nodes(ournodename)
       us[:label] = [life.name, life.age.to_i, life.cause, life.player_name].compact.join("\n")
 
       if life.killer
-        killerkey = life.killer.gsub('.', '')
-        killer = g.get_node(killerkey) || g.add_nodes(killerkey)
-        if lives.include?(killerkey)
+        killernodename = life.killer.gsub('.', '')
+        killer = g.get_node(killernodename) || g.add_nodes(killernodename)
+        if lives.has_key?(life.killer)
           g.add_edges(us, killer, :color => 'red', :constraint => 'false')
+          us[:label] = [life.name, life.age.to_i, "Killed by #{lives[life.killer].name}", life.player_name].compact.join("\n")
         else
           g.add_edges(us, killer, :color => 'red')
         end
