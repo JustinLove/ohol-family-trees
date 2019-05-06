@@ -106,17 +106,51 @@ end
 class Life
   def initialize(key)
     @key = key
+    @playerid = 0
+    @parent = Lifelog::NoParent
+    @chain = 0
+    @age = 0.0
+    @cause = "unkown"
+  end
+
+  def birth=(birth)
+    return unless birth
+    @playerid = birth.playerid
+    @birth_time = birth.time
+    @birth_coords = birth.coords
+    @hash = birth.hash
+    @parent = birth.parent
+    @chain = birth.chain
+    @gender = birth.gender
+  end
+
+  def death=(death)
+    return unless death
+    @playerid = death.playerid
+    @death_time = death.time
+    @death_coords = death.coords
+    @hash = death.hash
+    @gender = death.gender
+    @age = death.age
+    @cause = death.cause
+    @killer = death.killer
   end
 
   attr_reader :key
 
-  attr_accessor :birth, :death
   attr_accessor :highlight
   attr_accessor :player_name
-
-  def playerid
-    (birth && birth.playerid) || (death && death.playerid) || 0
-  end
+  attr_reader :playerid
+  attr_reader :time
+  attr_reader :birth_time
+  attr_reader :death_time
+  attr_reader :hash
+  attr_reader :parent
+  attr_reader :chain
+  attr_reader :gender
+  attr_reader :age
+  attr_reader :cause
+  attr_reader :killer
 
   def name=(text)
     @name = text
@@ -131,42 +165,14 @@ class Life
   end
 
   def time
-    (birth && birth.time) || (death && death.time) || 0
-  end
-
-  def hash
-    (birth && birth.hash) || (death && death.hash)
-  end
-
-  def parent
-    (birth && birth.parent) || Lifelog::NoParent
-  end
-
-  def chain
-    (birth && birth.chain) || 0
-  end
-
-  def gender
-    (birth && birth.gender) || (death && death.gender)
-  end
-
-  def age
-    (death && death.age) || 0.0
+    birth_time || death_time
   end
 
   def lifetime
-    if birth && death
-      (death.time - birth.time).to_f / 60
+    if birth_time && death_time
+      (death_time - birth_time).to_f / 60
     else
       0
     end
-  end
-
-  def cause
-    (death && death.cause) || "unknown"
-  end
-
-  def killer
-    (death && death.killer)
   end
 end
