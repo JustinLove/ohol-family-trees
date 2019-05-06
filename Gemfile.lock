@@ -1,25 +1,21 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    GraphvizR (0.5.1)
-      hoe (>= 1.2.0)
     color (1.8)
-    hoe (3.17.0)
-      rake (>= 0.8, < 13.0)
     httpclient (2.8.3)
     mini_portile2 (2.4.0)
     nokogiri (1.10.3-x64-mingw32)
       mini_portile2 (~> 2.4.0)
-    rake (12.3.1)
+    ruby-graphviz (1.2.4)
 
 PLATFORMS
   x64-mingw32
 
 DEPENDENCIES
-  GraphvizR
   color
   httpclient
   nokogiri (>= 1.8.5)
+  ruby-graphviz
 
 BUNDLED WITH
    1.16.4

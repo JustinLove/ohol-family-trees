@@ -33,22 +33,20 @@ Dir.foreach("cache/") do |dir|
       if life.time > from && life.time < to && life.lifetime > 3
         eve = lives.ancestors(life).last
         unless lines[eve.key]
-          lines[eve.key] = lives.family(eve)
-          lines[eve.key].each do |l|
+          line = lines[eve.key] = lives.family(eve)
+          #lives.outsiders(line) #tends to hang outputting
+          line.each do |l|
             l.player_name = known_players[l.hash]
             if l.player_name
-              l.highlight
+              l.highlight = true
             end
           end
+          filename = "output/#{Time.at(eve.time).strftime('%Y-%m-%d')}_#{line.length}_#{eve.name}"
+          p filename
+          #Graph.graph(line).output(:dot => filename + ".gv")
+          Graph.html(line, filename + ".html")
         end
       end
     end
-  end
-
-  lines.each do |key,line|
-    eve = line[key]
-    filename = "output/#{Time.at(eve.time).strftime('%Y-%m-%d')}_#{line.length}_#{eve.name}"
-    #Graph.graph(line).output(filename + ".gv", 'dot')
-    Graph.html(line, filename + ".html")
   end
 end

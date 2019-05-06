@@ -125,4 +125,16 @@ class History
 
     return focus
   end
+
+  def outsiders(focus)
+    count = 0
+    while focus.length > count
+      count = focus.length
+      lives.values.each do |life|
+        if life.killer && !focus.include?(life.killer)
+          focus.merge!(family(lives[life.killer]))
+        end
+      end
+    end
+  end
 end

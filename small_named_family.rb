@@ -17,4 +17,4 @@ focus = lives.family(lives[target])
 
 p focus.length
 
-Graph.graph(focus).output('small_named_family.gv', 'dot')
+Graph.graph(focus).output(:dot => "small_named_family.gv")

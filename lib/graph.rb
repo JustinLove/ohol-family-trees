@@ -1,20 +1,20 @@
-require 'graphviz_r'
+require 'ruby-graphviz'
 require 'color/palette/monocontrast'
 require 'color/rgb'
 
 module Graph
   def self.graph(lives)
-    g = GraphvizR.new 'familytree'
+    g = GraphViz.new(:G, :type => :digraph)
     lives.each do |life|
-      us = life.key.gsub('.', '')
-      g[us] [:label => [life.name, life.age.to_i, life.cause, life.player_name].compact.join("\n")]
+      uskey = life.key.gsub('.', '')
+      us = g.add_nodes(uskey, :label => [life.name, life.age.to_i, life.cause, life.player_name].compact.join("\n"))
 
       if life.killer
         killer = life.killer.gsub('.', '')
         if lives.include?(killer)
-          (g[us] >> g[killer]) [:color => 'red', :constraint => 'false']
+          g.add_edges(us, g.add_nodes(killer), :color => 'red', :constraint => 'false')
         else
-          (g[us] >> g[killer]) [:color => 'red']
+          g.add_edges(us, g.add_nodes(killer), :color => 'red')
         end
       end
 
@@ -26,30 +26,34 @@ module Graph
         cfore = Color::RGB.from_html(sfore)
         palette = Color::Palette::MonoContrast.new(cback, cfore)
         if life.age < 3
-          g[us] [:color => palette.background[5].html, :style => 'filled', :fontcolor => palette.foreground[-5].html]
+          us[:color] = palette.background[5].html
+          us[:style] = 'filled'
+          us[:fontcolor] = palette.foreground[-5].html
         else
-          g[us] [:color => palette.background[0].html, :style => 'filled', :fontcolor => palette.foreground[0].html]
+          us[:color] = palette.background[0].html
+          us[:style] = 'filled'
+          us[:fontcolor] = palette.foreground[0].html
         end
       end
 
       if life.highlight
-        g[us] [:fontsize => '48']
+        us[:fontsize] = '48'
       end
 
       if life.gender == "F"
-        g[us] [:shape => :ellipse]
+        us[:shape] = :ellipse
       else
-        g[us] [:shape => :box]
+        us[:shape] = :box
       end
 
       if life.parent == Lifelog::NoParent
-        g[us] [:shape => :egg]
+        us[:shape] = :egg
       elsif life.parent.nil?
-        g[us] [:shape => :polygon]
+        us[:shape] = :polygon
       else
         parent = life.parent.gsub('.', '')
         #g[parent] [:label => lives[life.parent].name]
-        g[parent] >> g[us]
+        g.add_edges(g.add_nodes(parent), us)
       end
     end
 
@@ -58,7 +62,7 @@ module Graph
 
   def self.html(lives, filename)
     @wrapper ||= File.read(File.dirname(__FILE__) + '/wrapper.html')
-    svg = graph(lives).data('svg')
+    svg = graph(lives).output('svg' => String)
     html = @wrapper.sub('#svg#', svg)
     File.write(filename, html)
   end

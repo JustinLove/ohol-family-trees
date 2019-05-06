@@ -48,6 +48,6 @@ focus.each do |l|
   end
 end
 
-filename = "output/boots.html"
-#Graph.graph(focus).output(filename, 'dot')
-Graph.html(focus, filename)
+filename = "output/boots"
+#Graph.graph(line).output(:dot => filename + ".gv")
+Graph.html(focus, filename + ".html")
