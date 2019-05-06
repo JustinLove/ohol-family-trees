@@ -39,6 +39,7 @@ lives.select do |life|
   end
 end
 
+#lives.outsiders(focus) #tends to hang outputting
 p focus.length
 
 focus.each do |l|
@@ -49,5 +50,5 @@ focus.each do |l|
 end
 
 filename = "output/boots"
-#Graph.graph(line).output(:dot => filename + ".gv")
+#Graph.graph(focus).output(:dot => filename + ".gv")
 Graph.html(focus, filename + ".html")

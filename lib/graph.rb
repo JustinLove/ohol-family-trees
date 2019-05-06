@@ -7,14 +7,16 @@ module Graph
     g = GraphViz.new(:G, :type => :digraph)
     lives.each do |life|
       uskey = life.key.gsub('.', '')
-      us = g.add_nodes(uskey, :label => [life.name, life.age.to_i, life.cause, life.player_name].compact.join("\n"))
+      us = g.get_node(uskey) || g.add_nodes(uskey)
+      us[:label] = [life.name, life.age.to_i, life.cause, life.player_name].compact.join("\n")
 
       if life.killer
-        killer = life.killer.gsub('.', '')
-        if lives.include?(killer)
-          g.add_edges(us, g.add_nodes(killer), :color => 'red', :constraint => 'false')
+        killerkey = life.killer.gsub('.', '')
+        killer = g.get_node(killerkey) || g.add_nodes(killerkey)
+        if lives.include?(killerkey)
+          g.add_edges(us, killer, :color => 'red', :constraint => 'false')
         else
-          g.add_edges(us, g.add_nodes(killer), :color => 'red')
+          g.add_edges(us, killer, :color => 'red')
         end
       end
 
@@ -51,9 +53,10 @@ module Graph
       elsif life.parent.nil?
         us[:shape] = :polygon
       else
-        parent = life.parent.gsub('.', '')
+        parentkey = life.parent.gsub('.', '')
         #g[parent] [:label => lives[life.parent].name]
-        g.add_edges(g.add_nodes(parent), us)
+        parent = g.get_node(parentkey) || g.add_nodes(parentkey)
+        g.add_edges(parent, us)
       end
     end
 
