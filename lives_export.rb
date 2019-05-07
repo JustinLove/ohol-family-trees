@@ -4,7 +4,7 @@ require 'graph'
 require 'date'
 require 'csv'
 
-from_time = (Date.today - 1).to_time
+from_time = (Date.today - 2).to_time
 to_time = (Date.today - 0).to_time
 
 Dir.foreach("cache/") do |dir|
@@ -25,7 +25,7 @@ Dir.foreach("cache/") do |dir|
   CSV.open("output/#{server}_#{from_time.to_date}_#{to_time.to_date}.csv", 'wb') do |csv|
     csv << [
       "hash",
-      "id",
+      "key",
       "gender",
       "parent",
       "chain",
@@ -43,16 +43,16 @@ Dir.foreach("cache/") do |dir|
       if life.time > from && life.time < to
         csv << [
           life.hash,
-          life.playerid,
+          life.key,
           life.gender,
           life.parent,
           life.chain,
           life.birth_time,
-          life.birth_coords[0],
-          life.birth_coords[1],
+          life.birth_coords && life.birth_coords[0],
+          life.birth_coords && life.birth_coords[1],
           life.death_time,
-          life.death_coords[0],
-          life.death_coords[1],
+          life.death_coords && life.death_coords[0],
+          life.death_coords && life.death_coords[1],
           life.age,
           life.cause,
           life.name_or_blank,

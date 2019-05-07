@@ -110,7 +110,7 @@ class Life
     @parent = Lifelog::NoParent
     @chain = 0
     @age = 0.0
-    @cause = "unkown"
+    @cause = "unknown"
   end
 
   def birth=(birth)
@@ -143,7 +143,9 @@ class Life
   attr_reader :playerid
   attr_reader :time
   attr_reader :birth_time
+  attr_reader :birth_coords
   attr_reader :death_time
+  attr_reader :death_coords
   attr_reader :hash
   attr_reader :parent
   attr_reader :chain

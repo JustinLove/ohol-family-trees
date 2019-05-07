@@ -66,7 +66,7 @@ class History
 
       (0..epoch).to_a.reverse.each do |e|
         key = Lifelog.key(namelog.playerid, e, server)
-        if lives[key]
+        if lives.has_key?(key)
           lives[key].name = namelog.name
           break
         end
@@ -96,7 +96,7 @@ class History
   def ancestors(target)
     cursor = target
     lineage = [target]
-    while cursor && lives[cursor.parent] && cursor.parent != Lifelog::NoParent
+    while cursor && lives.has_key?(cursor.parent) && cursor.parent != Lifelog::NoParent
       cursor = lives[cursor.parent]
       lineage << cursor
     end
@@ -106,7 +106,7 @@ class History
 
   def family(target)
     cursor = target
-    while cursor && lives[cursor.parent] && cursor.parent != Lifelog::NoParent
+    while cursor && lives.has_key?(cursor.parent) && cursor.parent != Lifelog::NoParent
       cursor = lives[cursor.parent]
     end
 
