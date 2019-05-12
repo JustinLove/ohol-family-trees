@@ -85,7 +85,7 @@ class Lifelog
       :population
 
     def killer
-      if cause.match('killer')
+      if cause && cause.match('killer')
         pid = cause.sub('killer_', '')
         Lifelog.key(pid, epoch, server)
       end
