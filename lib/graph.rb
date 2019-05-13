@@ -29,12 +29,16 @@ module Graph
         cfore = Color::RGB.from_html(sfore)
         palette = Color::Palette::MonoContrast.new(cback, cfore)
         if life.age < 3
-          us[:color] = palette.background[5].html
-          us[:style] = 'filled'
+          us[:fillcolor] = palette.background[5].html
+          us[:color] = palette.foreground[-5].html
+          us[:penwidth] = 1
+          us[:style] = 'filled,solid'
           us[:fontcolor] = palette.foreground[-5].html
         else
-          us[:color] = palette.background[0].html
-          us[:style] = 'filled'
+          us[:fillcolor] = palette.background[0].html
+          us[:color] = sfore
+          us[:penwidth] = 4
+          us[:style] = 'filled,solid'
           us[:fontcolor] = palette.foreground[0].html
         end
       end
