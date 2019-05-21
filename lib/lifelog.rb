@@ -44,7 +44,7 @@ class Lifelog
     def initialize(parts, epoch = 0, server = '?')
       super
       @gender = parts[4]
-      @coords = parts[5] && parts[5].gsub(/\(|\)/, '').split(',')
+      @coords = parts[5] && parts[5].gsub(/\(|\)/, '').split(',').map(&:to_i)
       if parts[6].nil? or parts[6] == 'noParent'
         @parent = NoParent
       else
@@ -73,7 +73,7 @@ class Lifelog
       super
       @age = parts[4] && parts[4][4..-1].to_f
       @gender = parts[5]
-      @coords = parts[6] && parts[6].gsub(/\(|\)/, '').split(',')
+      @coords = parts[6] && parts[6].gsub(/\(|\)/, '').split(',').map(&:to_i)
       @cause = parts[7]
       @population = parts[8]
     end

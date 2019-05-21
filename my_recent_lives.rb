@@ -10,7 +10,7 @@ to_time = (Date.today - 0).to_time
 
 known_players = {}
 CSV.foreach("known-players.csv") do |row|
-  known_players[row[0]] = row[1]
+  known_players[row[0]] = row[1] #if row[1] == 'wondible'
 end
 
 Dir.foreach("cache/") do |dir|
