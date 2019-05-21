@@ -4,11 +4,14 @@ GEM
     color (1.8)
     httpclient (2.8.3)
     mini_portile2 (2.4.0)
+    nokogiri (1.10.3)
+      mini_portile2 (~> 2.4.0)
     nokogiri (1.10.3-x64-mingw32)
       mini_portile2 (~> 2.4.0)
     ruby-graphviz (1.2.4)
 
 PLATFORMS
+  ruby
   x64-mingw32
 
 DEPENDENCIES
