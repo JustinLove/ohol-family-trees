@@ -51,4 +51,4 @@ end
 
 filename = "output/boots"
 #Graph.graph(focus).output(:dot => filename + ".gv")
-Graph.html(focus, filename + ".html")
+Graph.html(filename + ".html", focus)

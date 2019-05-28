@@ -33,6 +33,6 @@ Dir.foreach("cache/") do |dir|
     filename = "output/#{Time.at(eve.time).strftime('%Y-%m-%d')}_#{line.length}_#{eve.name}"
     p filename
     #Graph.graph(line).output(:dot => filename + ".gv")
-    Graph.html(line, filename + ".html")
+    Graph.html(filename + ".html", line)
   end
 end

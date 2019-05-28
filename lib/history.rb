@@ -137,4 +137,14 @@ class History
       end
     end
   end
+
+  def killers(victims)
+    focus = History.new
+    victims.each do |life|
+      if life.killer && !victims.has_key?(life.killer)
+        focus[life.killer] = lives[life.killer]
+      end
+    end
+    return focus
+  end
 end

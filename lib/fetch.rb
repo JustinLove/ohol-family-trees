@@ -66,6 +66,6 @@ monument_directory = fetch_file(MonumentsUrl, "", "cache/monuments/index.html", 
 monument_list = extract_monument_path_list(monument_directory)
 
 monument_list.each do |path|
-  fetch_file(MonumentsUrl, path, "cache/monuments/#{path}")
+  fetch_file(MonumentsUrl, path, "cache/monuments/#{path}", Time.now)
 end
 
