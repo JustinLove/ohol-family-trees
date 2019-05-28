@@ -3,8 +3,6 @@ cache
 *.svg
 *.png
 known-players.csv
-output/*.html
-output/*.csv
-output/*.json
+output
 elm-stuff
 ui/public/family-tree-viewer.js
