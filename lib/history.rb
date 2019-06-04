@@ -39,9 +39,8 @@ class History
 
   def load_log(path)
     server = path.match(/lifeLog_(.*)\//)[1]
-    lines = File.open(path, "r", :external_encoding => 'ASCII-8BIT') {|f| f.readlines}
-
-    lines.each do |line|
+    file = File.open(path, "r", :external_encoding => 'ASCII-8BIT')
+    while line = file.gets
       log = Lifelog.create(line, epoch, server)
 
       if log.kind_of?(Lifelog::Birth)
@@ -59,9 +58,9 @@ class History
 
   def load_names(path)
     server = path.match(/lifeLog_(.*)\//)[1]
-    lines = File.open(path, "r", :external_encoding => 'ASCII-8BIT') {|f| f.readlines}
+    file = File.open(path, "r", :external_encoding => 'ASCII-8BIT')
 
-    lines.each do |line|
+    while line = file.gets
       namelog = Namelog.new(line)
 
       (0..epoch).to_a.reverse.each do |e|
@@ -84,7 +83,9 @@ class History
 
       #p path
 
-      if path.match('_names.txt')
+      if block_given?
+        yield File.join(dir, path)
+      elsif path.match('_names.txt')
         load_names(File.join(dir, path))
       else
         load_log(File.join(dir, path))

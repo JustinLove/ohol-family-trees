@@ -13,7 +13,7 @@ Dir.foreach("cache/monuments") do |dir|
   json = []
 
   monuments.each do |monument|
-    json << [monument.x, monument.y, monument.date]
+    json << [monument.x, monument.y, monument.date, monument.server]
   end
 
   File.open("output/#{server}_monuments.json", 'wb') do |file|

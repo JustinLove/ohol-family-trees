@@ -6,6 +6,7 @@ module Graph
   def self.graph(lives, others = {})
     g = GraphViz.new(:G, :type => :digraph)
     lives.each do |life|
+      next if life.age < 0.5
       us = node(g, life)
 
       if life.killer

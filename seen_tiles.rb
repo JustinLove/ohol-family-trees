@@ -4,82 +4,88 @@ require 'date'
 require 'json'
 require 'progress_bar'
 
-#from_time = (Date.today - 2).to_time
-#to_time = (Date.today - 0).to_time
+zoom_levels = 24..24
+#zoom_levels = 24..24
 
-Dir.foreach("cache/") do |dir|
-  next unless dir.match("lifeLog_")
-  next if dir.match("bigserver")
+zoom_levels.each do |zoom|
+  tile_width = 2**(32 - zoom)
+  around = 500 / tile_width
+  p around
+  range = (-around..around)
+  Dir.foreach("cache/") do |dir|
+  #do
+    #dir = "lifeLog_bigserver2.onehouronelife.com"
+    next unless dir.match("lifeLog_")
 
-  lives = History.new
+    lives = History.new
 
-  puts dir
+    #p dir
 
-  #lives.load_dir("cache/"+dir, ((from_time - 60*60*24*1)..(to_time + 60*60*24*1)))
-  lives.load_dir("cache/"+dir)
+    server = dir.sub('lifeLog_', '').sub('.onehouronelife.com', '')
 
-  #p lives.length
-  next unless lives.length > 0
+    # level 29:
+    #next if server.match('big')
+    #next if server.match('server1')
+    #next if server == 'server2'
 
-  #from = from_time.to_i
-  #to = to_time.to_i
+    p "#{server} #{zoom}"
 
-  server = dir.sub('lifeLog_', '').sub('.onehouronelife.com', '')
-  #next unless server == 'bigserver2'
+    files = Dir.entries("cache/"+dir).reject {|path| path.match('_names.txt')}.size
+    bar = ProgressBar.new(files)
 
-  zoom_levels = 28..28
-  #zoom_levels = 24..24
+    chunk_size = 10000000
+    chunk_number = 0
+    sparse = Hash.new {|h,k| h[k] = 0}
 
-  zoom_levels.each do |zoom|
-    puts "#{server} #{zoom}"
-    tile_width = 2**(32 - zoom)
-    around = 500 / tile_width
-    p around
-    bar = ProgressBar.new(lives.lives.size)
-    lives.lives.values.each_slice(100000).each_with_index do |chunk,i|
-      puts "#{server} #{zoom} #{i}"
-      puts chunk.size
-      sparse = Hash.new {|h,k| h[k] = 0}
-      chunk.each_with_index do |life,l|
-        x, y = life.birth_coords
+    from_time = (Date.today - 7).to_time
+    to_time = (Date.today - 0).to_time
+    lives.load_dir("cache/"+dir, ((from_time - 60*60*24*1)..(to_time + 60*60*24*1))) do |path|
+    #lives.load_dir("cache/"+dir) do |path|
+    #path = "cache/lifeLog_bigserver2.onehouronelife.com/2019_05May_29_Wednesday.txt"
+    #do
+      next if path.match('_names.txt')
+
+      #p path
+      logfile = File.open(path, "r", :external_encoding => 'ASCII-8BIT')
+      i = 0
+      while line = logfile.gets
+        i += 1
+        log = Lifelog.create(line, 0, server)
+
+        x, y = log.coords
         unless x.nil? || y.nil?
           tilex = x / tile_width
           tiley = (-y / tile_width)
           #p [x, y, tilex, tiley]
-          (-around..around).each do |dx|
-            (-around..around).each do |dy|
-              sparse[[tilex + dx,tiley + dy]] += 1
+          range.each do |dx|
+            range.each do |dy|
+              sparse["#{tilex + dx} #{tiley + dy}"] += 1
             end
           end
-        end
-
-        x, y = life.death_coords
-        unless x.nil? || y.nil?
-          tilex = x / tile_width
-          tiley = (-y / tile_width)
-          #p [x, y, tilex, tiley]
-          (-around..around).each do |dx|
-            (-around..around).each do |dy|
-              sparse[[tilex + dx,tiley + dy]] += 1
-            end
-          end
-        end
-
-        if l % 100 == 99
-          bar.increment! 100
         end
       end
 
-      puts "writing #{sparse.size}"
-      File.open("output/tilelists/#{server}_#{zoom}_#{i}_tiles.txt", 'wb') do |file|
-        sparse.each_pair do |key,value|
-          file << (key.join(' ') + "\n")
+      bar.increment!
+
+      if sparse.size > chunk_size
+        p "writing #{sparse.size}"
+        File.open("output/tilelists_update/#{server}_#{zoom}_#{chunk_number}_tiles.txt", 'wb') do |out|
+          sparse.each_pair do |key,value|
+            out << (key + "\n")
+          end
         end
+        chunk_number += 1
+        sparse = Hash.new {|h,k| h[k] = 0}
       end
     end
+
+    p "writing #{sparse.size} - final"
+    File.open("output/tilelists_update/#{server}_#{zoom}_#{chunk_number}_tiles.txt", 'wb') do |list|
+      sparse.each_pair do |key,value|
+        list << (key + "\n")
+      end
+    end
+    chunk_number += 1
+    sparse = nil
   end
-
-  #p sparse
-
-
 end
