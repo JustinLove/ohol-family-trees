@@ -109,6 +109,7 @@ class Life
     @playerid = 0
     @parent = Lifelog::NoParent
     @chain = 0
+    @lineage = 0
     @age = 0.0
     @cause = "unknown"
   end
@@ -140,6 +141,7 @@ class Life
 
   attr_accessor :highlight
   attr_accessor :player_name
+  attr_accessor :lineage
   attr_reader :playerid
   attr_reader :time
   attr_reader :birth_time
