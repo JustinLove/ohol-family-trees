@@ -1,3 +1,13 @@
+PATH
+  remote: .
+  specs:
+    ohol-family-trees (0.0.0)
+      color
+      httpclient
+      nokogiri (>= 1.8.5)
+      progress_bar
+      ruby-graphviz
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -20,11 +30,7 @@ PLATFORMS
   x64-mingw32
 
 DEPENDENCIES
-  color
-  httpclient
-  nokogiri (>= 1.8.5)
-  progress_bar
-  ruby-graphviz
+  ohol-family-trees!
 
 BUNDLED WITH
    1.16.4
