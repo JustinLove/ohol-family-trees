@@ -1,5 +1,7 @@
-require 'monument'
+require 'ohol-family-trees/monument'
 require 'json'
+
+include OHOLFamilyTrees
 
 Dir.foreach("cache/monuments") do |dir|
   next unless dir.match("onehouronelife.com.php")

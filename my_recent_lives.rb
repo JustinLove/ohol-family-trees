@@ -1,9 +1,11 @@
-require 'lifelog'
-require 'history'
-require 'graph'
+require 'ohol-family-trees/lifelog'
+require 'ohol-family-trees/history'
+require 'ohol-family-trees/graph'
 require 'date'
 require 'csv'
 require 'json'
+
+include OHOLFamilyTrees
 
 wondible = 'e45aa4e489b35b6b0fd9f59f0049c688237a9a86'
 from_time = (Date.today - 2).to_time

@@ -1,7 +1,9 @@
-require 'lifelog'
-require 'history'
-require 'graph'
+require 'ohol-family-trees/lifelog'
+require 'ohol-family-trees/history'
+require 'ohol-family-trees/graph'
 require 'date'
+
+include OHOLFamilyTrees
 
 Dir.foreach("cache/") do |dir|
   next unless dir.match("lifeLog_")

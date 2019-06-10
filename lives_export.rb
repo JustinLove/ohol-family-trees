@@ -1,8 +1,10 @@
-require 'lifelog'
-require 'history'
-require 'graph'
+require 'ohol-family-tress/lifelog'
+require 'ohol-family-tress/history'
+require 'ohol-family-tress/graph'
 require 'date'
 require 'csv'
+
+include OHOLFamilyTrees
 
 from_time = (Date.today - 2).to_time
 to_time = (Date.today - 0).to_time

@@ -1,7 +1,9 @@
-require 'lifelog'
-require 'history'
-require 'graph'
+require 'ohol-family-trees/lifelog'
+require 'ohol-family-trees/history'
+require 'ohol-family-trees/graph'
 require 'date'
+
+include OHOLFamilyTrees
 
 from_time = (Date.today - 1).to_time
 to_time = (Date.today - 0).to_time

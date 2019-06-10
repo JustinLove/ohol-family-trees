@@ -1,10 +1,12 @@
-require 'lifelog'
-require 'history'
+require 'ohol-family-trees/lifelog'
+require 'ohol-family-trees/history'
 require 'date'
 require 'json'
 require 'progress_bar'
 
-zoom_levels = 24..24
+include OHOLFamilyTrees
+
+zoom_levels = 1..24
 #zoom_levels = 24..24
 
 zoom_levels.each do |zoom|
