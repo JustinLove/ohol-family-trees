@@ -147,29 +147,29 @@ module OHOLFamilyTrees
 
     def birth=(birth)
       return unless birth
-      @playerid = birth.playerid
-      @epoch = birth.epoch
-      @birth_time = birth.time
-      @birth_coords = birth.coords
-      @birth_population = birth.population
-      @hash = birth.hash
-      @parent = birth.parent
-      @chain = birth.chain
-      @gender = birth.gender
+      @playerid = birth.playerid if birth.playerid
+      @epoch = birth.epoch if birth.epoch
+      @birth_time = birth.time if birth.time
+      @birth_coords = birth.coords if birth.coords
+      @birth_population = birth.population if birth.population
+      @hash = birth.hash if birth.hash
+      @parent = birth.parent if birth.parent
+      @chain = birth.chain if birth.chain
+      @gender = birth.gender if birth.gender
     end
 
     def death=(death)
       return unless death
-      @playerid = death.playerid
-      @epoch = death.epoch
-      @death_time = death.time
-      @death_coords = death.coords
-      @death_population = death.population
-      @hash = death.hash
-      @gender = death.gender
-      @age = death.age
-      @cause = death.cause
-      @killer = death.killer
+      @playerid = death.playerid if death.playerid
+      @epoch = death.epoch if death.epoch
+      @death_time = death.time if death.time
+      @death_coords = death.coords if death.coords
+      @death_population = death.population if death.population
+      @hash = death.hash if death.hash
+      @gender = death.gender if death.gender
+      @age = death.age if death.age
+      @cause = death.cause if death.cause
+      @killer = death.killer if death.killer
     end
 
     attr_reader :key

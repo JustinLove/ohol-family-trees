@@ -83,11 +83,11 @@ module OHOLFamilyTrees
         #p path
 
         if block_given?
-          yield File.join(dir, path)
+          yield path
         elsif path.match('_names.txt')
           load_names(File.join(dir, path))
         else
-        #  load_log(File.join(dir, path))
+          load_log(File.join(dir, path))
         end
 
       end
