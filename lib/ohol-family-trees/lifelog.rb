@@ -7,7 +7,7 @@ module OHOLFamilyTrees
     end
 
     def self.create(line, epoch = 0, server = '?')
-      parts = line.gsub("\x00ff", '').split(' ')
+      parts = line.tr("\xff".force_encoding("ASCII-8BIT"), '').split(' ')
       if parts.first == 'B'
         Birth.new(parts, epoch, server)
       elsif parts.first == 'D'
