@@ -6,7 +6,7 @@ require 'json'
 
 include OHOLFamilyTrees
 
-from_time = (Date.today - 2).to_time
+from_time = (Date.today - 3).to_time
 to_time = (Date.today - 0).to_time
 
 #from_time = (Time.gm(2019, 6, 3))
@@ -26,7 +26,7 @@ Dir.foreach("cache/") do |dir|
   next unless lives.length > 0
 
   to = lives.lives.values.last.time
-  from = to - 60*60*24
+  from = to - 60*60*48
 #  from = from_time.to_i
 #  to = to_time.to_i
 

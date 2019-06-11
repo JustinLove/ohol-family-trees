@@ -7,7 +7,7 @@ module OHOLFamilyTrees
     end
 
     def self.create(line, epoch = 0, server = '?')
-      parts = line.split(' ')
+      parts = line.gsub("\x00ff", '').split(' ')
       if parts.first == 'B'
         Birth.new(parts, epoch, server)
       elsif parts.first == 'D'
@@ -47,24 +47,25 @@ module OHOLFamilyTrees
         @gender = parts[4]
         @coords = parts[5] && parts[5].gsub(/\(|\)/, '').split(',').map(&:to_i)
         if parts[6].nil? or parts[6] == 'noParent'
-          @parent = NoParent
+          @parentid = NoParent
         else
-          @parent = parts[6][7..-1].to_i
+          @parentid = parts[6][7..-1].to_i
         end
-        @population = parts[7]
+        @population = parts[7] && parts[7][4..-1].to_i
         @chain = parts[8] && parts[8][6..-1].to_i
       end
 
       attr_reader :gender,
         :coords,
         :population,
-        :chain
+        :chain,
+        :parentid
 
       def parent
-        if @parent == NoParent
+        if @parentid == NoParent
           return NoParent
         else
-          Lifelog.key(@parent, epoch, server)
+          Lifelog.key(@parentid, epoch, server)
         end
       end
     end
@@ -76,7 +77,7 @@ module OHOLFamilyTrees
         @gender = parts[5]
         @coords = parts[6] && parts[6].gsub(/\(|\)/, '').split(',').map(&:to_i)
         @cause = parts[7]
-        @population = parts[8]
+        @population = parts[8] && parts[8][4..-1].to_i
       end
 
       attr_reader :age,
@@ -84,6 +85,12 @@ module OHOLFamilyTrees
         :coords,
         :cause,
         :population
+
+      def killerid
+        if cause && cause.match('killer')
+          cause.sub('killer_', '')
+        end
+      end
 
       def killer
         if cause && cause.match('killer')
@@ -138,6 +145,7 @@ module OHOLFamilyTrees
       @key = key
       @playerid = 0
       @epoch = 0
+      @parentid = Lifelog::NoParent
       @parent = Lifelog::NoParent
       @chain = 0
       @lineage = 0
@@ -153,6 +161,7 @@ module OHOLFamilyTrees
       @birth_coords = birth.coords if birth.coords
       @birth_population = birth.population if birth.population
       @hash = birth.hash if birth.hash
+      @parentid = birth.parentid if birth.parentid
       @parent = birth.parent if birth.parent
       @chain = birth.chain if birth.chain
       @gender = birth.gender if birth.gender
@@ -188,6 +197,7 @@ module OHOLFamilyTrees
     attr_reader :death_population
     attr_reader :hash
     attr_reader :parent
+    attr_reader :parentid
     attr_reader :chain
     attr_reader :gender
     attr_reader :age
