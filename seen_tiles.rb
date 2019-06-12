@@ -1,5 +1,6 @@
 require 'ohol-family-trees/lifelog'
 require 'ohol-family-trees/history'
+require 'ohol-family-trees/lifelog_cache'
 require 'date'
 require 'json'
 require 'progress_bar'
@@ -14,16 +15,14 @@ zoom_levels.each do |zoom|
   around = 500 / tile_width
   p around
   range = (-around..around)
-  Dir.foreach("cache/") do |dir|
+  LifelogCache::Servers.new.each do |logs|
   #do
     #dir = "lifeLog_bigserver2.onehouronelife.com"
-    next unless dir.match("lifeLog_")
-
     lives = History.new
 
     #p dir
 
-    server = dir.sub('lifeLog_', '').sub('.onehouronelife.com', '')
+    server = logs.server
 
     # level 29:
     #next if server.match('big')
@@ -32,8 +31,8 @@ zoom_levels.each do |zoom|
 
     p "#{server} #{zoom}"
 
-    files = Dir.entries("cache/"+dir).reject {|path| path.match('_names.txt')}.size
-    bar = ProgressBar.new(files)
+    #files = Dir.entries("cache/"+dir).reject {|path| path.match('_names.txt')}.size
+    bar = ProgressBar.new()
 
     chunk_size = 10000000
     chunk_number = 0
@@ -41,16 +40,16 @@ zoom_levels.each do |zoom|
 
     from_time = (Date.today - 7).to_time
     to_time = (Date.today - 0).to_time
-    lives.load_dir("cache/"+dir, ((from_time - 60*60*24*1)..(to_time + 60*60*24*1))) do |path|
+    lives.load_server(logs, ((from_time - 60*60*24*1)..(to_time + 60*60*24*1))) do |logfile|
     #lives.load_dir("cache/"+dir) do |path|
     #path = "cache/lifeLog_bigserver2.onehouronelife.com/2019_05May_29_Wednesday.txt"
     #do
-      next if path.match('_names.txt')
+      next if logfile.names?
 
       #p path
-      logfile = File.open(path, "r", :external_encoding => 'ASCII-8BIT')
+      file = logfile.open
       i = 0
-      while line = logfile.gets
+      while line = file.gets
         i += 1
         log = Lifelog.create(line, 0, server)
 

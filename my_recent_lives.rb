@@ -1,5 +1,6 @@
 require 'ohol-family-trees/lifelog'
 require 'ohol-family-trees/history'
+require 'ohol-family-trees/lifelog_cache'
 require 'ohol-family-trees/graph'
 require 'date'
 require 'csv'
@@ -8,7 +9,7 @@ require 'json'
 include OHOLFamilyTrees
 
 wondible = 'e45aa4e489b35b6b0fd9f59f0049c688237a9a86'
-from_time = (Date.today - 2).to_time
+from_time = (Date.today - 5).to_time
 to_time = (Date.today - 0).to_time
 
 known_players = {}
@@ -16,18 +17,17 @@ CSV.foreach("known-players.csv") do |row|
   known_players[row[0]] = row[1] #if row[1] == 'wondible'
 end
 
-
-Dir.foreach("cache/") do |dir|
-  next unless dir.match("lifeLog_")
-
+LifelogCache::Servers.new.each do |logs|
+  #p logs
   lives_json = []
-  server = dir.sub('lifeLog_', '').sub('.onehouronelife.com', '')
+  server = logs.server
 
   lives = History.new
 
-  lives.load_dir("cache/"+dir, ((from_time - 60*60*24*3)..(to_time + 60*60*24*3)))
+  time_range = (from_time - 60*60*24*3)..(to_time + 60*60*24*3)
+  lives.load_server(logs, time_range)
 
-  p [dir, lives.length]
+  p [logs.server, lives.length]
 
   lines = {}
   from = from_time.to_i

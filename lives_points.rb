@@ -1,5 +1,6 @@
 require 'ohol-family-trees/lifelog'
 require 'ohol-family-trees/history'
+require 'ohol-family-trees/lifelog_cache'
 require 'ohol-family-trees/graph'
 require 'date'
 require 'json'
@@ -13,14 +14,12 @@ to_time = (Date.today - 0).to_time
 #to_time = (Time.gm(2019, 6, 3))
 p from_time
 
-Dir.foreach("cache/") do |dir|
-  next unless dir.match("lifeLog_")
-  next unless dir.match("bigserver2")
+LifelogCache::Servers.new.each do |logs|
+  next unless logs.server == "bigserver2"
 
   lives = History.new
 
-  lives.load_dir("cache/"+dir, ((from_time - 60*60*24*3)..(to_time + 60*60*24*1)))
-  #lives.load_dir("cache/"+dir, ((from_time)..(to_time)))
+  lives.load_server(logs, ((from_time - 60*60*24*3)..(to_time + 60*60*24*1)))
 
   p lives.length
   next unless lives.length > 0
@@ -30,7 +29,7 @@ Dir.foreach("cache/") do |dir|
 #  from = from_time.to_i
 #  to = to_time.to_i
 
-  server = dir.sub('lifeLog_', '').sub('.onehouronelife.com', '')
+  server = logs.server
   json = []
 
   lives.each do |l|

@@ -1,5 +1,6 @@
 require 'ohol-family-trees/lifelog'
 require 'ohol-family-trees/history'
+require 'ohol-family-trees/lifelog_cache'
 require 'ohol-family-trees/graph'
 require 'date'
 require 'csv'
@@ -9,8 +10,8 @@ include OHOLFamilyTrees
 lives = History.new
 
 # boots family
-dir = "cache/lifeLog_server7.onehouronelife.com"
-lives.load_dir(dir)
+logs = LifelogCache::Logs.new("lifeLog_server7.onehouronelife.com")
+lives.load_server(logs)
 #target = 6897
 #focus = lives.family(lives[target])
 

@@ -38,9 +38,9 @@ module OHOLFamilyTrees
       @lives.has_key?(key)
     end
 
-    def load_log(path)
-      server = path.match(/lifeLog_(.*)\//)[1]
-      file = File.open(path, "r", :external_encoding => 'ASCII-8BIT')
+    def load_log(logfile)
+      server = logfile.server
+      file = logfile.open
       while line = file.gets
         log = Lifelog.create(line, epoch, server)
 
@@ -57,9 +57,9 @@ module OHOLFamilyTrees
       end
     end
 
-    def load_names(path)
-      server = path.match(/lifeLog_(.*)\//)[1]
-      file = File.open(path, "r", :external_encoding => 'ASCII-8BIT')
+    def load_names(logfile)
+      server = logfile.server
+      file = logfile.open
 
       while namelog = Namelog.next_log(file)
         (0..epoch).to_a.reverse.each do |e|
@@ -72,24 +72,15 @@ module OHOLFamilyTrees
       end
     end
 
-    def load_dir(dir, time_range = (Time.at(0)..Time.now))
-      Dir.foreach(dir) do |path|
-        dateparts = path.match(/(\d{4})_(\d{2})\w+_(\d{2})/)
-        next unless dateparts
-
-        approx_log_time = Time.gm(dateparts[1], dateparts[2], dateparts[3])
-        next unless time_range.cover?(approx_log_time)
-
-        #p path
-
-        if block_given?
-          yield path
-        elsif path.match('_names.txt')
-          load_names(File.join(dir, path))
+    def load_server(logs, time_range = (Time.at(0)..Time.now))
+      logs.each do |logfile|
+        next unless logfile.within(time_range)
+        #p logfile
+        if logfile.names?
+          load_names(logfile)
         else
-          load_log(File.join(dir, path))
+          load_log(logfile)
         end
-
       end
     end
 
