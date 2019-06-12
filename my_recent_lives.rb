@@ -9,7 +9,7 @@ require 'json'
 include OHOLFamilyTrees
 
 wondible = 'e45aa4e489b35b6b0fd9f59f0049c688237a9a86'
-from_time = (Date.today - 5).to_time
+from_time = (Date.today - 3).to_time
 to_time = (Date.today - 0).to_time
 
 known_players = {}

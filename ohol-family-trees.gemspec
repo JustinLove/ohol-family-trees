@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
   ]
 
   s.add_runtime_dependency "httpclient"
+  s.add_runtime_dependency "stringio"
   s.add_runtime_dependency "nokogiri", ">= 1.8.5"
   s.add_runtime_dependency "ruby-graphviz"
   s.add_runtime_dependency "color"
