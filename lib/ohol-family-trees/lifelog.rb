@@ -7,8 +7,20 @@ module OHOLFamilyTrees
     end
 
     def self.create(line, epoch = 0, server = '?')
-      parts = line.tr("\xff".force_encoding("ASCII-8BIT"), '').split(' ')
-      if parts.first == 'B'
+      fixed = line.tr("\xff".force_encoding("ASCII-8BIT"), '')
+      parts = fixed.split(' ')
+      if parts.length > 9
+        # a parent shouldn't be an account hash, but we've got at least three of them
+        # 2018-11-14 was a really bad day on server 3
+        if match = fixed.match(/(\d{10}) (\d+) ([0-9a-f]{40}) ([FM]) (\(-?\d+,-?\d+\)) (noParent|parent=\d+|[0-9a-f]{40}) (pop=\d+) (chain=\d+)/)
+          Birth.new(match.to_a, epoch, server)
+        elsif match = fixed.match(/(\d{10}) (\d+) ([0-9a-f]{40}) (age=[\d.]+) ([FM]) (\(-?\d+,-?\d+\)) ([^ ]+) (pop=\d+)/)
+          Death.new(match.to_a, epoch, server)
+        else
+          p line
+          raise "corrupt line"
+        end
+      elsif parts.first == 'B'
         Birth.new(parts, epoch, server)
       elsif parts.first == 'D'
         Death.new(parts, epoch, server)
@@ -25,7 +37,7 @@ module OHOLFamilyTrees
     def initialize(parts, epoch = 0, server = '?')
       @time = parts[1].to_i
       @playerid = parts[2].to_i
-      @hash = parts[3]
+      @hash = parts[3].tr('^0-9a-f', '')
       @epoch = epoch
       @server = server
     end
