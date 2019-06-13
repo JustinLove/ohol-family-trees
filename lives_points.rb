@@ -15,7 +15,8 @@ to_time = (Date.today - 0).to_time
 p from_time
 
 LifelogCache::Servers.new.each do |logs|
-  next unless logs.server == "bigserver2"
+  server = logs.server.sub('.onehouronelife.com', '')
+  next unless server == 'bigserver2'
 
   lives = History.new
 
@@ -29,7 +30,6 @@ LifelogCache::Servers.new.each do |logs|
 #  from = from_time.to_i
 #  to = to_time.to_i
 
-  server = logs.server
   json = []
 
   lives.each do |l|

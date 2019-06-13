@@ -100,7 +100,7 @@ module OHOLFamilyTrees
 
       def killerid
         if cause && cause.match('killer')
-          cause.sub('killer_', '')
+          cause.sub('killer_', '').to_i
         end
       end
 

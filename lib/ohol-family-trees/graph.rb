@@ -92,7 +92,11 @@ module OHOLFamilyTrees
       @wrapper ||= File.read(File.dirname(__FILE__) + '/wrapper.html')
       svg = graph(lives, others).output('svg' => String)
       html = @wrapper.sub('#svg#', svg)
-      File.write(filename, html)
+      if filename
+        File.write(filename, html)
+      else
+        html
+      end
     end
   end
 end
