@@ -3,6 +3,10 @@ require 'nokogiri'
 
 module OHOLFamilyTrees
   module MonumentServer
+    BaseUrl = "https://onehouronelife.com/"
+
+    Client = HTTPClient.new
+
     def self.extract_monument_path_list(directory)
       paths = []
       Nokogiri::HTML(directory).css('table table table a').each do |node|
@@ -13,26 +17,28 @@ module OHOLFamilyTrees
       return paths
     end
 
-    MonumentsUrl = "https://onehouronelife.com/monuments/"
-
-    Client = HTTPClient.new
+    def self.monument_count(baseurl = BaseUrl)
+      contents = Client.get_content(baseurl + "monumentStats.php")
+      if contents && match = contents.match(/(\d+) monuments completed/)
+        match[1].to_i
+      end
+    end
 
     class Servers
       include Enumerable
 
-      def initialize(baseurl = MonumentsUrl)
+      def initialize(baseurl = BaseUrl)
         @baseurl = baseurl
       end
 
       attr_reader :baseurl
 
       def each(&block)
-        p baseurl
-        index = Client.get_content(baseurl)
+        index = Client.get_content(baseurl + "monuments/")
         #p index
         iter = MonumentServer.extract_monument_path_list(index)
           .select {|dir| dir.match("onehouronelife.com.php")}
-          .map {|dir| Logfile.new(dir, baseurl) }
+          .map {|dir| Logfile.new("monuments/" + dir, baseurl) }
         if block_given?
           iter.each(&block)
         end
@@ -40,7 +46,7 @@ module OHOLFamilyTrees
     end
 
     class Logfile
-      def initialize(path, baseurl = MonumentsUrl) 
+      def initialize(path, baseurl = BaseUrl) 
         @path = path
         @baseurl = baseurl
       end
@@ -53,12 +59,12 @@ module OHOLFamilyTrees
       end
 
       def server
-        path.sub('.php', '')
+        path.sub('monuments/', '').sub('.php', '')
       end
 
       def read
-        p baseurl + path
-        Client.get_content(baseurl + path)
+        p url
+        Client.get_content(url)
       end
     end
   end

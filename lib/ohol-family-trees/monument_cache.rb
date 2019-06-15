@@ -1,9 +1,18 @@
 module OHOLFamilyTrees
   module MonumentCache
+    CachePath = "cache/monuments/"
+
+    def self.monument_count(cache = CachePath)
+      contents = File.read(File.join(cache, "monumentStats.php"))
+      if contents && match = contents.match(/(\d+) monuments completed/)
+        match[1].to_i
+      end
+    end
+
     class Servers
       include Enumerable
 
-      def initialize(cache = "cache/monuments/")
+      def initialize(cache = CachePath)
         @cache = cache
       end
 
@@ -20,7 +29,7 @@ module OHOLFamilyTrees
     end
 
     class Logfile
-      def initialize(path, cache = "cache/")
+      def initialize(path, cache = CachePath)
         @path = path
         @cache = cache
       end

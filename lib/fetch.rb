@@ -61,11 +61,29 @@ end
 MonumentsUrl = "https://onehouronelife.com/monuments/"
 
 FileUtils.mkdir_p('cache/monuments')
-monument_directory = fetch_file(MonumentsUrl, "", "cache/monuments/index.html", Time.now)
+known = nil
+if File.exists?("cache/monuments/count.txt")
+  known = File.read("cache/monuments/count.txt")
+end
+known = known && known.to_i
 
-monument_list = extract_monument_path_list(monument_directory)
+fetch_file("https://onehouronelife.com/", "monumentStats.php", "cache/monuments/monumentStats.php", Time.now)
+contents = File.read("cache/monuments/monumentStats.php")
+count = nil
 
-monument_list.each do |path|
-  fetch_file(MonumentsUrl, path, "cache/monuments/#{path}", Time.now)
+if contents && match = contents.match(/(\d+) monuments completed/)
+  count = match[1].to_i
+  File.write("cache/monuments/count.txt", count.to_s)
 end
 
+p "#{count} monuments now, #{known} last time"
+
+if known.nil? || count.nil? || count > known
+  monument_directory = fetch_file(MonumentsUrl, "", "cache/monuments/index.html", Time.now)
+
+  monument_list = extract_monument_path_list(monument_directory)
+
+  monument_list.each do |path|
+    fetch_file(MonumentsUrl, path, "cache/monuments/#{path}", Time.now)
+  end
+end
