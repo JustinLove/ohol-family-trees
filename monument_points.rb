@@ -1,15 +1,15 @@
 require 'ohol-family-trees/monument'
+require 'ohol-family-trees/monument_cache'
 require 'json'
 
 include OHOLFamilyTrees
 
-Dir.foreach("cache/monuments") do |dir|
-  next unless dir.match("onehouronelife.com.php")
-  p dir
+MonumentCache::Servers.new.each do |logfile|
+  p logfile.path
 
-  server = dir.sub('.php','')
+  server = logfile.server
 
-  monuments = Monument.load_file("cache/monuments/"+dir, dir)
+  monuments = Monument.load_log(logfile)
   #p monuments
 
   json = []
