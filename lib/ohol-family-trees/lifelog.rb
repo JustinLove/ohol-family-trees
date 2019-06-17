@@ -35,9 +35,9 @@ module OHOLFamilyTrees
     end
 
     def initialize(parts, epoch = 0, server = '?')
-      @time = parts[1].to_i
-      @playerid = parts[2].to_i
-      @hash = parts[3].tr('^0-9a-f', '')
+      @time = parts[1] && parts[1].to_i
+      @playerid = parts[2] && parts[2].to_i
+      @hash = parts[3] && parts[3].tr('^0-9a-f', '')
       @epoch = epoch
       @server = server
     end

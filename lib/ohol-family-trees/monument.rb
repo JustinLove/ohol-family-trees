@@ -10,7 +10,7 @@ module OHOLFamilyTrees
 
     def initialize(node, server)
       @server = server
-      @date = Date.parse(node.children[3].text)
+      @date = DateTime.parse(node.children[3].text)
       @x, @y = node.children[5].text.sub("\nLocation: (", '').sub(')', '').split(', ').map(&:to_i)
     end
 
