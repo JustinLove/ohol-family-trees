@@ -191,6 +191,7 @@ module OHOLFamilyTrees
       @age = death.age if death.age
       @cause = death.cause if death.cause
       @killer = death.killer if death.killer
+      @killerid = death.killerid if death.killerid
     end
 
     attr_reader :key
@@ -215,6 +216,7 @@ module OHOLFamilyTrees
     attr_reader :age
     attr_reader :cause
     attr_reader :killer
+    attr_reader :killerid
 
     def name=(text)
       @name = text
