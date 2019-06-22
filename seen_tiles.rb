@@ -7,8 +7,11 @@ require 'progress_bar'
 
 include OHOLFamilyTrees
 
-zoom_levels = 1..24
+zoom_levels = 2..24
 #zoom_levels = 24..24
+days = 14
+from_time = (Date.today - days).to_time
+to_time = (Date.today - 0).to_time
 
 zoom_levels.each do |zoom|
   tile_width = 2**(32 - zoom)
@@ -18,11 +21,9 @@ zoom_levels.each do |zoom|
   LifelogCache::Servers.new.each do |logs|
   #do
     #dir = "lifeLog_bigserver2.onehouronelife.com"
-    lives = History.new
+    #p logs
 
-    #p dir
-
-    server = logs.server
+    server = logs.server.sub('.onehouronelife.com', '')
 
     # level 29:
     #next if server.match('big')
@@ -32,21 +33,19 @@ zoom_levels.each do |zoom|
     p "#{server} #{zoom}"
 
     #files = Dir.entries("cache/"+dir).reject {|path| path.match('_names.txt')}.size
-    bar = ProgressBar.new()
+    bar = ProgressBar.new(days)
 
     chunk_size = 10000000
     chunk_number = 0
     sparse = Hash.new {|h,k| h[k] = 0}
 
-    from_time = (Date.today - 7).to_time
-    to_time = (Date.today - 0).to_time
-    lives.load_server(logs, ((from_time - 60*60*24*1)..(to_time + 60*60*24*1))) do |logfile|
-    #lives.load_dir("cache/"+dir) do |path|
+    logs.each do |logfile|
+      next unless logfile.within((from_time - 60*60*24*1)..(to_time + 60*60*24*1))
     #path = "cache/lifeLog_bigserver2.onehouronelife.com/2019_05May_29_Wednesday.txt"
     #do
+      #p logfile
       next if logfile.names?
 
-      #p path
       file = logfile.open
       i = 0
       while line = file.gets
