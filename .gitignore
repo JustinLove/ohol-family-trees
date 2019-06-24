@@ -4,5 +4,3 @@ cache
 *.png
 known-players.csv
 output
-elm-stuff
-ui/public/family-tree-viewer.js
