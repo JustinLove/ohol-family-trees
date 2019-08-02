@@ -48,6 +48,25 @@ server_list.each do |path,date|
   end
 end
 
+MapUrl = "http://publicdata.onehouronelife.com/publicMapChangeData/"
+
+FileUtils.mkdir_p('cache/map')
+
+server_directory = fetch_file(MapUrl, "", "cache/map/index.html", Time.now)
+
+server_list = extract_path_list(server_directory)
+
+server_list.each do |path,date|
+  FileUtils.mkdir_p('cache/map/' + path)
+
+  index = fetch_file(MapUrl, path, "cache/map/#{path}/index.html", date)
+
+  log_paths = extract_path_list(index)
+  log_paths.each do |log_path,log_date|
+    fetch_file(MapUrl, "#{path}#{log_path}", "cache/map/#{path}#{log_path}", log_date)
+  end
+end
+
 def extract_monument_path_list(directory)
   paths = []
   Nokogiri::HTML(directory).css('table table table a').each do |node|
