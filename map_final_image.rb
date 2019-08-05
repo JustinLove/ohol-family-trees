@@ -7,6 +7,8 @@ include OHOLFamilyTrees
 
 FileUtils.mkdir_p('output/map')
 
+tile_width = 256
+
 MaplogCache::Servers.new.each do |logs|
   p logs
 
@@ -14,25 +16,26 @@ MaplogCache::Servers.new.each do |logs|
 
   logs.each do |logfile|
     #next unless logfile.path.match('1151446675seed')
-    map = {}
+    map = Hash.new {|h,k| h[k] = {}}
     p logfile
     file = logfile.open
     while line = file.gets
       log = Maplog.create(line)
 
       if log.kind_of?(Maplog::Placement)
-        map["#{log.x} #{log.y}"] = log.object
+        tilex = log.x / tile_width
+        tiley = (-log.y / tile_width)
+        map[[tilex,tiley]]["#{log.x} #{log.y}"] = log.object
       end
     end
-    basename = logfile.path.split(/[\/]/)[1]
-    list = []
-    map.each_pair do |key,value|
-      list << ("#{key} #{value}\n")
-    end
-    list.sort!
-    File.open("output/map/#{basename}", 'wb') do |out|
-      list.each do |l|
-        out << l
+    basename = logfile.path.split(/[\/]/)[1].sub('.txt', '')
+    map.each do |coords,tile|
+      tilex, tiley = *coords
+      FileUtils.mkdir_p("output/map/#{basename}/#{tilex}")
+      File.open("output/map/#{basename}/#{tilex}/#{tiley}.txt", 'wb') do |out|
+        tile.each do |key,value|
+          out << "#{key} #{value}\n"
+        end
       end
     end
   end
