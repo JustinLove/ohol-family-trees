@@ -5,7 +5,7 @@ require 'fileutils'
 
 include OHOLFamilyTrees
 
-output_dir = 'output/mapfinalplacements'
+output_dir = 'output/keyplace'
 
 FileUtils.mkdir_p(output_dir)
 
@@ -26,15 +26,21 @@ MaplogCache::Servers.new.each do |logs|
 
       if log.kind_of?(Maplog::Placement)
         tilex = log.x / tile_width
-        tiley = (-log.y / tile_width)
+        #(-tileY - 1) * tile_width = log.y
+        #-tileY - 1 = log.y / tile_width
+        #-tileY = log.y / tile_width + 1
+        tiley = -(log.y / tile_width + 1)
+        #if log.y.abs < 2
+          #p [log.x, log.y, tilex, tiley]
+        #end
         map[[tilex,tiley]]["#{log.x} #{log.y}"] = log.object
       end
     end
-    basename = logfile.path.split(/[\/]/)[1].sub('.txt', '')
+    dir = logfile.timestamp.to_s
     map.each do |coords,tile|
       tilex, tiley = *coords
-      FileUtils.mkdir_p("#{output_dir}/#{basename}/#{tilex}")
-      File.open("#{output_dir}/#{basename}/#{tilex}/#{tiley}.txt", 'wb') do |out|
+      FileUtils.mkdir_p("#{output_dir}/#{dir}/#{tilex}")
+      File.open("#{output_dir}/#{dir}/#{tilex}/#{tiley}.txt", 'wb') do |out|
         tile.each do |key,value|
           out << "#{key} #{value}\n"
         end
