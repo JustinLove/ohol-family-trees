@@ -33,6 +33,10 @@ module OHOLFamilyTrees
         @y = parts[2].to_i
         @object = parts[3]
       end
+
+      def floor?
+        object.start_with?('f')
+      end
     end
   end
 end
