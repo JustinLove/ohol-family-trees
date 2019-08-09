@@ -37,6 +37,10 @@ module OHOLFamilyTrees
       def floor?
         object.start_with?('f')
       end
+
+      def id
+        object.sub('f', '').split(/\D/).first
+      end
     end
   end
 end
