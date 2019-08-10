@@ -3,6 +3,7 @@ require 'ohol-family-trees/maplog'
 require 'ohol-family-trees/arc'
 require 'date'
 require 'fileutils'
+require 'json'
 
 include OHOLFamilyTrees
 
@@ -26,6 +27,12 @@ def write_tiles(objects, floors, dir, zoom)
   end
 end
 
+floorRemoval = {}
+objectMaster = JSON.parse(File.read('cache/objects.json'))
+objectMaster['floorRemovals'].each do |transition|
+  floorRemoval[transition['newTargetID']] = 'f' + transition['targetID']
+end
+
 ZoomLevels = 24..24
 
 ZoomLevels.each do |zoom|
@@ -46,6 +53,7 @@ ZoomLevels.each do |zoom|
       ms_last_offset = 0
       p logfile
       file = logfile.open
+      previous = nil
       while line = file.gets
         log = Maplog.create(line)
 
@@ -69,6 +77,16 @@ ZoomLevels.each do |zoom|
           if log.floor?
             floors[[tilex,tiley]]["#{log.x} #{log.y}"] = object
           else
+            removes = floorRemoval[object]
+            if removes
+              if floors[[tilex,tiley]]["#{log.x} #{log.y}"] == removes &&
+                 previous.object == "0" &&
+                 previous.x == log.x &&
+                 previous.y == log.y &&
+                 previous.ms_offset == log.ms_offset
+                floors[[tilex,tiley]].delete("#{log.x} #{log.y}")
+              end
+            end
             objects[[tilex,tiley]]["#{log.x} #{log.y}"] = object
           end
           tx = log.x % tile_width
@@ -104,6 +122,7 @@ ZoomLevels.each do |zoom|
             end
           end
         end
+        previous = log
       end
       if start && objects.length > 0
         arc = Arc.new(0, start.s_start, (ms_last_offset/1000).round, 0)
