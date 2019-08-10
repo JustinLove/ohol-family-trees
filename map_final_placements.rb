@@ -3,7 +3,6 @@ require 'ohol-family-trees/maplog'
 require 'ohol-family-trees/arc'
 require 'date'
 require 'fileutils'
-require 'json'
 
 include OHOLFamilyTrees
 
@@ -27,29 +26,13 @@ def write_tiles(objects, floors, dir, zoom)
   end
 end
 
-ZoomLevels = 24..28
-FullDetail = 28
-
-objectSize = {}
-objectMaster = JSON.parse(File.read('cache/objects.json'))
-objectMaster['ids'].each_with_index do |id,i|
-  bounds = objectMaster['bounds'][i]
-  objectSize[id] = [bounds[2] - bounds[0] - 30, bounds[3] - bounds[1] - 30].min
-end
-
+ZoomLevels = 24..24
 
 ZoomLevels.each do |zoom|
   tile_width = 2**(32 - zoom)
-  cellSize = 2**(zoom - 24)
-  if zoom >= FullDetail
-    minSize = 0
-  else
-    minSize = 1.5 * (128/cellSize)
-  end
 
   MaplogCache::Servers.new.each do |logs|
     p logs
-    excluded = 0
 
     #server = logs.server.sub('.onehouronelife.com', '')
 
@@ -86,19 +69,6 @@ ZoomLevels.each do |zoom|
           if log.floor?
             floors[[tilex,tiley]]["#{log.x} #{log.y}"] = object
           else
-            size = objectSize[log.id]
-            if !size || size <= minSize
-              previous = objects[[tilex,tiley]]["#{log.x} #{log.y}"]
-              if size
-                #p log.id
-                excluded += 1
-              end
-              if previous && previous != "0"
-                object = "0"
-              else
-                next
-              end
-            end
             objects[[tilex,tiley]]["#{log.x} #{log.y}"] = object
           end
           tx = log.x % tile_width
@@ -139,7 +109,6 @@ ZoomLevels.each do |zoom|
         arc = Arc.new(0, start.s_start, (ms_last_offset/1000).round, 0)
         write_tiles(objects, floors, arc.s_end, zoom)
       end
-      p excluded
     end
   end
 end
