@@ -25,7 +25,7 @@ module OHOLFamilyTrees
       attr_reader :ms_offset
       attr_reader :x
       attr_reader :y
-      attr_reader :object
+      attr_accessor :object
 
       def initialize(parts)
         @ms_offset = (parts[0].to_f * 1000).to_i

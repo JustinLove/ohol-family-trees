@@ -61,8 +61,8 @@ ZoomLevels.each do |zoom|
         if log.kind_of?(Maplog::ArcStart)
           if log.s_start < Arc::SplitArcsBefore
             if start && objects.length > 0
-              arc = Arc.new(0, start.s_start, (ms_last_offset/1000).round, 0)
-              write_tiles(objects, floors, arc.s_end, zoom)
+              s_end = start.s_start + (ms_last_offset/1000).round
+              write_tiles(objects, floors, s_end, zoom)
             end
             objects = Hash.new {|h,k| h[k] = {}}
             floors = Hash.new {|h,k| h[k] = {}}
