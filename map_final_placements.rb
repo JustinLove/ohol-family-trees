@@ -48,7 +48,9 @@ ZoomLevels.each do |zoom|
       #next unless logfile.path.match('1521396640seed') # two arcs in one file
       #next unless logfile.path.match('588415882seed') # one arc with multiple start times
       p logfile
-      TiledPlacementLog.read(logfile, tile_width, floor_removal).each do |tiled|
+      TiledPlacementLog.read(logfile, tile_width, {
+          :floor_removal => floor_removal
+        }).each do |tiled|
         write_tiles(tiled.objects, tiled.floors, tiled.s_end, zoom)
       end
     end

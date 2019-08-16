@@ -15,7 +15,11 @@ module OHOLFamilyTrees
       @s_end = 0
     end
 
-    def self.read(logfile, tile_width, floor_removal)
+    def self.read(logfile, tile_width, options = {})
+      excluded = 0
+      floor_removal = options[:floor_removal] || {}
+      min_size = options[:min_size] || 0
+      object_size = options[:object_size] || {}
       start = nil
       ms_last_offset = 0
       file = logfile.open
@@ -41,8 +45,8 @@ module OHOLFamilyTrees
           #-tileY = log.y / tile_width + 1
           tiley = -(log.y / tile_width + 1)
           object = log.object
-          out.placements[[tilex,tiley]] << log
           if log.floor?
+            out.placements[[tilex,tiley]] << log
             out.floors[[tilex,tiley]]["#{log.x} #{log.y}"] = object
           else
             removes = floor_removal[object]
@@ -56,6 +60,24 @@ module OHOLFamilyTrees
                 previous.object = "f0"
               end
             end
+
+            size = object_size[log.id]
+            if !size || size <= min_size
+              occupant = out.objects[[tilex,tiley]]["#{log.x} #{log.y}"]
+              if size
+                #p log.id
+                excluded += 1
+              end
+              if occupant && occupant != "0"
+                log.object = "0"
+                object = "0"
+              else
+                previous = log
+                next
+              end
+            end
+
+            out.placements[[tilex,tiley]] << log
             out.objects[[tilex,tiley]]["#{log.x} #{log.y}"] = object
           end
           tx = log.x % tile_width
@@ -95,6 +117,7 @@ module OHOLFamilyTrees
         previous = log
       end
       out.s_end = start.s_start + (ms_last_offset/1000).round
+      p "excluded #{excluded} objects"
       tiled
     end
   end

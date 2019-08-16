@@ -23,16 +23,30 @@ def write_tiles(map, dir, zoom)
   end
 end
 
-floor_removal = {}
 object_master = JSON.parse(File.read('cache/objects.json'))
+
+object_size = {}
+object_master['ids'].each_with_index do |id,i|
+  bounds = object_master['bounds'][i]
+  object_size[id] = [bounds[2] - bounds[0] - 30, bounds[3] - bounds[1] - 30].min
+end
+
+floor_removal = {}
 object_master['floorRemovals'].each do |transition|
   floor_removal[transition['newTargetID']] = 'f' + transition['targetID']
 end
 
-ZoomLevels = 24..24
+ZoomLevels = 24..28
+FullDetail = 28
 
 ZoomLevels.each do |zoom|
   tile_width = 2**(32 - zoom)
+  cellSize = 2**(zoom - 24)
+  if zoom >= FullDetail
+    min_size = 0
+  else
+    min_size = 1.5 * (128/cellSize)
+  end
 
   MaplogCache::Servers.new.each do |logs|
     p logs
@@ -43,9 +57,13 @@ ZoomLevels.each do |zoom|
       #next unless logfile.path.match('000seed')
       #next unless logfile.path.match('1151446675seed') # small file
       #next unless logfile.path.match('1521396640seed') # two arcs in one file
-      #next unless logfile.path.match('588415882seed') # one arc with multiple start times
+      next unless logfile.path.match('588415882seed') # one arc with multiple start times
       p logfile
-      TiledPlacementLog.read(logfile, tile_width, floor_removal).each do |tiled|
+      TiledPlacementLog.read(logfile, tile_width, {
+          :floor_removal => floor_removal,
+          :min_size => min_size,
+          :object_size => object_size,
+        }).each do |tiled|
         write_tiles(tiled.placements, tiled.s_end, zoom)
       end
     end
