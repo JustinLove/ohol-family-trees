@@ -8,7 +8,6 @@ require 'json'
 include OHOLFamilyTrees
 
 OutputDir = 'output/keyplace'
-SplitArcsBefore = DateTime.parse('2019-07-31 12:56-0500').to_time.to_i
 
 FileUtils.mkdir_p(OutputDir)
 
@@ -60,7 +59,7 @@ ZoomLevels.each do |zoom|
         log = Maplog.create(line)
 
         if log.kind_of?(Maplog::ArcStart)
-          if log.s_start < SplitArcsBefore
+          if log.s_start < Arc::SplitArcsBefore
             if start && objects.length > 0
               arc = Arc.new(0, start.s_start, (ms_last_offset/1000).round, 0)
               write_tiles(objects, floors, arc.s_end, zoom)
@@ -129,8 +128,8 @@ ZoomLevels.each do |zoom|
         previous = log
       end
       if start && objects.length > 0
-        arc = Arc.new(0, start.s_start, (ms_last_offset/1000).round, 0)
-        write_tiles(objects, floors, arc.s_end, zoom)
+        s_end = start.s_start + (ms_last_offset/1000).round
+        write_tiles(objects, floors, s_end, zoom)
       end
     end
   end
