@@ -8,6 +8,7 @@ require 'json'
 include OHOLFamilyTrees
 
 OutputDir = 'output/keyplace'
+SplitArcsBefore = DateTime.parse('2019-07-31 12:56-0500').to_time.to_i
 
 FileUtils.mkdir_p(OutputDir)
 
@@ -45,8 +46,9 @@ ZoomLevels.each do |zoom|
 
     logs.each do |logfile|
       #next unless logfile.path.match('000seed')
-      #next unless logfile.path.match('1151446675seed')
-      #next unless logfile.path.match('1521396640seed')
+      #next unless logfile.path.match('1151446675seed') # small file
+      #next unless logfile.path.match('1521396640seed') # two arcs in one file
+      #next unless logfile.path.match('588415882seed') # one arc with multiple start times
       objects = Hash.new {|h,k| h[k] = {}}
       floors = Hash.new {|h,k| h[k] = {}}
       start = nil
@@ -58,12 +60,14 @@ ZoomLevels.each do |zoom|
         log = Maplog.create(line)
 
         if log.kind_of?(Maplog::ArcStart)
-          if start && objects.length > 0
-            arc = Arc.new(0, start.s_start, (ms_last_offset/1000).round, 0)
-            write_tiles(objects, floors, arc.s_end, zoom)
+          if log.s_start < SplitArcsBefore
+            if start && objects.length > 0
+              arc = Arc.new(0, start.s_start, (ms_last_offset/1000).round, 0)
+              write_tiles(objects, floors, arc.s_end, zoom)
+            end
+            objects = Hash.new {|h,k| h[k] = {}}
+            floors = Hash.new {|h,k| h[k] = {}}
           end
-          objects = Hash.new {|h,k| h[k] = {}}
-          floors = Hash.new {|h,k| h[k] = {}}
           start = log
           ms_last_offset = 0
         elsif log.kind_of?(Maplog::Placement)
