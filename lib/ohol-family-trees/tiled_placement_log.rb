@@ -19,7 +19,8 @@ module OHOLFamilyTrees
       excluded = 0
       floor_removal = options[:floor_removal] || {}
       min_size = options[:min_size] || 0
-      object_size = options[:object_size] || {}
+      object_size = options[:object_size]
+      object_over = options[:object_over] || Hash.new {|h,k| h[k] = ObjectOver.new(2, 2, 2, 4)}
       start = nil
       ms_last_offset = 0
       file = logfile.open
@@ -46,9 +47,11 @@ module OHOLFamilyTrees
           tiley = -(log.y / tile_width + 1)
           object = log.object
           if log.floor?
+            occupant = out.floors[[tilex,tiley]]["#{log.x} #{log.y}"]
             out.placements[[tilex,tiley]] << log
             out.floors[[tilex,tiley]]["#{log.x} #{log.y}"] = object
           else
+            occupant = out.objects[[tilex,tiley]]["#{log.x} #{log.y}"]
             removes = floor_removal[object]
             if removes
               if out.floors[[tilex,tiley]]["#{log.x} #{log.y}"] == removes &&
@@ -61,19 +64,20 @@ module OHOLFamilyTrees
               end
             end
 
-            size = object_size[log.id]
-            if !size || size <= min_size
-              occupant = out.objects[[tilex,tiley]]["#{log.x} #{log.y}"]
-              if size
-                #p log.id
-                excluded += 1
-              end
-              if occupant && occupant != "0"
-                log.object = "0"
-                object = "0"
-              else
-                previous = log
-                next
+            if object_size
+              size = object_size[log.id]
+              if !size || size <= min_size
+                if size
+                  #p log.id
+                  excluded += 1
+                end
+                if occupant && occupant != "0"
+                  log.object = "0"
+                  object = "0"
+                else
+                  previous = log
+                  next
+                end
               end
             end
 
@@ -82,18 +86,22 @@ module OHOLFamilyTrees
           end
           tx = log.x % tile_width
           ty = log.y % tile_width
+          newover = object_over[log.id]&.over(tx, ty, tile_width) || [0, 0]
+          oldover = (occupant && object_over[Maplog::Placement.id(occupant)]&.over(tx, ty, tile_width)) || [0, 0]
+
           overx = 0
+          if newover[0] != 0
+            overx = newover[0]
+          elsif oldover[0] != 0
+            overx = oldover[0]
+          end
           overy = 0
-          if tx <= 2
-            overx = -1
-          elsif tx >= (tile_width - 2)
-            overx = 1
+          if newover[1] != 0
+            overy = newover[1]
+          elsif oldover[1] != 0
+            overy = oldover[1]
           end
-          if ty <= 2
-            overy = 1
-          elsif ty >= (tile_width - 4)
-            overy = -1
-          end
+
           overs = []
           if overx != 0
             overs << [tilex+overx,tiley]
@@ -119,6 +127,24 @@ module OHOLFamilyTrees
       out.s_end = start.s_start + (ms_last_offset/1000).round
       p "excluded #{excluded} objects"
       tiled
+    end
+
+    ObjectOver = Struct.new(:left, :bottom, :right, :top) do
+      def over(tx, ty, tile_width)
+        overx = 0
+        overy = 0
+        if tx < left
+          overx = -1
+        elsif tx >= (tile_width - right)
+          overx = 1
+        end
+        if ty < bottom
+          overy = 1
+        elsif ty >= (tile_width - top)
+          overy = -1
+        end
+        return [overx, overy]
+      end
     end
   end
 end
