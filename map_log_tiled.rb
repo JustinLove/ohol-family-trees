@@ -16,8 +16,14 @@ def write_tiles(map, dir, zoom)
     tilex, tiley = *coords
     FileUtils.mkdir_p("#{OutputDir}/#{dir}/#{zoom}/#{tilex}")
     File.open("#{OutputDir}/#{dir}/#{zoom}/#{tilex}/#{tiley}.txt", 'wb') do |out|
+      last_x = 0
+      last_y = 0
+      last_offset = 0
       tile.each do |logline|
-        out << "#{logline.ms_offset} #{logline.x} #{logline.y} #{logline.object}\n"
+        out << "#{(logline.ms_offset - last_offset)/10} #{logline.x - last_x} #{logline.y - last_y} #{logline.object}\n"
+        last_offset = logline.ms_offset
+        last_x = logline.x
+        last_y = logline.y
       end
     end
   end
@@ -36,8 +42,8 @@ object_master['floorRemovals'].each do |transition|
   floor_removal[transition['newTargetID']] = 'f' + transition['targetID']
 end
 
-ZoomLevels = 24..28
-FullDetail = 28
+ZoomLevels = 24..24
+FullDetail = 24
 
 ZoomLevels.each do |zoom|
   tile_width = 2**(32 - zoom)
