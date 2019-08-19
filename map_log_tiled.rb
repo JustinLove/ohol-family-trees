@@ -6,7 +6,7 @@ require 'json'
 
 include OHOLFamilyTrees
 
-OutputDir = 'output/maplogover'
+OutputDir = 'output/maplogtime'
 
 FileUtils.mkdir_p(OutputDir)
 
@@ -19,10 +19,10 @@ def write_tiles(map, dir, zoom)
     File.open("#{OutputDir}/#{dir}/#{zoom}/#{tilex}/#{tiley}.txt", 'wb') do |out|
       last_x = 0
       last_y = 0
-      last_offset = 0
+      last_time = 0
       tile.each do |logline|
-        out << "#{(logline.ms_offset - last_offset)/10} #{logline.x - last_x} #{logline.y - last_y} #{logline.object}\n"
-        last_offset = logline.ms_offset
+        out << "#{(logline.ms_time - last_time)/10} #{logline.x - last_x} #{logline.y - last_y} #{logline.object}\n"
+        last_time = logline.ms_time
         last_x = logline.x
         last_y = logline.y
       end
@@ -66,7 +66,7 @@ ZoomLevels.each do |zoom|
       #next unless logfile.path.match('000seed')
       #next unless logfile.path.match('1151446675seed') # small file
       #next unless logfile.path.match('1521396640seed') # two arcs in one file
-      next unless logfile.path.match('588415882seed') # one arc with multiple start times
+      #next unless logfile.path.match('588415882seed') # one arc with multiple start times
       p logfile
       TiledPlacementLog.read(logfile, tile_width, {
           :floor_removal => floor_removal,

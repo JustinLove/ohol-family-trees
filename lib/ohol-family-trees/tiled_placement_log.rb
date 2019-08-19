@@ -22,7 +22,6 @@ module OHOLFamilyTrees
       object_size = options[:object_size]
       object_over = options[:object_over] || Hash.new {|h,k| h[k] = ObjectOver.new(2, 2, 2, 4)}
       start = nil
-      ms_last_offset = 0
       file = logfile.open
       previous = nil
       tiled = []
@@ -32,14 +31,14 @@ module OHOLFamilyTrees
         log = Maplog.create(line)
         if log.kind_of?(Maplog::ArcStart)
           if start && log.s_start < Arc::SplitArcsBefore
-            out.s_end = start.s_start + (ms_last_offset/1000).round
             out = new
             tiled << out
           end
           start = log
-          ms_last_offset = 0
+          out.s_end = start.s_start
         elsif log.kind_of?(Maplog::Placement)
-          ms_last_offset = log.ms_offset
+          log.ms_start = start.ms_start
+          out.s_end = log.s_time
           tilex = log.x / tile_width
           #(-tileY - 1) * tile_width = log.y
           #-tileY - 1 = log.y / tile_width
@@ -124,7 +123,6 @@ module OHOLFamilyTrees
         end
         previous = log
       end
-      out.s_end = start.s_start + (ms_last_offset/1000).round
       p "excluded #{excluded} objects"
       tiled
     end

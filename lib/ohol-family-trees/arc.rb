@@ -24,25 +24,27 @@ module OHOLFamilyTrees
       arcs = []
       start = nil
       s_start = 0
-      ms_last_offset = 0
+      s_end = 0
       while line = file.gets
         log = Maplog.create(line)
         if log.kind_of?(Maplog::ArcStart)
           if s_start == 0
-            s_start = log.s_start
+            s_end = s_start = log.s_start
           end
           if start && log.s_start < SplitArcsBefore
             s_start = log.s_start
-            s_end = start.s_start + (ms_last_offset/1000).round
+            p s_end
             arcs << Arc.new(server, start.s_start, s_end, seed)
+            s_end = s_start
           end
           start = log
         else
-          ms_last_offset = log.ms_offset
+          log.ms_start = start.ms_start
+          s_end = log.s_time
         end
       end
       if s_start != 0
-        s_end = start.s_start + (ms_last_offset/1000).round
+        p s_end
         arcs << Arc.new(server, s_start, s_end, seed)
       end
       arcs
