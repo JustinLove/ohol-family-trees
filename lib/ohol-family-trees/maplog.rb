@@ -17,7 +17,7 @@ module OHOLFamilyTrees
       end
 
       def s_start
-        (ms_start.to_f / 1000).floor
+        (ms_start.to_f / 1000).ceil
       end
     end
 

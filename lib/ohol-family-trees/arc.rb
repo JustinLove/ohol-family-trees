@@ -32,9 +32,9 @@ module OHOLFamilyTrees
             s_end = s_start = log.s_start
           end
           if start && log.s_start < SplitArcsBefore
-            s_start = log.s_start
-            p s_end
+            p [s_start, s_end]
             arcs << Arc.new(server, start.s_start, s_end, seed)
+            s_start = log.s_start
             s_end = s_start
           end
           start = log
@@ -44,7 +44,7 @@ module OHOLFamilyTrees
         end
       end
       if s_start != 0
-        p s_end
+        p [s_start, s_end]
         arcs << Arc.new(server, s_start, s_end, seed)
       end
       arcs
