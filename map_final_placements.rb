@@ -57,6 +57,13 @@ ZoomLevels.each do |zoom|
       #next unless logfile.path.match('1151446675seed') # small file
       #next unless logfile.path.match('1521396640seed') # two arcs in one file
       #next unless logfile.path.match('588415882seed') # one arc with multiple start times
+      #next unless logfile.path.match('1315059099seed')
+      #next unless logfile.path.match('2072746342seed')
+      #next unless logfile.path.match('2739539232seed')
+      #next unless logfile.path.match('5224995seed')
+      #next unless logfile.path.match('980020880seed')
+      #next unless logfile.path.match('3239436732seed')
+      next unless logfile.path.match('2680185702seed')
       p logfile
       TiledPlacementLog.read(logfile, tile_width, {
           :floor_removal => floor_removal,

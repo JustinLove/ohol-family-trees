@@ -38,7 +38,7 @@ module OHOLFamilyTrees
             s_end = s_start
           end
           start = log
-        else
+        elsif log.kind_of?(Maplog::Placement)
           log.ms_start = start.ms_start
           s_end = log.s_time
         end

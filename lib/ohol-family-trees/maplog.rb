@@ -2,10 +2,13 @@ module OHOLFamilyTrees
   class Maplog
     def self.create(line)
       parts = line.split(' ')
-      if (parts[0] == 'startTime:')
+      if parts[0] == 'startTime:'
         ArcStart.new(parts[1])
-      else
+      elsif parts.length == 4
         Placement.new(parts)
+      else
+        p ['invalid maplog line', line]
+        nil
       end
     end
 
