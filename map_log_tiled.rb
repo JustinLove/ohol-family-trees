@@ -6,7 +6,7 @@ require 'json'
 
 include OHOLFamilyTrees
 
-OutputDir = 'output/maplogtime'
+OutputDir = 'output/ml'
 
 FileUtils.mkdir_p(OutputDir)
 
@@ -76,7 +76,8 @@ ZoomLevels.each do |zoom|
       #next unless logfile.path.match('5224995seed')
       #next unless logfile.path.match('980020880seed')
       #next unless logfile.path.match('3239436732seed')
-      next unless logfile.path.match('2680185702seed')
+      #next unless logfile.path.match('2680185702seed')
+      next unless logfile.path.match('4065733201seed')
       p logfile
       TiledPlacementLog.read(logfile, tile_width, {
           :floor_removal => floor_removal,

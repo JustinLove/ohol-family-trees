@@ -1,3 +1,5 @@
+require 'ohol-family-trees/combined_logfile'
+
 module OHOLFamilyTrees
   module MaplogCache
     class Servers
@@ -35,10 +37,28 @@ module OHOLFamilyTrees
       end
 
       def each
-        Dir.foreach(File.join(cache, dir)) do |path|
-          next unless path.match('_mapLog.txt')
-          cache_path = File.join(dir, path)
-          yield Logfile.new(cache_path, cache)
+        handle = Dir.new(File.join(cache, dir))
+        buffer = []
+        loop do
+          while buffer.length < 2 || buffer[-1].seed == buffer[-2].seed
+            path = handle.read
+            break unless path
+            next unless path.match('_mapLog.txt')
+            cache_path = File.join(dir, path)
+            buffer << Logfile.new(cache_path, cache)
+          end
+          if buffer.length < 1
+            break
+          elsif buffer.length == 1
+            # just yield below
+          elsif buffer[-1].seed == buffer[-2].seed
+            buffer = [CombinedLogfile.new(buffer)]
+          elsif buffer.length == 2
+            # just yield below
+          else
+            buffer = [CombinedLogfile.new(buffer[0..-2]), buffer[-1]]
+          end
+          yield buffer.shift
         end
       end
     end

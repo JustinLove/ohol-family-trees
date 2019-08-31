@@ -1,3 +1,4 @@
+require 'ohol-family-trees/combined_logfile'
 require 'httpclient'
 require 'nokogiri'
 
@@ -60,12 +61,29 @@ module OHOLFamilyTrees
         p baseurl + dir
         index = Client.get_content(baseurl + dir)
         #p index
-        MaplogServer.extract_path_list(index)
-          .map do |path, log_date|
+        path_list = MaplogServer.extract_path_list(index)
+        buffer = []
+        loop do
+          while buffer.length < 2 || buffer[-1].seed == buffer[-2].seed
+            path,log_date = *path_list.shift
+            break unless path
             next unless path.match('_mapLog.txt')
             cache_path = dir + path
-            yield Logfile.new(cache_path, log_date, baseurl)
+            buffer << Logfile.new(cache_path, log_date, baseurl)
           end
+          if buffer.length < 1
+            break
+          elsif buffer.length == 1
+            # just yield below
+          elsif buffer[-1].seed == buffer[-2].seed
+            buffer = [CombinedLogfile.new(buffer)]
+          elsif buffer.length == 2
+            # just yield below
+          else
+            buffer = [CombinedLogfile.new(buffer[0..-2]), buffer[-1]]
+          end
+          yield buffer.shift
+        end
       end
     end
 
