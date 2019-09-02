@@ -92,6 +92,7 @@ module OHOLFamilyTrees
         @path = path
         @date = date
         @baseurl = baseurl
+        @contents = nil
       end
 
       attr_reader :path
@@ -126,7 +127,7 @@ module OHOLFamilyTrees
 
       def open
         p baseurl + path
-        contents = Client.get_content(baseurl + path)
+        @contents ||= Client.get_content(baseurl + path)
         #p contents
         StringIO.new(contents)
       end

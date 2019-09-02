@@ -62,30 +62,33 @@ if File.exist?(ProcessedPath)
 end
 #p processed
 
-ZoomLevels.each do |zoom|
-  tile_width = 2**(32 - zoom)
+MaplogCache::Servers.new.each do |logs|
+  p logs
 
-  MaplogCache::Servers.new.each do |logs|
-    p logs
+  #server = logs.server.sub('.onehouronelife.com', '')
 
-    #server = logs.server.sub('.onehouronelife.com', '')
+  logs.each do |logfile|
+    #next unless logfile.path.match('000seed')
+    #next unless logfile.path.match('1151446675seed') # small file
+    #next unless logfile.path.match('1521396640seed') # two arcs in one file
+    #next unless logfile.path.match('588415882seed') # one arc with multiple start times
+    #next unless logfile.path.match('2680185702seed') # multiple files one seed
+    next if processed[logfile.path] && logfile.date.to_i <= processed[logfile.path]['time']
+    processed[logfile.path] = {
+      'time' => Time.now.to_i,
+      'paths' => []
+    }
 
-    logs.each do |logfile|
-      #next unless logfile.path.match('000seed')
-      #next unless logfile.path.match('1151446675seed') # small file
-      #next unless logfile.path.match('1521396640seed') # two arcs in one file
-      #next unless logfile.path.match('588415882seed') # one arc with multiple start times
-      #next unless logfile.path.match('2680185702seed') # multiple files one seed
-      next if processed[logfile.path] && logfile.date.to_i <= processed[logfile.path]['time']
-      p logfile
-      processed[logfile.path] = {
-        'time' => Time.now.to_i,
-        'paths' => []
-      }
+    p logfile
+
+    ZoomLevels.each do |zoom|
+      tile_width = 2**(32 - zoom)
+
       TiledPlacementLog.read(logfile, tile_width, {
           :floor_removal => floor_removal,
           :object_over => object_over,
         }).each do |tiled|
+
         arcs[tiled.arc.s_start.to_s] = {
           'start' => tiled.arc.s_start,
           'end' => tiled.arc.s_end,
@@ -93,12 +96,14 @@ ZoomLevels.each do |zoom|
         }
         #p arcs
 
-        #write_tiles(tiled.objects, tiled.floors, tiled.s_end, zoom)
+        write_tiles(tiled.objects, tiled.floors, tiled.s_end, zoom)
+
         processed[logfile.path]['paths'] << tiled.arc.s_end.to_s
         #p processed
       end
-      File.write(ArcPath, JSON.pretty_generate(arcs.values.sort_by {|arc| arc['start']}))
-      File.write(ProcessedPath, JSON.pretty_generate(processed))
     end
+
+    File.write(ArcPath, JSON.pretty_generate(arcs.values.sort_by {|arc| arc['start']}))
+    File.write(ProcessedPath, JSON.pretty_generate(processed))
   end
 end
