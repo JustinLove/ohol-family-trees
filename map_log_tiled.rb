@@ -32,20 +32,7 @@ def write_tiles(map, dir, zoom)
   end
 end
 
-object_master = JSON.parse(File.read('cache/objects.json'))
-
-object_size = {}
-object_over = {}
-object_master['ids'].each_with_index do |id,i|
-  bounds = object_master['bounds'][i]
-  object_over[id] = TiledPlacementLog::ObjectOver.new(*bounds.map {|b| (b/128.0).round.abs})
-  object_size[id] = [bounds[2] - bounds[0] - 30, bounds[3] - bounds[1] - 30].min
-end
-
-floor_removal = {}
-object_master['floorRemovals'].each do |transition|
-  floor_removal[transition['newTargetID']] = 'f' + transition['targetID']
-end
+objects = ObjectData.new('cache/objects.json').read!
 
 ZoomLevels = 24..27
 FullDetail = 27
@@ -88,13 +75,13 @@ MaplogCache::Servers.new.each do |logs|
       p zoom
 
       TiledPlacementLog.read(logfile, tile_width, {
-          :floor_removal => floor_removal,
+          :floor_removal => objects.floor_removal,
           :min_size => min_size,
-          :object_size => object_size,
-          :object_over => object_over,
+          :object_size => objects.object_size,
+          :object_over => objects.object_over,
         }).each do |tiled|
 
-        write_tiles(tiled.placements, tiled.s_end, zoom)
+        write_tiles(tiled.placements, tiled.arc.s_end, zoom)
 
         processed[logfile.path]['paths'] << "#{tiled.arc.s_end.to_s}/#{zoom}"
         #p processed

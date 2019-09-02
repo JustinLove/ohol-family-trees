@@ -1,6 +1,7 @@
 require 'ohol-family-trees/maplog_cache'
 require 'ohol-family-trees/maplog'
 require 'ohol-family-trees/tiled_placement_log'
+require 'ohol-family-trees/object_data'
 require 'fileutils'
 require 'json'
 
@@ -30,20 +31,7 @@ def write_tiles(objects, floors, dir, zoom)
   end
 end
 
-object_master = JSON.parse(File.read('cache/objects.json'))
-
-object_size = {}
-object_over = {}
-object_master['ids'].each_with_index do |id,i|
-  bounds = object_master['bounds'][i]
-  object_over[id] = TiledPlacementLog::ObjectOver.new(*bounds.map {|b| (b/128.0).round.abs})
-  object_size[id] = [bounds[2] - bounds[0] - 30, bounds[3] - bounds[1] - 30].min
-end
-
-floor_removal = {}
-object_master['floorRemovals'].each do |transition|
-  floor_removal[transition['newTargetID']] = 'f' + transition['targetID']
-end
+objects = ObjectData.new('cache/objects.json').read!
 
 ZoomLevels = 24..24
 
@@ -85,8 +73,8 @@ MaplogCache::Servers.new.each do |logs|
       tile_width = 2**(32 - zoom)
 
       TiledPlacementLog.read(logfile, tile_width, {
-          :floor_removal => floor_removal,
-          :object_over => object_over,
+          :floor_removal => objects.floor_removal,
+          :object_over => objects.object_over,
         }).each do |tiled|
 
         arcs[tiled.arc.s_start.to_s] = {
@@ -96,7 +84,7 @@ MaplogCache::Servers.new.each do |logs|
         }
         #p arcs
 
-        write_tiles(tiled.objects, tiled.floors, tiled.s_end, zoom)
+        write_tiles(tiled.objects, tiled.floors, tiled.arc.s_end, zoom)
 
         processed[logfile.path]['paths'] << tiled.arc.s_end.to_s
         #p processed
