@@ -77,7 +77,8 @@ ZoomLevels.each do |zoom|
       #next unless logfile.path.match('980020880seed')
       #next unless logfile.path.match('3239436732seed')
       #next unless logfile.path.match('2680185702seed')
-      next unless logfile.path.match('4065733201seed')
+      #next unless logfile.path.match('4065733201seed')
+      next unless logfile.path.match('4253255440seed')
       p logfile
       TiledPlacementLog.read(logfile, tile_width, {
           :floor_removal => floor_removal,

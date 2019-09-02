@@ -37,7 +37,7 @@ module OHOLFamilyTrees
 
   class CombinedFile
     def initialize(logfiles)
-      @queue = logfiles
+      @queue = logfiles.dup
       @current = queue.shift.open
     end
 
@@ -47,6 +47,7 @@ module OHOLFamilyTrees
     def gets
       value = current.gets
       if current.eof? && queue.any?
+        @current.close
         @current = queue.shift.open
       end
       value
@@ -54,6 +55,10 @@ module OHOLFamilyTrees
 
     def eof?
       current.eof?
+    end
+
+    def close
+      current && current.close
     end
   end
 end

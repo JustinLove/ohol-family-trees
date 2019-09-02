@@ -6,8 +6,8 @@ module OHOLFamilyTrees
     SplitArcsBefore = DateTime.parse('2019-07-31 12:56-0500').to_time.to_i
 
     attr_reader :server
-    attr_reader :s_start
-    attr_reader :s_end
+    attr_accessor :s_start
+    attr_accessor :s_end
     attr_reader :seed
 
     def initialize(server, st, en, sd)

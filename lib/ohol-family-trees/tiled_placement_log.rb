@@ -6,13 +6,13 @@ module OHOLFamilyTrees
     attr_reader :floors
     attr_reader :objects
     attr_reader :placements
-    attr_accessor :s_end
+    attr_reader :arc
 
-    def initialize
+    def initialize(arc)
       @objects = Hash.new {|h,k| h[k] = {}}
       @floors = Hash.new {|h,k| h[k] = {}}
       @placements = Hash.new {|h,k| h[k] = []}
-      @s_end = 0
+      @arc = arc
     end
 
     def self.read(logfile, tile_width, options = {})
@@ -25,20 +25,25 @@ module OHOLFamilyTrees
       file = logfile.open
       previous = nil
       tiled = []
-      out = new
+      server = logfile.server
+      seed = logfile.seed
+      out = new(Arc.new(server, 0, 0, seed))
       tiled << out
       while line = file.gets
         log = Maplog.create(line)
         if log.kind_of?(Maplog::ArcStart)
           if start && log.s_start < Arc::SplitArcsBefore
-            out = new
+            out = new(Arc.new(server, log.s_start, log.s_start, seed))
             tiled << out
           end
           start = log
-          out.s_end = start.s_start
+          if out.arc.s_start == 0
+            out.arc.s_start = start.s_start
+          end
+          out.arc.s_end = start.s_start
         elsif log.kind_of?(Maplog::Placement)
           log.ms_start = start.ms_start
-          out.s_end = log.s_time
+          out.arc.s_end = log.s_time
           tilex = log.x / tile_width
           #(-tileY - 1) * tile_width = log.y
           #-tileY - 1 = log.y / tile_width
@@ -123,6 +128,7 @@ module OHOLFamilyTrees
         end
         previous = log
       end
+      file.close
       p "excluded #{excluded} objects"
       tiled
     end
