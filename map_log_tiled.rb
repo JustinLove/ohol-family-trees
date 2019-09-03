@@ -1,6 +1,7 @@
 require 'ohol-family-trees/maplog_cache'
 require 'ohol-family-trees/maplog'
 require 'ohol-family-trees/tiled_placement_log'
+require 'ohol-family-trees/object_data'
 require 'fileutils'
 require 'json'
 
