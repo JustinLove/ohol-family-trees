@@ -12,10 +12,12 @@ module OHOLFamilyTrees
     FullDetail = 27
 
     attr_reader :output_dir
+    attr_reader :filesystem
     attr_reader :objects
 
-    def initialize(output_dir, objects)
+    def initialize(output_dir, filesystem, objects)
       @output_dir = output_dir
+      @filesystem = filesystem
       @objects = objects
       FileUtils.mkdir_p(output_dir)
     end
@@ -35,7 +37,7 @@ module OHOLFamilyTrees
     end
 
     def process(logfile)
-      return if processed[logfile.path] && logfile.date.to_i <= processed[logfile.path]['time']
+      #return if processed[logfile.path] && logfile.date.to_i <= processed[logfile.path]['time']
       processed[logfile.path] = {
         'time' => Time.now.to_i,
         'paths' => []
@@ -72,10 +74,10 @@ module OHOLFamilyTrees
     def write_tiles(map, dir, zoom)
       p dir
       map.each do |coords,tile|
-        tilex, tiley = *coords
         next if tile.empty?
-        FileUtils.mkdir_p("#{output_dir}/#{dir}/#{zoom}/#{tilex}")
-        File.open("#{output_dir}/#{dir}/#{zoom}/#{tilex}/#{tiley}.txt", 'wb') do |out|
+        tilex, tiley = *coords
+        path = "#{dir}/#{zoom}/#{tilex}/#{tiley}.txt"
+        filesystem.write(path) do |out|
           last_x = 0
           last_y = 0
           last_time = 0
