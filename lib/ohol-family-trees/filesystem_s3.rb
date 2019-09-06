@@ -13,7 +13,7 @@ module OHOLFamilyTrees
     def write(path, &block)
       out = StringIO.new
       yield out
-      p [bucket, path]
+      #p [bucket, path]
       out.rewind
       client.put_object({
         :body => out,

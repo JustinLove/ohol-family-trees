@@ -10,13 +10,10 @@ require 'json'
 
 include OHOLFamilyTrees
 
-PlacementPath = "kptest"
-MaplogPath = "mltest"
+PlacementPath = "kp"
+MaplogPath = "ml"
 
 OutputDir = 'output'
-PlacementDir = "#{OutputDir}/#{PlacementPath}"
-MaplogDir = "#{OutputDir}/#{MaplogPath}"
-
 OutputBucket = 'wondible-com-ohol-tiles'
 
 objects = ObjectData.new('cache/objects.json').read!
@@ -28,13 +25,7 @@ filesystem = FilesystemGroup.new([
 
 final_placements = OutputFinalPlacements.new(OutputDir, PlacementPath, filesystem, objects)
 
-=begin
-maplog_system = FilesystemGroup.new([
-  FilesystemLocal.new(PlacementDir),
-  FilesystemS3.new(PlacementDir),
-])
-maplog = OutputMaplog.new(MaplogDir, maplog_system, objects)
-=end
+maplog = OutputMaplog.new(OutputDir, MaplogPath, filesystem, objects)
 
 MaplogCache::Servers.new.each do |logs|
   p logs
@@ -52,6 +43,6 @@ MaplogCache::Servers.new.each do |logs|
     p logfile
 
     final_placements.process(logfile)
-    #maplog.process(logfile)
+    maplog.process(logfile)
   end
 end

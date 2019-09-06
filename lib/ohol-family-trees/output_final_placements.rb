@@ -1,6 +1,7 @@
 require 'ohol-family-trees/tiled_placement_log'
 require 'fileutils'
 require 'json'
+require 'progress_bar'
 
 module OHOLFamilyTrees
   class OutputFinalPlacements
@@ -56,7 +57,7 @@ module OHOLFamilyTrees
     end
 
     def process(logfile)
-      #return if processed[logfile.path] && logfile.date.to_i <= processed[logfile.path]['time']
+      return if processed[logfile.path] && logfile.date.to_i <= processed[logfile.path]['time']
       processed[logfile.path] = {
         'time' => Time.now.to_i,
         'paths' => []
@@ -89,7 +90,10 @@ module OHOLFamilyTrees
 
     def write_tiles(objects, floors, dir, zoom)
       p dir
-      (objects.keys | floors.keys).each do |coords|
+      set = (objects.keys | floors.keys)
+      bar = ProgressBar.new(set.length)
+      set.each do |coords|
+        bar.increment!
         next if floors[coords].empty? && objects[coords].empty?
         tilex, tiley = *coords
         path = "#{output_path}/#{dir}/#{zoom}/#{tilex}/#{tiley}.txt"
