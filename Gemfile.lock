@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     ohol-family-trees (0.0.0)
+      aws-sdk-s3 (~> 1)
       color
       httpclient
       nokogiri (>= 1.8.5)
@@ -12,13 +13,30 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
+    aws-eventstream (1.0.3)
+    aws-partitions (1.209.0)
+    aws-sdk-core (3.66.0)
+      aws-eventstream (~> 1.0, >= 1.0.2)
+      aws-partitions (~> 1.0)
+      aws-sigv4 (~> 1.1)
+      jmespath (~> 1.0)
+    aws-sdk-kms (1.24.0)
+      aws-sdk-core (~> 3, >= 3.61.1)
+      aws-sigv4 (~> 1.1)
+    aws-sdk-s3 (1.48.0)
+      aws-sdk-core (~> 3, >= 3.61.1)
+      aws-sdk-kms (~> 1)
+      aws-sigv4 (~> 1.1)
+    aws-sigv4 (1.1.0)
+      aws-eventstream (~> 1.0, >= 1.0.2)
     color (1.8)
     highline (2.0.2)
     httpclient (2.8.3)
+    jmespath (1.4.0)
     mini_portile2 (2.4.0)
-    nokogiri (1.10.3)
+    nokogiri (1.10.4)
       mini_portile2 (~> 2.4.0)
-    nokogiri (1.10.3-x64-mingw32)
+    nokogiri (1.10.4-x64-mingw32)
       mini_portile2 (~> 2.4.0)
     options (2.3.2)
     progress_bar (1.3.0)

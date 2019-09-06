@@ -5,24 +5,26 @@ require 'json'
 module OHOLFamilyTrees
   class OutputFinalPlacements
     def arc_path
-      "#{output_dir}/arcs.json"
+      "#{output_dir}/#{output_path}/arcs.json"
     end
 
     def processed_path
-      "#{output_dir}/processed.json"
+      "#{output_dir}/#{output_path}/processed.json"
     end
 
     ZoomLevels = 24..24
 
     attr_reader :output_dir
+    attr_reader :output_path
     attr_reader :filesystem
     attr_reader :objects
 
-    def initialize(output_dir, filesystem, objects)
+    def initialize(output_dir, output_path, filesystem, objects)
       @output_dir = output_dir
+      @output_path = output_path
       @filesystem = filesystem
       @objects = objects
-      FileUtils.mkdir_p(output_dir)
+      FileUtils.mkdir_p("#{output_dir}/#{output_path}")
     end
 
     def arcs
@@ -90,7 +92,7 @@ module OHOLFamilyTrees
       (objects.keys | floors.keys).each do |coords|
         next if floors[coords].empty? && objects[coords].empty?
         tilex, tiley = *coords
-        path = "#{dir}/#{zoom}/#{tilex}/#{tiley}.txt"
+        path = "#{output_path}/#{dir}/#{zoom}/#{tilex}/#{tiley}.txt"
         filesystem.write(path) do |out|
           floors[coords].each do |key,value|
             out << "#{key} #{value}\n"

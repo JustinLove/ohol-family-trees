@@ -5,21 +5,23 @@ require 'json'
 module OHOLFamilyTrees
   class OutputMaplog
     def processed_path
-      "#{output_dir}/processed.json"
+      "#{output_dir}/#{output_path}/processed.json"
     end
 
     ZoomLevels = 24..27
     FullDetail = 27
 
     attr_reader :output_dir
+    attr_reader :output_path
     attr_reader :filesystem
     attr_reader :objects
 
-    def initialize(output_dir, filesystem, objects)
+    def initialize(output_dir, output_path, filesystem, objects)
       @output_dir = output_dir
+      @output_path = output_path
       @filesystem = filesystem
       @objects = objects
-      FileUtils.mkdir_p(output_dir)
+      FileUtils.mkdir_p("#{output_dir}/#{output_path}")
     end
 
     def processed
@@ -76,7 +78,7 @@ module OHOLFamilyTrees
       map.each do |coords,tile|
         next if tile.empty?
         tilex, tiley = *coords
-        path = "#{dir}/#{zoom}/#{tilex}/#{tiley}.txt"
+        path = "#{output_path}/#{dir}/#{zoom}/#{tilex}/#{tiley}.txt"
         filesystem.write(path) do |out|
           last_x = 0
           last_y = 0
