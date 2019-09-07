@@ -28,8 +28,10 @@ module OHOLFamilyTrees
         :key => path,
       })
       yield response.body
+      return true
     rescue Aws::S3::Errors::NoSuchKey
       p ['not found', path]
+      return false
     end
   end
 end

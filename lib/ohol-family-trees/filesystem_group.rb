@@ -14,7 +14,7 @@ module OHOLFamilyTrees
 
     def read(path, &block)
       filesystems.each do |fs|
-        fs.read(path, &block)
+        return if fs.read(path, &block)
       end
     end
   end

@@ -18,6 +18,7 @@ module OHOLFamilyTrees
       filepath = "#{output_dir}/#{path}"
       if File.exist?(filepath)
         File.open(filepath, 'rb', &block)
+        return true
       end
     end
   end

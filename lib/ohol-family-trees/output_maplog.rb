@@ -47,6 +47,8 @@ module OHOLFamilyTrees
         'paths' => []
       }
 
+      p logfile.path
+
       ZoomLevels.each do |zoom|
         tile_width = 2**(32 - zoom)
         cellSize = 2**(zoom - 24)

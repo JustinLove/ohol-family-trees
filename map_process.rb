@@ -16,12 +16,18 @@ MaplogPath = "ml"
 OutputDir = 'output'
 OutputBucket = 'wondible-com-ohol-tiles'
 
-objects = ObjectData.new('cache/objects.json').read!
 
 filesystem = FilesystemGroup.new([
   FilesystemLocal.new(OutputDir),
   FilesystemS3.new(OutputBucket),
 ])
+
+objects = ObjectData.new
+filesystem.read('static/objects.json') do |f|
+  objects.read!(f.read)
+end
+
+raise "no object data" unless objects.object_size.length > 0
 
 final_placements = OutputFinalPlacements.new(OutputDir, PlacementPath, filesystem, objects)
 
@@ -38,8 +44,6 @@ MaplogCache::Servers.new.each do |logs|
     #next unless logfile.path.match('1521396640seed') # two arcs in one file
     #next unless logfile.path.match('588415882seed') # one arc with multiple start times
     #next unless logfile.path.match('2680185702seed') # multiple files one seed
-
-    p logfile
 
     final_placements.process(logfile)
     maplog.process(logfile)

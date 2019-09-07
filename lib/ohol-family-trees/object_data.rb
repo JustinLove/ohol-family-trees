@@ -1,19 +1,17 @@
 module OHOLFamilyTrees
   class ObjectData
-    def initialize(path)
-      @path = path
+    def initialize
       @object_size = {}
       @object_over = {}
       @floor_removal = {}
     end
 
-    attr_reader :path
     attr_reader :object_size
     attr_reader :object_over
     attr_reader :floor_removal
 
-    def read!
-      object_master = JSON.parse(File.read(path))
+    def read!(contents)
+      object_master = JSON.parse(contents)
 
       object_master['ids'].each_with_index do |id,i|
         bounds = object_master['bounds'][i]
