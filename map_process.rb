@@ -34,11 +34,10 @@ MaplogCache::Servers.new.each do |logs|
 
   logs.each do |logfile|
     #next unless logfile.path.match('000seed')
-    next unless logfile.path.match('1151446675seed') # small file
+    #next unless logfile.path.match('1151446675seed') # small file
     #next unless logfile.path.match('1521396640seed') # two arcs in one file
     #next unless logfile.path.match('588415882seed') # one arc with multiple start times
     #next unless logfile.path.match('2680185702seed') # multiple files one seed
-    #next if processed[logfile.path] && logfile.date.to_i <= processed[logfile.path]['time']
 
     p logfile
 

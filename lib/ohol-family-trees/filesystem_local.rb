@@ -13,5 +13,12 @@ module OHOLFamilyTrees
       FileUtils.mkdir_p(File.dirname(filepath))
       File.open(filepath, 'wb', &block)
     end
+
+    def read(path, &block)
+      filepath = "#{output_dir}/#{path}"
+      if File.exist?(filepath)
+        File.open(filepath, 'rb', &block)
+      end
+    end
   end
 end

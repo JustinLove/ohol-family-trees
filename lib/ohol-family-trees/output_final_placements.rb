@@ -6,11 +6,11 @@ require 'progress_bar'
 module OHOLFamilyTrees
   class OutputFinalPlacements
     def arc_path
-      "#{output_dir}/#{output_path}/arcs.json"
+      "#{output_path}/arcs.json"
     end
 
     def processed_path
-      "#{output_dir}/#{output_path}/processed.json"
+      "#{output_path}/processed.json"
     end
 
     ZoomLevels = 24..24
@@ -25,35 +25,38 @@ module OHOLFamilyTrees
       @output_path = output_path
       @filesystem = filesystem
       @objects = objects
-      FileUtils.mkdir_p("#{output_dir}/#{output_path}")
     end
 
     def arcs
       return @arcs if @arcs
       @arcs = {}
-      if File.exist?(arc_path)
-        list = JSON.parse(File.read(arc_path))
+      filesystem.read(arc_path) do |f|
+        list = JSON.parse(f.read)
         list.each do |arc|
           @arcs[arc['start'].to_s] = arc
         end
       end
-      @arcs
       #p @arcs
+      @arcs
     end
 
     def processed
       return @processed if @processed
       @processed = {}
-      if File.exist?(processed_path)
-        @processed = JSON.parse(File.read(processed_path))
+      filesystem.read(processed_path) do |f|
+        @processed = JSON.parse(f.read)
       end
-      @processed
       #p @processed
+      @processed
     end
 
     def checkpoint
-      File.write(arc_path, JSON.pretty_generate(arcs.values.sort_by {|arc| arc['start']}))
-      File.write(processed_path, JSON.pretty_generate(processed))
+      filesystem.write(arc_path) do |f|
+        f << JSON.pretty_generate(arcs.values.sort_by {|arc| arc['start']})
+      end
+      filesystem.write(processed_path) do |f|
+        f << JSON.pretty_generate(processed)
+      end
     end
 
     def process(logfile)

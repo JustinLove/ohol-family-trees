@@ -11,5 +11,11 @@ module OHOLFamilyTrees
         fs.write(path, &block)
       end
     end
+
+    def read(path, &block)
+      filesystems.each do |fs|
+        fs.read(path, &block)
+      end
+    end
   end
 end

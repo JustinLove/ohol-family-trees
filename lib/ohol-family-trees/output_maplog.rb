@@ -6,7 +6,7 @@ require 'progress_bar'
 module OHOLFamilyTrees
   class OutputMaplog
     def processed_path
-      "#{output_dir}/#{output_path}/processed.json"
+      "#{output_path}/processed.json"
     end
 
     ZoomLevels = 24..27
@@ -22,21 +22,22 @@ module OHOLFamilyTrees
       @output_path = output_path
       @filesystem = filesystem
       @objects = objects
-      FileUtils.mkdir_p("#{output_dir}/#{output_path}")
     end
 
     def processed
       return @processed if @processed
       @processed = {}
-      if File.exist?(processed_path)
-        @processed = JSON.parse(File.read(processed_path))
+      filesystem.read(processed_path) do |f|
+        @processed = JSON.parse(f.read)
       end
       @processed
       #p @processed
     end
 
     def checkpoint
-      File.write(processed_path, JSON.pretty_generate(processed))
+      filesystem.write(processed_path) do |f|
+        f << JSON.pretty_generate(processed)
+      end
     end
 
     def process(logfile)

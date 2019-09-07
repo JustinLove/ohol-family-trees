@@ -21,5 +21,15 @@ module OHOLFamilyTrees
         :key => path,
       })
     end
+
+    def read(path, &block)
+      response = client.get_object({
+        :bucket => bucket,
+        :key => path,
+      })
+      yield response.body
+    rescue Aws::S3::Errors::NoSuchKey
+      p ['not found', path]
+    end
   end
 end
