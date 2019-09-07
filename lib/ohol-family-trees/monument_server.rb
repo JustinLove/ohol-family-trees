@@ -17,13 +17,6 @@ module OHOLFamilyTrees
       return paths
     end
 
-    def self.monument_count(baseurl = BaseUrl)
-      contents = Client.get_content(baseurl + "monumentStats.php")
-      if contents && match = contents.match(/(\d+) monuments completed/)
-        match[1].to_i
-      end
-    end
-
     class Servers
       include Enumerable
 
@@ -41,6 +34,13 @@ module OHOLFamilyTrees
           .map {|dir| Logfile.new("monuments/" + dir, baseurl) }
         if block_given?
           iter.each(&block)
+        end
+      end
+
+      def monument_count
+        contents = Client.get_content(baseurl + "monumentStats.php")
+        if contents && match = contents.match(/(\d+) monuments completed/)
+          match[1].to_i
         end
       end
     end

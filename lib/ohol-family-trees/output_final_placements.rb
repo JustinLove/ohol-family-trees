@@ -15,13 +15,11 @@ module OHOLFamilyTrees
 
     ZoomLevels = 24..24
 
-    attr_reader :output_dir
     attr_reader :output_path
     attr_reader :filesystem
     attr_reader :objects
 
-    def initialize(output_dir, output_path, filesystem, objects)
-      @output_dir = output_dir
+    def initialize(output_path, filesystem, objects)
       @output_path = output_path
       @filesystem = filesystem
       @objects = objects
