@@ -98,6 +98,7 @@ module OHOLFamilyTrees
       attr_reader :path
       attr_reader :date
       attr_reader :baseurl
+      attr_reader :contents
 
       def url
         baseurl + path
