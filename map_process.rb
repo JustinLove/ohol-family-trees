@@ -19,7 +19,7 @@ OutputBucket = 'wondible-com-ohol-tiles'
 
 filesystem = FilesystemGroup.new([
   FilesystemLocal.new(OutputDir),
-  FilesystemS3.new(OutputBucket),
+  #FilesystemS3.new(OutputBucket),
 ])
 
 objects = ObjectData.new
