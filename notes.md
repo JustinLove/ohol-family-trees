@@ -1,4 +1,3 @@
-- handling arcs/processed files on s3
 - running on data server
 
 - process multiple servers

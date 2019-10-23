@@ -6,6 +6,8 @@ module OHOLFamilyTrees
         ArcStart.new(parts[1])
       elsif parts.length == 4
         Placement.new(parts)
+      elsif line.match('startTime:')
+        ArcStart.new(parts[parts.length-1])
       else
         p ['invalid maplog line', line]
         nil
