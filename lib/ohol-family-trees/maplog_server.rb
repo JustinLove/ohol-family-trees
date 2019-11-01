@@ -64,7 +64,7 @@ module OHOLFamilyTrees
         path_list = MaplogServer.extract_path_list(index)
         buffer = []
         loop do
-          while buffer.length < 2 || buffer[-1].seed == buffer[-2].seed
+          while buffer.length < 2 || buffer[-1].merges_with?(buffer[-2])
             path,log_date = *path_list.shift
             break unless path
             next unless path.match('_mapLog.txt')
@@ -75,7 +75,7 @@ module OHOLFamilyTrees
             break
           elsif buffer.length == 1
             # just yield below
-          elsif buffer[-1].seed == buffer[-2].seed
+          elsif buffer[-1].merges_with?(buffer[-2])
             buffer = [CombinedLogfile.new(buffer)]
           elsif buffer.length == 2
             # just yield below
@@ -122,8 +122,23 @@ module OHOLFamilyTrees
         path.match(/(\d{10})time_/)[1].to_i
       end
 
+      def cache_valid_at?(at_time)
+        date.to_i <= at_time && (at_time < 1571853427 || 1572325200 < at_time)
+      end
+
       def seed
+        if timestamp == 1571995987
+          return nil
+        elsif timestamp == 1572240860
+          return 30691433003
+        elsif timestamp == 1572297324
+          return nil
+        end
         path.match(/_(\d+)seed/)[1].to_i
+      end
+
+      def merges_with?(file)
+        seed && file.seed && seed == file.seed
       end
 
       def open

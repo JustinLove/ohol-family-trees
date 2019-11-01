@@ -1,4 +1,11 @@
 - running on data server
+- "bigserver2.onehouronelife.com/1571995987time_3738527057seed_mapLog.txt"
+- 1572240860time_2976543425seed_mapLog.txt
+  - possible seed for second part: 1572297324time_3069153003seed_mapLog.txt
+- suspect change: 2019-10-23 12:22:28
+- suspect golive: 2019-10-26 00:48:51
+- fixed: 2019-10-28 16:57
+- released: ?
 
 - process multiple servers
 - search method to narrow down life for graph

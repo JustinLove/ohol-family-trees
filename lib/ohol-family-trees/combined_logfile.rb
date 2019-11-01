@@ -26,6 +26,13 @@ module OHOLFamilyTrees
       logfiles.last.server
     end
 
+    def cache_valid_at?(at_time)
+      logfiles.each do |logfile|
+        return false unless logfile.cache_valid_at?(at_time)
+      end
+      return true
+    end
+
     def seed
       logfiles.last.seed
     end
