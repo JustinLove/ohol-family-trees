@@ -63,7 +63,7 @@ module OHOLFamilyTrees
             :min_size => min_size,
             :object_size => objects.object_size,
             :object_over => objects.object_over,
-          }).each do |tiled|
+          }) do |tiled|
 
           write_tiles(tiled.placements, tiled.s_end, zoom)
 

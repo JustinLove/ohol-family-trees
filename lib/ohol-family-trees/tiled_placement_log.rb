@@ -3,7 +3,7 @@ require 'json'
 
 module OHOLFamilyTrees
   class TiledPlacementLog
-    MaxLog = 24*60*60
+    MaxLog = 60*60
 
     attr_reader :floors
     attr_reader :objects
@@ -16,11 +16,11 @@ module OHOLFamilyTrees
     attr_accessor :s_base
     attr_reader :seed
 
-    def initialize(server, st, en, sd, arc = Arc.new(server, st, en, sd))
+    def initialize(server, bs, st, en, sd, arc = Arc.new(server, st, en, sd))
       @server = server
+      @s_base = bs
       @s_start = st
       @s_end = en
-      @s_base = 0
       @seed = sd
 
       @objects = Hash.new {|h,k| h[k] = {}}
@@ -48,17 +48,15 @@ module OHOLFamilyTrees
       start = nil
       file = logfile.open
       previous = nil
-      tiled = []
       server = logfile.server
       seed = logfile.seed
-      out = new(server, 0, 0, seed)
-      tiled << out
+      out = new(server, 0, 0, 0, seed)
       while line = file.gets
         log = Maplog.create(line)
         if log.kind_of?(Maplog::ArcStart)
           if start && log.s_start < Arc::SplitArcsBefore
-            out = new(server, log.s_start, log.s_start, seed)
-            tiled << out
+            yield out
+            out = new(server, 0, log.s_start, log.s_start, seed)
           end
           start = log
           if out.arc.s_start == 0
@@ -73,11 +71,8 @@ module OHOLFamilyTrees
           log.ms_start = start.ms_start
           if breakpoints.any? && log.s_time > breakpoints.first
             breakpoints.shift
-            out = new(server, log.s_time, log.s_time, seed, out.arc)
-            if tiled.any? 
-              out.s_base = tiled.last.s_end
-            end
-            tiled << out
+            yield out
+            out = new(server, out.s_end, log.s_time, log.s_time, seed, out.arc)
           end
 
           out.arc.s_end = log.s_time
@@ -167,8 +162,8 @@ module OHOLFamilyTrees
         previous = log
       end
       file.close
+      yield out
       p "excluded #{excluded} objects"
-      tiled
     end
 
     ObjectOver = Struct.new(:left, :bottom, :right, :top) do

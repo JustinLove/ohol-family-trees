@@ -1,7 +1,7 @@
 - diffed keyframes
-  - multiple arcs in one file - base reset
-  - multiple input files
+  - maintain map state between span breaks
   - resumption from previous keyframe
+  - multiple input files
 - batch reprocess ranges
 - overdraw missing for large natural objets
   - assume unknown objects are very large

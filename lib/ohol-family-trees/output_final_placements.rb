@@ -92,7 +92,7 @@ module OHOLFamilyTrees
         TiledPlacementLog.read(logfile, tile_width, {
             :floor_removal => objects.floor_removal,
             :object_over => objects.object_over,
-          }).each do |tiled|
+          }) do |tiled|
 
           arcs[tiled.arc.s_start.to_s] = {
             'start' => tiled.arc.s_start,
