@@ -9,6 +9,10 @@ module OHOLFamilyTrees
       "#{output_path}/arcs.json"
     end
 
+    def span_path
+      "#{output_path}/spans.json"
+    end
+
     def processed_path
       "#{output_path}/processed.json"
     end
@@ -38,6 +42,19 @@ module OHOLFamilyTrees
       @arcs
     end
 
+    def spans
+      return @spans if @spans
+      @spans = {}
+      filesystem.read(span_path) do |f|
+        list = JSON.parse(f.read)
+        list.each do |span|
+          @spans[span['start'].to_s] = span
+        end
+      end
+      #p @spans
+      @spans
+    end
+
     def processed
       return @processed if @processed
       @processed = {}
@@ -52,13 +69,16 @@ module OHOLFamilyTrees
       filesystem.write(arc_path) do |f|
         f << JSON.pretty_generate(arcs.values.sort_by {|arc| arc['start']})
       end
+      filesystem.write(span_path) do |f|
+        f << JSON.pretty_generate(spans.values.sort_by {|span| span['start']})
+      end
       filesystem.write(processed_path) do |f|
         f << JSON.pretty_generate(processed)
       end
     end
 
     def process(logfile)
-      return if processed[logfile.path] && logfile.cache_valid_at?(processed[logfile.path]['time'])
+      #return if processed[logfile.path] && logfile.cache_valid_at?(processed[logfile.path]['time'])
       processed[logfile.path] = {
         'time' => Time.now.to_i,
         'paths' => []
@@ -81,9 +101,17 @@ module OHOLFamilyTrees
           }
           #p arcs
 
-          write_tiles(tiled.objects, tiled.floors, tiled.arc.s_end, zoom)
+          spans[tiled.s_start.to_s] = {
+            'start' => tiled.s_start,
+            'end' => tiled.s_end,
+            'base' => tiled.s_base,
+            'seed' => tiled.seed,
+          }
+          #p arcs
 
-          processed[logfile.path]['paths'] << tiled.arc.s_end.to_s
+          write_tiles(tiled.objects, tiled.floors, tiled.s_end, zoom)
+
+          processed[logfile.path]['paths'] << tiled.s_end.to_s
           #p processed
         end
       end

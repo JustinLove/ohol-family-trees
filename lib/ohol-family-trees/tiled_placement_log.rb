@@ -3,16 +3,39 @@ require 'json'
 
 module OHOLFamilyTrees
   class TiledPlacementLog
+    MaxLog = 24*60*60
+
     attr_reader :floors
     attr_reader :objects
     attr_reader :placements
     attr_reader :arc
 
-    def initialize(arc)
+    attr_reader :server
+    attr_accessor :s_start
+    attr_accessor :s_end
+    attr_accessor :s_base
+    attr_reader :seed
+
+    def initialize(server, st, en, sd, arc = Arc.new(server, st, en, sd))
+      @server = server
+      @s_start = st
+      @s_end = en
+      @s_base = 0
+      @seed = sd
+
       @objects = Hash.new {|h,k| h[k] = {}}
       @floors = Hash.new {|h,k| h[k] = {}}
       @placements = Hash.new {|h,k| h[k] = []}
       @arc = arc
+    end
+
+    def self.breakpoints(logfile)
+      Arc.load_log(logfile).flat_map do |arc|
+        length = arc.s_end - arc.s_start
+        chunks = (length.to_f / MaxLog).ceil
+        chunk = length / chunks
+        (1...chunks).map {|i| arc.s_start + chunk*i }
+      end
     end
 
     def self.read(logfile, tile_width, options = {})
@@ -21,29 +44,47 @@ module OHOLFamilyTrees
       min_size = options[:min_size] || 0
       object_size = options[:object_size]
       object_over = options[:object_over] || Hash.new {|h,k| h[k] = ObjectOver.new(2, 2, 2, 4)}
+      breakpoints = breakpoints(logfile)
       start = nil
       file = logfile.open
       previous = nil
       tiled = []
       server = logfile.server
       seed = logfile.seed
-      out = new(Arc.new(server, 0, 0, seed))
+      out = new(server, 0, 0, seed)
       tiled << out
       while line = file.gets
         log = Maplog.create(line)
         if log.kind_of?(Maplog::ArcStart)
           if start && log.s_start < Arc::SplitArcsBefore
-            out = new(Arc.new(server, log.s_start, log.s_start, seed))
+            out = new(server, log.s_start, log.s_start, seed)
+            if tiled.any? 
+              out.s_base = tiled.last.s_end
+            end
             tiled << out
           end
           start = log
           if out.arc.s_start == 0
             out.arc.s_start = start.s_start
           end
+          if out.s_start == 0
+            out.s_start = start.s_start
+          end
           out.arc.s_end = start.s_start
+          out.s_end = start.s_start
         elsif log.kind_of?(Maplog::Placement)
           log.ms_start = start.ms_start
+          if breakpoints.any? && log.s_time > breakpoints.first
+            breakpoints.shift
+            out = new(server, log.s_time, log.s_time, seed, out.arc)
+            if tiled.any? 
+              out.s_base = tiled.last.s_end
+            end
+            tiled << out
+          end
+
           out.arc.s_end = log.s_time
+          out.s_end = log.s_time
           tilex = log.x / tile_width
           #(-tileY - 1) * tile_width = log.y
           #-tileY - 1 = log.y / tile_width
