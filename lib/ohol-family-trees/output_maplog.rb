@@ -39,7 +39,7 @@ module OHOLFamilyTrees
     end
 
     def process(logfile)
-      return if processed[logfile.path] && logfile.cache_valid_at?(processed[logfile.path]['time'])
+      #return if processed[logfile.path] && logfile.cache_valid_at?(processed[logfile.path]['time'])
       processed[logfile.path] = {
         'time' => Time.now.to_i,
         'paths' => []
@@ -65,9 +65,9 @@ module OHOLFamilyTrees
             :object_over => objects.object_over,
           }).each do |tiled|
 
-          write_tiles(tiled.placements, tiled.arc.s_end, zoom)
+          write_tiles(tiled.placements, tiled.s_end, zoom)
 
-          processed[logfile.path]['paths'] << "#{tiled.arc.s_end.to_s}/#{zoom}"
+          processed[logfile.path]['paths'] << "#{tiled.s_end.to_s}/#{zoom}"
           #p processed
         end
       end
