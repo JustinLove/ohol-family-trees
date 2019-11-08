@@ -58,9 +58,6 @@ module OHOLFamilyTrees
         if log.kind_of?(Maplog::ArcStart)
           if start && log.s_start < Arc::SplitArcsBefore
             out = new(server, log.s_start, log.s_start, seed)
-            if tiled.any? 
-              out.s_base = tiled.last.s_end
-            end
             tiled << out
           end
           start = log
