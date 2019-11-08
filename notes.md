@@ -1,7 +1,7 @@
 - diffed keyframes
-  - maintain map state between span breaks
   - resumption from previous keyframe
   - multiple input files
+  - expiring tiles from the keyplace after sufficient time
 - batch reprocess ranges
 - overdraw missing for large natural objets
   - assume unknown objects are very large
