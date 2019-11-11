@@ -89,9 +89,16 @@ module OHOLFamilyTrees
       ZoomLevels.each do |zoom|
         tile_width = 2**(32 - zoom)
 
+        base_span = spans.values.first
+        base_tiled = nil
+        if base_span
+          base_tiled = read_tiles(base_span['end'], zoom)
+        end
+
         TiledPlacementLog.read(logfile, tile_width, {
             :floor_removal => objects.floor_removal,
             :object_over => objects.object_over,
+            :base => base_tiled,
           }) do |tiled|
 
           arcs[tiled.arc.s_start.to_s] = {
@@ -107,7 +114,7 @@ module OHOLFamilyTrees
             'base' => tiled.s_base,
             'seed' => tiled.seed,
           }
-          #p arcs
+          #p spans
 
           write_tiles(tiled.objects, tiled.floors, tiled.s_end, zoom)
 
@@ -137,6 +144,35 @@ module OHOLFamilyTrees
           end
         end
       end
+    end
+
+    def read_tiles(dir, zoom)
+      #p dir, zoom
+      prefix = "#{output_path}/#{dir}/#{zoom}"
+      #p prefix
+      paths = filesystem.list(prefix)
+      bar = ProgressBar.new(paths.length)
+      tiled = TiledPlacementLog.new(0, 0, 0)
+      tiled.s_end = dir
+      paths.each do |path|
+        bar.increment!
+        next unless path.match('.txt')
+        #p path
+        parts = path.split(/[\/\.]/)
+        coords = [parts[3],parts[4]]
+        #p coords
+        filesystem.read(path) do |file|
+          file.each_line do |line|
+            parts = line.split(' ')
+            if parts[2].start_with?('f')
+              tiled.floors[coords]["#{parts[0]} #{parts[1]}"] = parts[2]
+            else
+              tiled.objects[coords]["#{parts[0]} #{parts[1]}"] = parts[2]
+            end
+          end
+        end
+      end
+      return tiled
     end
   end
 end

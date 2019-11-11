@@ -22,6 +22,11 @@ filesystem = FilesystemGroup.new([
   #FilesystemS3.new(OutputBucket),
 ])
 
+#filesystem.list('kp/1573263189/24').each do |path|
+  #p path
+#end
+#exit
+
 objects = ObjectData.new
 filesystem.read('static/objects.json') do |f|
   objects.read!(f.read)

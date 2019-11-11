@@ -34,7 +34,8 @@ module OHOLFamilyTrees
       return false
     end
 
-    def list(path, &block)
+    def list(path)
+      paths = []
       response = client.list_objects_v2({
         :bucket => bucket,
         :prefix => path,
@@ -48,12 +49,10 @@ module OHOLFamilyTrees
           :continuation_token => token
         })
         token = response.next_continuation_token
-        response.contents.each do |entry|
-          yield entry.key
-        end
+        paths += response.contents.map { |entry| entry.key }
         crazy += 1
       end while response.is_truncated && crazy <= 200
-      return crazy > 0
+      return paths
     end
   end
 end

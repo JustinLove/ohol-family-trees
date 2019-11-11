@@ -62,6 +62,9 @@ module OHOLFamilyTrees
       server = logfile.server
       seed = logfile.seed
       out = new(server, 0, seed)
+      if options[:base]
+        out.copy_key(options[:base])
+      end
       while line = file.gets
         log = Maplog.create(line)
         if log.kind_of?(Maplog::ArcStart)
