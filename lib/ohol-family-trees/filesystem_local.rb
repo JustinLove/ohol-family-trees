@@ -21,5 +21,16 @@ module OHOLFamilyTrees
         return true
       end
     end
+
+    def list(path, &block)
+      filepath = "#{output_dir}/#{path}"
+      notprefix = ("#{output_dir}/".length)..-1
+      if Dir.exist?(filepath)
+        Dir.glob(filepath + "/**/*") do |entry|
+          yield entry[notprefix]
+        end
+        return true
+      end
+    end
   end
 end
