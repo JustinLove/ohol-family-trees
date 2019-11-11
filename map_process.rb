@@ -10,8 +10,8 @@ require 'json'
 
 include OHOLFamilyTrees
 
-PlacementPath = "kp"
-MaplogPath = "ml"
+PlacementPath = "kptest"
+MaplogPath = "mltest"
 
 OutputDir = 'output'
 OutputBucket = 'wondible-com-ohol-tiles'
@@ -44,8 +44,9 @@ MaplogCache::Servers.new.each do |logs|
     #next unless logfile.path.match('1521396640seed') # two arcs in one file
     #next unless logfile.path.match('588415882seed') # one arc with multiple start times
     #next unless logfile.path.match('2680185702seed') # multiple files one seed
+    next unless logfile.path.match('3019284048seed') # multiple files one seed, smaller dataset
 
     final_placements.process(logfile)
-    maplog.process(logfile)
+    #maplog.process(logfile)
   end
 end

@@ -3,7 +3,7 @@ require 'json'
 
 module OHOLFamilyTrees
   class TiledPlacementLog
-    MaxLog = 60*60
+    MaxLog = 24*60*60
 
     attr_reader :floors
     attr_reader :objects
