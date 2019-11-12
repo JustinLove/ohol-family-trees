@@ -4,7 +4,6 @@ require 'ohol-family-trees/lifelog_cache'
 require 'ohol-family-trees/graph'
 require 'date'
 require 'csv'
-require 'json'
 
 include OHOLFamilyTrees
 
@@ -19,8 +18,7 @@ end
 
 LifelogCache::Servers.new.each do |logs|
   #p logs
-  lives_json = []
-  server = logs.server
+  #server = logs.server
 
   lives = History.new
 
@@ -40,24 +38,11 @@ LifelogCache::Servers.new.each do |logs|
       if life.time > from && life.time < to && life.lifetime > 3
         eve = lives.ancestors(life).last
 
-        if life.birth_coords
-          p "adding point"
-          lives_json << life.birth_coords + [life.name]
-        end
-        if life.birth_coords
-          p "adding point"
-          lives_json << life.death_coords + [life.name]
-        end
-
         unless lines[eve.key]
           line = lines[eve.key] = lives.family(eve)
           length = line.length
           #lives.outsiders(line)
-          json = []
           line.each do |l|
-            if l.birth_coords && l.age > 0.5
-              json << l.birth_coords + [l.name]
-            end
             l.player_name = known_players[l.hash]
             if l.player_name
               l.highlight = true
@@ -74,21 +59,9 @@ LifelogCache::Servers.new.each do |logs|
           p [filename, line.length]
           #Graph.graph(line).output(:dot => filename + ".gv")
           Graph.html(filename + ".html", line, killers)
-          #File.open("#{filename}_points.json", 'wb') do |file|
-            #file << JSON.generate(json)
-          #end
         end
       end
     end
   end
-
-  p "#{server} #{lives_json.length}"
-=begin
-  if lives_json.length > 0
-    File.open("output/#{server}_points.json", 'wb') do |file|
-      file << JSON.generate(lives_json)
-    end
-  end
-=end
 end
 
