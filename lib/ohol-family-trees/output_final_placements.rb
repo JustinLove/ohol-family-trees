@@ -78,6 +78,19 @@ module OHOLFamilyTrees
       end
     end
 
+    def base_tiled(logfile, basefile, zoom)
+      if basefile
+        candidates = spans.values
+          .select {|span| basefile.timestamp <= span['start'] && span['end'] <= logfile.timestamp }
+          .sort_by {|span| span['end']}
+        base_span = candidates.last
+        #p base_span
+        if base_span
+          return read_tiles(base_span['end'], zoom)
+        end
+      end
+    end
+
     def process(logfile, basefile = nil)
       #return if processed[logfile.path] && logfile.cache_valid_at?(processed[logfile.path]['time'])
       processed[logfile.path] = {
@@ -87,27 +100,13 @@ module OHOLFamilyTrees
 
       p logfile.path
 
-      base_span = nil
-      if basefile
-        candidates = spans.values
-          .select {|span| basefile.timestamp <= span['start'] && span['end'] <= logfile.timestamp }
-          .sort_by {|span| span['end']}
-        base_span = candidates.last
-        #p base_span
-      end
-
       ZoomLevels.each do |zoom|
         tile_width = 2**(32 - zoom)
-
-        base_tiled = nil
-        if base_span
-          base_tiled = read_tiles(base_span['end'], zoom)
-        end
 
         TiledPlacementLog.read(logfile, tile_width, {
             :floor_removal => objects.floor_removal,
             :object_over => objects.object_over,
-            :base => base_tiled,
+            :base => base_tiled(logfile, basefile, zoom),
           }) do |tiled|
 
           arcs[tiled.arc.s_start.to_s] = {

@@ -1,5 +1,4 @@
 - diffed keyframes
-  - pick the right base frame
   - expiring tiles from the keyplace after sufficient time
 - batch reprocess ranges
 - overdraw missing for large natural objets
