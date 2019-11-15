@@ -90,7 +90,8 @@ module OHOLFamilyTrees
         elsif timestamp == 1572297324
           return nil
         end
-        path.match(/_(\d+)seed/)[1].to_i
+        match = path.match(/_(\d+)seed/)
+        match && match[1].to_i
       end
 
       def merges_with?(file)
