@@ -1,3 +1,5 @@
+- seed files
+- two part seed
 - diffed keyframes
   - expiring tiles from the keyplace after sufficient time
 - batch reprocess ranges
