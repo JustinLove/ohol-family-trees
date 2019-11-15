@@ -63,7 +63,7 @@ module OHOLFamilyTrees
       seed = logfile.seed
       out = new(server, 0, seed)
       if options[:base]
-        p "resume from ", options[:base].s_end
+        p "resume from #{options[:base].s_end}"
         out.copy_key(options[:base])
       end
       while line = file.gets

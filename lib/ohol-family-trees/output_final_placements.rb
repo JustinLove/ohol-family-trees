@@ -2,6 +2,7 @@ require 'ohol-family-trees/tiled_placement_log'
 require 'fileutils'
 require 'json'
 require 'progress_bar'
+require 'set'
 
 module OHOLFamilyTrees
   class OutputFinalPlacements
@@ -92,7 +93,7 @@ module OHOLFamilyTrees
           .select {|span| basefile.timestamp <= span['start'] && span['end'] <= logfile.timestamp }
           .sort_by {|span| span['end']}
         base_span = candidates.last
-        p base_span
+        #p base_span
       end
 
       ZoomLevels.each do |zoom|
@@ -135,14 +136,15 @@ module OHOLFamilyTrees
     end
 
     def write_tiles(objects, floors, dir, zoom)
-      p dir
-      set = (objects.keys | floors.keys)
+      p "write #{dir}"
+      set = Set.new(objects.keys).merge(floors.keys)
       bar = ProgressBar.new(set.length)
       set.each do |coords|
         bar.increment!
         next if floors[coords].empty? && objects[coords].empty?
         tilex, tiley = *coords
         path = "#{output_path}/#{dir}/#{zoom}/#{tilex}/#{tiley}.txt"
+        #p path
         filesystem.write(path) do |out|
           floors[coords].each do |key,value|
             out << "#{key} #{value}\n"
@@ -155,6 +157,7 @@ module OHOLFamilyTrees
     end
 
     def read_tiles(dir, zoom)
+      p "read #{dir}"
       #p dir, zoom
       prefix = "#{output_path}/#{dir}/#{zoom}"
       #p prefix
@@ -167,7 +170,7 @@ module OHOLFamilyTrees
         next unless path.match('.txt')
         #p path
         parts = path.split(/[\/\.]/)
-        coords = [parts[3],parts[4]]
+        coords = [parts[3].to_i,parts[4].to_i]
         #p coords
         filesystem.read(path) do |file|
           file.each_line do |line|
