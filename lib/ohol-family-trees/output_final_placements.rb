@@ -77,7 +77,7 @@ module OHOLFamilyTrees
       end
     end
 
-    def process(logfile)
+    def process(logfile, basefile = nil)
       #return if processed[logfile.path] && logfile.cache_valid_at?(processed[logfile.path]['time'])
       processed[logfile.path] = {
         'time' => Time.now.to_i,
@@ -86,10 +86,18 @@ module OHOLFamilyTrees
 
       p logfile.path
 
+      base_span = nil
+      if basefile
+        candidates = spans.values
+          .select {|span| basefile.timestamp <= span['start'] && span['end'] <= logfile.timestamp }
+          .sort_by {|span| span['end']}
+        base_span = candidates.last
+        p base_span
+      end
+
       ZoomLevels.each do |zoom|
         tile_width = 2**(32 - zoom)
 
-        base_span = spans.values.first
         base_tiled = nil
         if base_span
           base_tiled = read_tiles(base_span['end'], zoom)

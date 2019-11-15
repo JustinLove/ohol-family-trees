@@ -39,19 +39,27 @@ final_placements = OutputFinalPlacements.new(PlacementPath, filesystem, objects)
 maplog = OutputMaplog.new(MaplogPath, filesystem, objects)
 
 MaplogCache::Servers.new.each do |logs|
-  p logs
+  #p logs
 
   #server = logs.server.sub('.onehouronelife.com', '')
 
+  prior = nil
+
   logs.each do |logfile|
+    base = nil
+    if prior and logfile.merges_with?(prior)
+      base = prior
+    end
+    prior = logfile
+
     #next unless logfile.path.match('000seed')
     #next unless logfile.path.match('1151446675seed') # small file
     #next unless logfile.path.match('1521396640seed') # two arcs in one file
     #next unless logfile.path.match('588415882seed') # one arc with multiple start times
-    #next unless logfile.path.match('2680185702seed') # multiple files one seed
-    next unless logfile.path.match('3019284048seed') # multiple files one seed, smaller dataset
+    next unless logfile.path.match('2680185702seed') # multiple files one seed
+    #next unless logfile.path.match('3019284048seed') # multiple files one seed, smaller dataset
 
-    final_placements.process(logfile)
-    #maplog.process(logfile)
+    final_placements.process(logfile, base)
+    #maplog.process(logfile, base)
   end
 end
