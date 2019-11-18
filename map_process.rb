@@ -36,7 +36,7 @@ raise "no object data" unless objects.object_size.length > 0
 
 final_placements = OutputFinalPlacements.new(PlacementPath, filesystem, objects)
 
-maplog = OutputMaplog.new(MaplogPath, filesystem, objects)
+#maplog = OutputMaplog.new(MaplogPath, filesystem, objects)
 
 MaplogCache::Servers.new.each do |logs|
   #p logs
@@ -60,6 +60,6 @@ MaplogCache::Servers.new.each do |logs|
     next unless logfile.path.match('3019284048seed') # multiple files one seed, smaller dataset
 
     final_placements.process(logfile, base)
-    maplog.process(logfile, base)
+    #maplog.process(logfile, base)
   end
 end

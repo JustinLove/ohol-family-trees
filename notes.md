@@ -1,9 +1,15 @@
+- diffed keyframes
+  - indexs should write timestamps for older tiles
+  - indexs should read timestamps for older tiles
+  - tile reading should use specified timestamp
+    - expiring tiles from the keyplace after sufficient time
+  - tile reading should be lazy
+  - track which tiles were touched - just objects/floors?
 - players ids in maplogs
   - redundant -1s
-- diffed keyframes
-  - expiring tiles from the keyplace after sufficient time
 - batch reprocess ranges
 - overdraw missing for large natural objets
+  - maplogs may skip small objects, should always write 0 if possibly unknown
   - assume unknown objects are very large
   - http://localhost:8000/public/index.html#x=5&y=2&z=29&t=1570914891
 - seed files
@@ -12,6 +18,7 @@
 - maplog compression
 - running on data server
   - failures on heroku
+  - split by tiles to temp and then process each tile?
 
 - process multiple servers
 - search method to narrow down life for graph

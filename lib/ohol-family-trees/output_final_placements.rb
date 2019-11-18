@@ -86,7 +86,8 @@ module OHOLFamilyTrees
         base_span = candidates.last
         #p base_span
         if base_span
-          return read_tiles(base_span['end'], zoom)
+          tiles = read_index(base_span['end'], zoom)
+          return read_tiles(base_span['end'], zoom, tiles)
         end
       end
     end
@@ -125,6 +126,7 @@ module OHOLFamilyTrees
           #p spans
 
           write_tiles(tiled.objects, tiled.floors, tiled.s_end, zoom)
+          write_index(tiled.objects, tiled.floors, tiled.s_end, zoom)
 
           processed[logfile.path]['paths'] << tiled.s_end.to_s
           #p processed
@@ -135,7 +137,7 @@ module OHOLFamilyTrees
     end
 
     def write_tiles(objects, floors, dir, zoom)
-      p "write #{dir}"
+      p "write #{dir}/#{zoom}"
       set = Set.new(objects.keys).merge(floors.keys)
       bar = ProgressBar.new(set.length)
       set.each do |coords|
@@ -155,22 +157,17 @@ module OHOLFamilyTrees
       end
     end
 
-    def read_tiles(dir, zoom)
-      p "read #{dir}"
+    def read_tiles(dir, zoom, tiles)
       #p dir, zoom
-      prefix = "#{output_path}/#{dir}/#{zoom}"
-      #p prefix
-      paths = filesystem.list(prefix)
-      bar = ProgressBar.new(paths.length)
+      bar = ProgressBar.new(tiles.length)
       tiled = TiledPlacementLog.new(0, 0, 0)
       tiled.s_end = dir
-      paths.each do |path|
+      tiles.each do |coords|
+        tilex, tiley = *coords
         bar.increment!
-        next unless path.match('.txt')
-        #p path
-        parts = path.split(/[\/\.]/)
-        coords = [parts[3].to_i,parts[4].to_i]
         #p coords
+        path = "#{output_path}/#{dir}/#{zoom}/#{tilex}/#{tiley}.txt"
+        #p path
         filesystem.read(path) do |file|
           file.each_line do |line|
             parts = line.split(' ')
@@ -183,6 +180,53 @@ module OHOLFamilyTrees
         end
       end
       return tiled
+    end
+
+    def list_tiles(dir, zoom)
+      #p dir, zoom
+      prefix = "#{output_path}/#{dir}/#{zoom}"
+      p "list #{prefix}"
+      paths = filesystem.list(prefix)
+      tiles = []
+      paths.each do |path|
+        next unless path.match('.txt')
+        #p path
+        parts = path.split(/[\/\.]/)
+        coords = [parts[3].to_i,parts[4].to_i]
+        #p coords
+        tiles << coords
+      end
+      return tiles
+    end
+
+    def write_index(objects, floors, dir, zoom)
+      path = "#{output_path}/#{dir}/#{zoom}/index.json"
+      p "write #{path}"
+      set = Set.new(objects.keys).merge(floors.keys)
+      filesystem.write(path) do |out|
+        set.to_a.sort.each do |coords|
+          next if floors[coords].empty? && objects[coords].empty?
+          tilex, tiley = *coords
+          line = "#{tilex}/#{tiley}"
+          #p line
+          out << "#{line}\n"
+        end
+      end
+    end
+
+    def read_index(dir, zoom)
+      path = "#{output_path}/#{dir}/#{zoom}/index.json"
+      p "read #{path}"
+      tiles = []
+      filesystem.read(path) do |file|
+        file.each_line do |line|
+          parts = line.split('/')
+          coords = [parts[0].to_i,parts[1].to_i]
+          #p coords
+          tiles << coords
+        end
+      end
+      return tiles
     end
   end
 end
