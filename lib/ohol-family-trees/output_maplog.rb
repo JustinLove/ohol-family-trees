@@ -15,13 +15,11 @@ module OHOLFamilyTrees
     attr_reader :output_path
     attr_reader :filesystem
     attr_reader :objects
-    attr_reader :final_placements
 
-    def initialize(output_path, filesystem, objects, final_placements)
+    def initialize(output_path, filesystem, objects)
       @output_path = output_path
       @filesystem = filesystem
       @objects = objects
-      @final_placements = final_placements
     end
 
     def processed
@@ -63,7 +61,6 @@ module OHOLFamilyTrees
             :min_size => min_size,
             :object_size => objects.object_size,
             :object_over => objects.object_over,
-            :base => final_placements && final_placements.base_tiled(logfile, basefile, 24),
           }) do |tiled|
 
           write_tiles(tiled.placements, tiled.s_end, zoom)

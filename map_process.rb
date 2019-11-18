@@ -36,7 +36,7 @@ raise "no object data" unless objects.object_size.length > 0
 
 final_placements = OutputFinalPlacements.new(PlacementPath, filesystem, objects)
 
-maplog = OutputMaplog.new(MaplogPath, filesystem, objects, final_placements)
+maplog = OutputMaplog.new(MaplogPath, filesystem, objects)
 
 MaplogCache::Servers.new.each do |logs|
   #p logs
