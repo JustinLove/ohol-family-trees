@@ -5,9 +5,7 @@ module OHOLFamilyTrees
   class TiledPlacementLog
     MaxLog = 24*60*60
 
-    attr_reader :floors
-    attr_reader :objects
-    attr_reader :placements
+    attr_reader :tiles
     attr_reader :arc
 
     attr_reader :server
@@ -23,9 +21,7 @@ module OHOLFamilyTrees
       @s_end = st
       @seed = sd
 
-      @objects = Hash.new {|h,k| h[k] = {}}
-      @floors = Hash.new {|h,k| h[k] = {}}
-      @placements = Hash.new {|h,k| h[k] = []}
+      @tiles = Hash.new {|h,k| h[k] = Tile.new(k)}
       @arc = arc
     end
 
@@ -33,10 +29,45 @@ module OHOLFamilyTrees
       self.class.new(server, st, seed, arc).copy_key(self)
     end
 
+    def get_floor(coord, x, y)
+      tiles[coord].floor(x, y)
+    end
+
+    def set_floor(coord, x, y, object)
+      tiles[coord].set_floor(x, y, object)
+    end
+
+    def remove_floor(coord, x, y)
+      tiles[coord].remove_floor(x, y)
+    end
+
+    def get_object(coord, x, y)
+      tiles[coord].object(x, y)
+    end
+
+    def set_object(coord, x, y, object)
+      tiles[coord].set_object(x, y, object)
+    end
+
+    def add_placement(coord, log) 
+      tiles[coord].add_placement(log)
+    end
+
+    def floors
+      tiles.select {|coord,tile| tile.updated}.transform_values {|tile| tile.floors}
+    end
+
+    def objects
+      tiles.select {|coord,tile| tile.updated}.transform_values {|tile| tile.objects}
+    end
+
+    def placements
+      tiles.transform_values {|tile| tile.placements}
+    end
+
     def copy_key(previous)
       @s_base = previous.s_end
-      @objects = previous.objects
-      @floors = previous.floors
+      previous.tiles.each_pair {|coords, tile| tiles[coords] = tile.copy }
       self
     end
 
@@ -99,19 +130,19 @@ module OHOLFamilyTrees
           tiley = -(log.y / tile_width + 1)
           object = log.object
           if log.floor?
-            occupant = out.floors[[tilex,tiley]]["#{log.x} #{log.y}"]
-            out.placements[[tilex,tiley]] << log
-            out.floors[[tilex,tiley]]["#{log.x} #{log.y}"] = object
+            occupant = out.get_floor([tilex,tiley], log.x, log.y)
+            out.add_placement([tilex,tiley], log)
+            out.set_floor([tilex,tiley], log.x, log.y, object)
           else
-            occupant = out.objects[[tilex,tiley]]["#{log.x} #{log.y}"]
+            occupant = out.get_object([tilex,tiley], log.x, log.y)
             removes = floor_removal[object]
             if removes
-              if out.floors[[tilex,tiley]]["#{log.x} #{log.y}"] == removes &&
+              if out.get_floor([tilex,tiley], log.x, log.y) == removes &&
                  previous.object == "0" &&
                  previous.x == log.x &&
                  previous.y == log.y &&
                  previous.ms_offset == log.ms_offset
-                out.floors[[tilex,tiley]].delete("#{log.x} #{log.y}")
+                out.remove_floor([tilex,tiley], log.x, log.y)
                 previous.object = "f0"
               end
             end
@@ -133,8 +164,8 @@ module OHOLFamilyTrees
               end
             end
 
-            out.placements[[tilex,tiley]] << log
-            out.objects[[tilex,tiley]]["#{log.x} #{log.y}"] = object
+            out.add_placement([tilex,tiley], log)
+            out.set_object([tilex,tiley], log.x, log.y, object)
           end
           tx = log.x % tile_width
           ty = log.y % tile_width
@@ -165,12 +196,12 @@ module OHOLFamilyTrees
             overs << [tilex+overx,tiley+overy]
           end
           overs.each do |tile|
-            out.placements[tile] << log
+            out.add_placement(tile, log)
             if log.floor?
               # overkill, but I don't want separate bounds for floors, bearskin can hang over
-              out.floors[tile]["#{log.x} #{log.y}"] = object
+              out.set_floor(tile, log.x, log.y, object)
             else
-              out.objects[tile]["#{log.x} #{log.y}"] = object
+              out.set_object(tile, log.x, log.y, object)
             end
           end
         end
@@ -197,6 +228,61 @@ module OHOLFamilyTrees
         end
         return [overx, overy]
       end
+    end
+  end
+
+  class Tile
+    attr_reader :floors
+    attr_reader :objects
+    attr_reader :placements
+
+    attr_reader :updated
+    attr_reader :coords
+
+    def initialize(cor)
+      @updated = false
+      @coords = cor
+      @floors = {}
+      @objects = {}
+      @placements = []
+    end
+
+    def copy_key(tile)
+      @coords = tile.coords
+      @floors = tile.floors
+      @objects = tile.objects
+      self
+    end
+
+    def copy
+      self.class.new(coords).copy_key(self)
+    end
+
+    def floor(x, y)
+      floors["#{x} #{y}"]
+    end
+
+    def remove_floor(x, y)
+      @updated = true
+      floors.delete("#{x} #{y}")
+    end
+
+    def set_floor(x, y, object)
+      @updated = true
+      floors["#{x} #{y}"] = object
+    end
+
+    def object(x, y)
+      objects["#{x} #{y}"]
+    end
+
+    def set_object(x, y, object)
+      @updated = true
+      objects["#{x} #{y}"] = object
+    end
+
+    def add_placement(log)
+      placements << log
     end
   end
 end

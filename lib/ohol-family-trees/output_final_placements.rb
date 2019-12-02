@@ -172,9 +172,9 @@ module OHOLFamilyTrees
           file.each_line do |line|
             parts = line.split(' ')
             if parts[2].start_with?('f')
-              tiled.floors[coords]["#{parts[0]} #{parts[1]}"] = parts[2]
+              tiled.set_floor(coords, parts[0], parts[1], parts[2])
             else
-              tiled.objects[coords]["#{parts[0]} #{parts[1]}"] = parts[2]
+              tiled.set_object(coords, parts[0], parts[1], parts[2])
             end
           end
         end
@@ -200,7 +200,7 @@ module OHOLFamilyTrees
     end
 
     def write_index(objects, floors, dir, zoom)
-      path = "#{output_path}/#{dir}/#{zoom}/index.json"
+      path = "#{output_path}/#{dir}/#{zoom}/index.txt"
       p "write #{path}"
       set = Set.new(objects.keys).merge(floors.keys)
       filesystem.write(path) do |out|
@@ -215,7 +215,7 @@ module OHOLFamilyTrees
     end
 
     def read_index(dir, zoom)
-      path = "#{output_path}/#{dir}/#{zoom}/index.json"
+      path = "#{output_path}/#{dir}/#{zoom}/index.txt"
       p "read #{path}"
       tiles = []
       filesystem.read(path) do |file|
