@@ -4,7 +4,7 @@ module OHOLFamilyTrees
       parts = line.split(' ')
       if parts[0] == 'startTime:'
         ArcStart.new(parts[1])
-      elsif parts.length == 4
+      elsif parts.length == 4 || parts.length == 5
         Placement.new(parts)
       elsif line.match('startTime:')
         ArcStart.new(parts[parts.length-1])
@@ -30,6 +30,7 @@ module OHOLFamilyTrees
       attr_reader :ms_offset
       attr_reader :x
       attr_reader :y
+      attr_reader :actor
       attr_accessor :object
       attr_accessor :ms_start
 
@@ -38,6 +39,7 @@ module OHOLFamilyTrees
         @x = parts[1].to_i
         @y = parts[2].to_i
         @object = parts[3]
+        @actor = parts[4]
         @ms_start = 0
       end
 
