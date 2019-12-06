@@ -1,8 +1,5 @@
 - diffed keyframes
   - have update tracking of log processing, need index support
-  - indexs should write timestamps for older tiles
-  - indexs should read timestamps for older tiles
-  - tile reading should use specified timestamp
     - expiring tiles from the keyplace after sufficient time
   - tile reading should be lazy
   - track which tiles were touched - just objects/floors?

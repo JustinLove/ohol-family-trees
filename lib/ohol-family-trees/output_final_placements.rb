@@ -126,7 +126,7 @@ module OHOLFamilyTrees
           #p spans
 
           write_tiles(tiled.updated_tiles, tiled.s_end, zoom)
-          write_index(tiled.tiles, tiled.s_end, zoom)
+          write_index(tiled.tile_index, tiled.s_end, zoom)
 
           processed[logfile.path]['paths'] << tiled.s_end.to_s
           #p processed
@@ -161,12 +161,13 @@ module OHOLFamilyTrees
       bar = ProgressBar.new(tile_list.length)
       tiled = TiledPlacementLog.new(0, 0, 0)
       tiled.s_end = dir
-      tile_list.each do |coords|
-        tilex, tiley, timestamp = *coords
+      tile_list.each do |triple|
+        tilex, tiley, timestamp = *triple
+        coords = [tilex,tiley]
         bar.increment!
         #p coords
         path = "#{output_path}/#{timestamp}/#{zoom}/#{tilex}/#{tiley}.txt"
-        tile = tiled.tiles[coords]
+        tile = tiled.tiles[coords] = TiledPlacementLog::Tile.new(coords, timestamp)
         #p path
         filesystem.read(path) do |file|
           file.each_line do |line|
@@ -199,15 +200,25 @@ module OHOLFamilyTrees
       return tiles
     end
 
-    def write_index(tiles, dir, zoom)
+    def write_index(triples, dir, zoom)
       path = "#{output_path}/#{dir}/#{zoom}/index.txt"
       p "write #{path}"
       filesystem.write(path) do |out|
-        out << "t#{dir}"
         lasty = nil
-        tiles.keys.sort{|a,b| (b[1] <=> a[1])*2 + (a[0] <=> b[0])}.each do |coords|
-          next if tiles[coords].empty?
-          tilex, tiley = *coords
+        lastt = nil
+        triples.sort {|a,b|
+            (a[2] <=> b[2])*4 +
+              (b[1] <=> a[1])*2 +
+              (a[0] <=> b[0])
+          }.each do |tilex, tiley, time|
+          if time != lastt
+            if lastt
+              out << "\n"
+            end
+            lastt = time
+            lasty = nil
+            out << "t#{time}"
+          end
           if tiley != lasty
             lasty = tiley
             out << "\n#{tiley}"

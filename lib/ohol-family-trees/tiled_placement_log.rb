@@ -21,7 +21,7 @@ module OHOLFamilyTrees
       @s_end = st
       @seed = sd
 
-      @tiles = Hash.new {|h,k| h[k] = Tile.new(k)}
+      @tiles = Hash.new {|h,k| h[k] = Tile.new(k,s_start)}
       @arc = arc
     end
 
@@ -31,6 +31,12 @@ module OHOLFamilyTrees
 
     def updated_tiles
       tiles.select {|coord,tile| tile.updated}
+    end
+
+    def tile_index
+      tiles.values.reject(&:empty?).map {|tile|
+        [tile.tilex,tile.tiley,(tile.updated ? s_end : tile.time)]
+      }
     end
 
     def placements
@@ -212,10 +218,12 @@ module OHOLFamilyTrees
 
     attr_reader :updated
     attr_reader :coords
+    attr_reader :time
 
-    def initialize(cor)
+    def initialize(cor, t)
       @updated = false
       @coords = cor
+      @time = t
       @floors = {}
       @objects = {}
       @placements = []
@@ -229,11 +237,19 @@ module OHOLFamilyTrees
     end
 
     def copy
-      self.class.new(coords).copy_key(self)
+      self.class.new(coords, time).copy_key(self)
     end
 
     def empty?
       floors.empty? && objects.empty?
+    end
+
+    def tilex
+      coords[0]
+    end
+
+    def tiley
+      coords[1]
     end
 
     def floor(x, y)
