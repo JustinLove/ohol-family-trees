@@ -29,30 +29,6 @@ module OHOLFamilyTrees
       self.class.new(server, st, seed, arc).copy_key(self)
     end
 
-    def get_floor(coord, x, y)
-      tiles[coord].floor(x, y)
-    end
-
-    def set_floor(coord, x, y, object)
-      tiles[coord].set_floor(x, y, object)
-    end
-
-    def remove_floor(coord, x, y)
-      tiles[coord].remove_floor(x, y)
-    end
-
-    def get_object(coord, x, y)
-      tiles[coord].object(x, y)
-    end
-
-    def set_object(coord, x, y, object)
-      tiles[coord].set_object(x, y, object)
-    end
-
-    def add_placement(coord, log) 
-      tiles[coord].add_placement(log)
-    end
-
     def placements
       tiles.transform_values {|tile| tile.placements}
     end
@@ -120,21 +96,22 @@ module OHOLFamilyTrees
           #-tileY - 1 = log.y / tile_width
           #-tileY = log.y / tile_width + 1
           tiley = -(log.y / tile_width + 1)
+          tile = out.tiles[[tilex,tiley]]
           object = log.object
           if log.floor?
-            occupant = out.get_floor([tilex,tiley], log.x, log.y)
-            out.add_placement([tilex,tiley], log)
-            out.set_floor([tilex,tiley], log.x, log.y, object)
+            occupant = tile.floor(log.x, log.y)
+            tile.add_placement(log)
+            tile.set_floor(log.x, log.y, object)
           else
-            occupant = out.get_object([tilex,tiley], log.x, log.y)
+            occupant = tile.object(log.x, log.y)
             removes = floor_removal[object]
             if removes
-              if out.get_floor([tilex,tiley], log.x, log.y) == removes &&
+              if tile.floor(log.x, log.y) == removes &&
                  previous.object == "0" &&
                  previous.x == log.x &&
                  previous.y == log.y &&
                  previous.ms_offset == log.ms_offset
-                out.remove_floor([tilex,tiley], log.x, log.y)
+                tile.remove_floor(log.x, log.y)
                 previous.object = "f0"
               end
             end
@@ -156,8 +133,8 @@ module OHOLFamilyTrees
               end
             end
 
-            out.add_placement([tilex,tiley], log)
-            out.set_object([tilex,tiley], log.x, log.y, object)
+            tile.add_placement(log)
+            tile.set_object(log.x, log.y, object)
           end
           tx = log.x % tile_width
           ty = log.y % tile_width
@@ -188,12 +165,13 @@ module OHOLFamilyTrees
             overs << [tilex+overx,tiley+overy]
           end
           overs.each do |coord|
-            out.add_placement(coord, log)
+            tile = out.tiles[coord]
+            tile.add_placement(log)
             if log.floor?
               # overkill, but I don't want separate bounds for floors, bearskin can hang over
-              out.set_floor(coord, log.x, log.y, object)
+              tile.set_floor(log.x, log.y, object)
             else
-              out.set_object(coord, log.x, log.y, object)
+              tile.set_object(log.x, log.y, object)
             end
           end
         end
