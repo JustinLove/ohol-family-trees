@@ -29,6 +29,10 @@ module OHOLFamilyTrees
       self.class.new(server, st, seed, arc).copy_key(self)
     end
 
+    def updated_tiles
+      tiles.select {|coord,tile| tile.updated}
+    end
+
     def placements
       tiles.transform_values {|tile| tile.placements}
     end

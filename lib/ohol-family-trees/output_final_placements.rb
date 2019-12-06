@@ -125,7 +125,7 @@ module OHOLFamilyTrees
           }
           #p spans
 
-          write_tiles(tiled.tiles, tiled.s_end, zoom)
+          write_tiles(tiled.updated_tiles, tiled.s_end, zoom)
           write_index(tiled.tiles, tiled.s_end, zoom)
 
           processed[logfile.path]['paths'] << tiled.s_end.to_s
@@ -162,10 +162,10 @@ module OHOLFamilyTrees
       tiled = TiledPlacementLog.new(0, 0, 0)
       tiled.s_end = dir
       tile_list.each do |coords|
-        tilex, tiley = *coords
+        tilex, tiley, timestamp = *coords
         bar.increment!
         #p coords
-        path = "#{output_path}/#{dir}/#{zoom}/#{tilex}/#{tiley}.txt"
+        path = "#{output_path}/#{timestamp}/#{zoom}/#{tilex}/#{tiley}.txt"
         tile = tiled.tiles[coords]
         #p path
         filesystem.read(path) do |file|
@@ -203,12 +203,16 @@ module OHOLFamilyTrees
       path = "#{output_path}/#{dir}/#{zoom}/index.txt"
       p "write #{path}"
       filesystem.write(path) do |out|
-        tiles.keys.sort.each do |coords|
+        out << "t#{dir}"
+        lasty = nil
+        tiles.keys.sort{|a,b| (b[1] <=> a[1])*2 + (a[0] <=> b[0])}.each do |coords|
           next if tiles[coords].empty?
           tilex, tiley = *coords
-          line = "#{tilex}/#{tiley}"
-          #p line
-          out << "#{line}\n"
+          if tiley != lasty
+            lasty = tiley
+            out << "\n#{tiley}"
+          end
+          out << " #{tilex}"
         end
       end
     end
@@ -217,12 +221,17 @@ module OHOLFamilyTrees
       path = "#{output_path}/#{dir}/#{zoom}/index.txt"
       p "read #{path}"
       tile_list = []
+      timestamp = dir
       filesystem.read(path) do |file|
         file.each_line do |line|
-          parts = line.split('/')
-          coords = [parts[0].to_i,parts[1].to_i]
-          #p coords
-          tile_list << coords
+          if line[0] == 't'
+            timestamp = line[1..-1].to_i
+          end
+          parts = line.split(' ').map(&:to_i)
+          tiley = parts.shift
+          parts.each do |tilex|
+            tile_list << [tilex,tiley,timestamp]
+          end
         end
       end
       return tile_list
