@@ -86,8 +86,8 @@ module OHOLFamilyTrees
         base_span = candidates.last
         #p base_span
         if base_span
-          tiles = read_index(base_span['end'], zoom)
-          return read_tiles(base_span['end'], zoom, tiles)
+          tile_list = read_index(base_span['end'], zoom)
+          return read_tiles(base_span['end'], zoom, tile_list)
         end
       end
     end
@@ -125,8 +125,8 @@ module OHOLFamilyTrees
           }
           #p spans
 
-          write_tiles(tiled.objects, tiled.floors, tiled.s_end, zoom)
-          write_index(tiled.objects, tiled.floors, tiled.s_end, zoom)
+          write_tiles(tiled.tiles, tiled.s_end, zoom)
+          write_index(tiled.tiles, tiled.s_end, zoom)
 
           processed[logfile.path]['paths'] << tiled.s_end.to_s
           #p processed
@@ -136,45 +136,45 @@ module OHOLFamilyTrees
       checkpoint
     end
 
-    def write_tiles(objects, floors, dir, zoom)
+    def write_tiles(tiles, dir, zoom)
       p "write #{dir}/#{zoom}"
-      set = Set.new(objects.keys).merge(floors.keys)
-      bar = ProgressBar.new(set.length)
-      set.each do |coords|
+      bar = ProgressBar.new(tiles.length)
+      tiles.each_pair do |coords,tile|
         bar.increment!
-        next if floors[coords].empty? && objects[coords].empty?
+        next if tile.floors.empty? && tile.objects.empty?
         tilex, tiley = *coords
         path = "#{output_path}/#{dir}/#{zoom}/#{tilex}/#{tiley}.txt"
         #p path
         filesystem.write(path) do |out|
-          floors[coords].each do |key,value|
+          tile.floors.each do |key,value|
             out << "#{key} #{value}\n"
           end
-          objects[coords].each do |key,value|
+          tile.objects.each do |key,value|
             out << "#{key} #{value}\n"
           end
         end
       end
     end
 
-    def read_tiles(dir, zoom, tiles)
+    def read_tiles(dir, zoom, tile_list)
       #p dir, zoom
-      bar = ProgressBar.new(tiles.length)
+      bar = ProgressBar.new(tile_list.length)
       tiled = TiledPlacementLog.new(0, 0, 0)
       tiled.s_end = dir
-      tiles.each do |coords|
+      tile_list.each do |coords|
         tilex, tiley = *coords
         bar.increment!
         #p coords
         path = "#{output_path}/#{dir}/#{zoom}/#{tilex}/#{tiley}.txt"
+        tile = tiled.tiles[coords]
         #p path
         filesystem.read(path) do |file|
           file.each_line do |line|
             parts = line.split(' ')
             if parts[2].start_with?('f')
-              tiled.set_floor(coords, parts[0], parts[1], parts[2])
+              tile.set_floor(parts[0], parts[1], parts[2])
             else
-              tiled.set_object(coords, parts[0], parts[1], parts[2])
+              tile.set_object(parts[0], parts[1], parts[2])
             end
           end
         end
@@ -199,13 +199,12 @@ module OHOLFamilyTrees
       return tiles
     end
 
-    def write_index(objects, floors, dir, zoom)
+    def write_index(tiles, dir, zoom)
       path = "#{output_path}/#{dir}/#{zoom}/index.txt"
       p "write #{path}"
-      set = Set.new(objects.keys).merge(floors.keys)
       filesystem.write(path) do |out|
-        set.to_a.sort.each do |coords|
-          next if floors[coords].empty? && objects[coords].empty?
+        tiles.keys.sort.each do |coords|
+          next if tiles[coords].empty?
           tilex, tiley = *coords
           line = "#{tilex}/#{tiley}"
           #p line
@@ -217,16 +216,16 @@ module OHOLFamilyTrees
     def read_index(dir, zoom)
       path = "#{output_path}/#{dir}/#{zoom}/index.txt"
       p "read #{path}"
-      tiles = []
+      tile_list = []
       filesystem.read(path) do |file|
         file.each_line do |line|
           parts = line.split('/')
           coords = [parts[0].to_i,parts[1].to_i]
           #p coords
-          tiles << coords
+          tile_list << coords
         end
       end
-      return tiles
+      return tile_list
     end
   end
 end

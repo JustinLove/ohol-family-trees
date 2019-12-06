@@ -1,6 +1,5 @@
 - diffed keyframes
   - have update tracking of log processing, need index support
-  - can tile setting move into tile class?
   - indexs should write timestamps for older tiles
   - indexs should read timestamps for older tiles
   - tile reading should use specified timestamp

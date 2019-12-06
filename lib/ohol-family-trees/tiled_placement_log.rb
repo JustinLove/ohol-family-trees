@@ -53,14 +53,6 @@ module OHOLFamilyTrees
       tiles[coord].add_placement(log)
     end
 
-    def floors
-      tiles.select {|coord,tile| tile.updated}.transform_values {|tile| tile.floors}
-    end
-
-    def objects
-      tiles.select {|coord,tile| tile.updated}.transform_values {|tile| tile.objects}
-    end
-
     def placements
       tiles.transform_values {|tile| tile.placements}
     end
@@ -195,13 +187,13 @@ module OHOLFamilyTrees
           if overx != 0 && overy != 0
             overs << [tilex+overx,tiley+overy]
           end
-          overs.each do |tile|
-            out.add_placement(tile, log)
+          overs.each do |coord|
+            out.add_placement(coord, log)
             if log.floor?
               # overkill, but I don't want separate bounds for floors, bearskin can hang over
-              out.set_floor(tile, log.x, log.y, object)
+              out.set_floor(coord, log.x, log.y, object)
             else
-              out.set_object(tile, log.x, log.y, object)
+              out.set_object(coord, log.x, log.y, object)
             end
           end
         end
@@ -256,6 +248,10 @@ module OHOLFamilyTrees
 
     def copy
       self.class.new(coords).copy_key(self)
+    end
+
+    def empty?
+      floors.empty? && objects.empty?
     end
 
     def floor(x, y)
