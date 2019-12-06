@@ -1,8 +1,6 @@
 - diffed keyframes
-  - have update tracking of log processing, need index support
-    - expiring tiles from the keyplace after sufficient time
   - tile reading should be lazy
-  - track which tiles were touched - just objects/floors?
+    - keep the total index somewhere, since it won't be just the tile list
   - split by size instead of time
 - players ids in maplogs
   - redundant -1s

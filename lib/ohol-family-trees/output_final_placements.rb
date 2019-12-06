@@ -86,7 +86,8 @@ module OHOLFamilyTrees
         base_span = candidates.last
         #p base_span
         if base_span
-          tile_list = read_index(base_span['end'], zoom)
+          cutoff = logfile.timestamp - 14 * 24 * 60 * 60
+          tile_list = read_index(base_span['end'], zoom, cutoff)
           return read_tiles(base_span['end'], zoom, tile_list)
         end
       end
@@ -228,7 +229,7 @@ module OHOLFamilyTrees
       end
     end
 
-    def read_index(dir, zoom)
+    def read_index(dir, zoom, cutoff)
       path = "#{output_path}/#{dir}/#{zoom}/index.txt"
       p "read #{path}"
       tile_list = []
@@ -238,6 +239,7 @@ module OHOLFamilyTrees
           if line[0] == 't'
             timestamp = line[1..-1].to_i
           end
+          next if timestamp < cutoff
           parts = line.split(' ').map(&:to_i)
           tiley = parts.shift
           parts.each do |tilex|
