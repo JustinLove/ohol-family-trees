@@ -1,4 +1,5 @@
 require 'ohol-family-trees/tiled_placement_log'
+require 'ohol-family-trees/key_plain'
 require 'fileutils'
 require 'json'
 require 'progress_bar'
@@ -95,7 +96,8 @@ module OHOLFamilyTrees
       if time
         cutoff = time - 14 * 24 * 60 * 60
         tile_list = read_index(time, zoom, cutoff)
-        return read_tiles(time, zoom, tile_list)
+        loader = KeyPlain.new(filesystem, output_path, zoom)
+        return TileSet.new(tile_list, loader)
       end
     end
 
@@ -148,45 +150,26 @@ module OHOLFamilyTrees
 
     def write_tiles(tiles, dir, zoom)
       p "write #{dir}/#{zoom}"
+      writer = KeyPlain.new(filesystem, output_path, zoom)
       bar = ProgressBar.new(tiles.length)
       tiles.each_pair do |coords,tile|
         bar.increment!
-        next if tile.floors.empty? && tile.objects.empty?
-        tilex, tiley = *coords
-        path = "#{output_path}/#{dir}/#{zoom}/#{tilex}/#{tiley}.txt"
-        #p path
-        filesystem.write(path) do |out|
-          tile.floors.each do |key,value|
-            out << "#{key} #{value}\n"
-          end
-          tile.objects.each do |key,value|
-            out << "#{key} #{value}\n"
-          end
-        end
+        next if tile.empty?
+        writer.write(tile, dir)
       end
     end
 
     def read_tiles(dir, zoom, tile_list)
       #p dir, zoom
+      reader = KeyPlain.new(filesystem, output_path, zoom)
       bar = ProgressBar.new(tile_list.length)
       tiles = TileSet.new
       tile_list.each do |triple|
         tilex, tiley, timestamp = *triple
+        coords = [tilex, tiley]
         bar.increment!
         #p coords
-        path = "#{output_path}/#{timestamp}/#{zoom}/#{tilex}/#{tiley}.txt"
-        tile = tiles.at(*triple)
-        #p path
-        filesystem.read(path) do |file|
-          file.each_line do |line|
-            parts = line.split(' ')
-            if parts[2].start_with?('f')
-              tile.set_floor(parts[0], parts[1], parts[2])
-            else
-              tile.set_object(parts[0], parts[1], parts[2])
-            end
-          end
-        end
+        tiles[coords] = reader.read(coords, timestamp)
       end
       return tiles
     end

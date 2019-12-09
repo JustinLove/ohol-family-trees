@@ -1,17 +1,27 @@
 module OHOLFamilyTrees
   class TileSet
     attr_reader :tiles
+    attr_reader :index
+    attr_reader :loader
 
-    def initialize()
-      @tiles = Hash.new {|h,k| h[k] = Tile.new(k,0)}
+    def initialize(index = [], loader = nil)
+      @tiles = {}
+      @index = index.map {|tilex,tiley,time| [[tilex, tiley], time]}.to_h
+      @loader = loader
     end
 
     def [](coords)
-      tiles[coords]
+      tiles[coords] ||= load_tile(coords) || Tile.new(coords, 0)
     end
 
     def []=(coords, tile)
       tiles[coords] = tile
+    end
+
+    def load_tile(coords)
+      if loader && index[coords]
+        loader.read(coords, index[coords]).copy
+      end
     end
 
     def at(tilex, tiley, time)
@@ -34,6 +44,8 @@ module OHOLFamilyTrees
     end
 
     def copy_key(previous)
+      @index = previous.index
+      @loader = previous.loader
       previous.tiles.each_pair {|coords, tile| tiles[coords] = tile.copy }
       self
     end
