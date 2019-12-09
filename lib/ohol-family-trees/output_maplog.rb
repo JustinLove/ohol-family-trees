@@ -61,11 +61,11 @@ module OHOLFamilyTrees
             :min_size => min_size,
             :object_size => objects.object_size,
             :object_over => objects.object_over,
-          }) do |tiled|
+          }) do |span, arc, tileset|
 
-          write_tiles(tiled.placements, tiled.s_end, zoom)
+          write_tiles(tileset.placements, span.s_end, zoom)
 
-          processed[logfile.path]['paths'] << "#{tiled.s_end.to_s}/#{zoom}"
+          processed[logfile.path]['paths'] << "#{span.s_end.to_s}/#{zoom}"
           #p processed
         end
       end

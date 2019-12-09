@@ -2,6 +2,7 @@
   - tile reading should be lazy
     - keep the total index somewhere, since it won't be just the tile list
   - split by size instead of time
+  - check multi-files arcs again
 - players ids in maplogs
   - redundant -1s
 - batch reprocess ranges

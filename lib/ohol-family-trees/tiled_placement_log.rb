@@ -1,52 +1,11 @@
 require 'ohol-family-trees/arc'
+require 'ohol-family-trees/span'
 require 'ohol-family-trees/tile_set'
 require 'json'
 
 module OHOLFamilyTrees
   class TiledPlacementLog
     MaxLog = 24*60*60
-
-    attr_reader :tiles
-    attr_reader :arc
-
-    attr_reader :server
-    attr_accessor :s_start
-    attr_accessor :s_end
-    attr_accessor :s_base
-    attr_reader :seed
-
-    def initialize(server, st, sd, arc = Arc.new(server, st, st, sd))
-      @server = server
-      @s_base = 0
-      @s_start = st
-      @s_end = st
-      @seed = sd
-
-      @tiles = TileSet.new
-      @arc = arc
-    end
-
-    def next_span(st)
-      self.class.new(server, st, seed, arc).copy_key(self)
-    end
-
-    def updated_tiles
-      tiles.updated_tiles
-    end
-
-    def tile_index
-      tiles.tile_index(s_end)
-    end
-
-    def placements
-      tiles.placements
-    end
-
-    def copy_key(previous)
-      @s_base = previous.s_end
-      tiles.copy_key(previous.tiles)
-      self
-    end
 
     def self.breakpoints(logfile)
       Arc.load_log(logfile).flat_map do |arc|
@@ -69,43 +28,50 @@ module OHOLFamilyTrees
       previous = nil
       server = logfile.server
       seed = logfile.seed
-      out = new(server, 0, seed)
-      if options[:base]
-        p "resume from #{options[:base].s_end}"
-        out.copy_key(options[:base])
+      span = Span.new(server, 0, seed)
+      arc = Arc.new(server, 0, 0, seed)
+      tiles = TileSet.new
+      if options[:base_tiles]
+        tiles = tiles.copy_key(options[:base_tiles])
+      end
+      if options[:base_time]
+        p "resume from #{options[:base_time]}"
+        span.s_base = options[:base_time]
       end
       while line = file.gets
         log = Maplog.create(line)
         if log.kind_of?(Maplog::ArcStart)
           if start && log.s_start < Arc::SplitArcsBefore
-            yield out
-            out = new(server, log.s_start, seed)
+            yield [span, arc, tiles]
+            span = Span.new(server, log.s_start, seed)
+            arc = Arc.new(server, log.s_start, log.s_start, seed)
           end
           start = log
-          if out.arc.s_start == 0
-            out.arc.s_start = start.s_start
+          if arc.s_start == 0
+            arc.s_start = start.s_start
           end
-          if out.s_start == 0
-            out.s_start = start.s_start
+          if span.s_start == 0
+            span.s_start = start.s_start
           end
-          out.arc.s_end = start.s_start
-          out.s_end = start.s_start
+          arc.s_end = start.s_start
+          span.s_end = start.s_start
         elsif log.kind_of?(Maplog::Placement)
           log.ms_start = start.ms_start
           if breakpoints.any? && log.s_time > breakpoints.first
             breakpoints.shift
-            yield out
-            out = out.next_span(log.s_time)
+            yield [span, arc, tiles]
+            span = span.next(log.s_time)
+            tiles = TileSet.new.copy_key(tiles)
           end
 
-          out.arc.s_end = log.s_time
-          out.s_end = log.s_time
+          span.s_end = log.s_time
+          arc.s_end = log.s_time
           tilex = log.x / tile_width
           #(-tileY - 1) * tile_width = log.y
           #-tileY - 1 = log.y / tile_width
           #-tileY = log.y / tile_width + 1
           tiley = -(log.y / tile_width + 1)
-          tile = out.tiles[[tilex,tiley]]
+          tile = tiles[[tilex,tiley]]
           object = log.object
           if log.floor?
             occupant = tile.floor(log.x, log.y)
@@ -174,7 +140,7 @@ module OHOLFamilyTrees
             overs << [tilex+overx,tiley+overy]
           end
           overs.each do |coord|
-            tile = out.tiles[coord]
+            tile = tiles[coord]
             tile.add_placement(log)
             if log.floor?
               # overkill, but I don't want separate bounds for floors, bearskin can hang over
@@ -187,7 +153,7 @@ module OHOLFamilyTrees
         previous = log
       end
       file.close
-      yield out
+      yield [span, arc, tiles]
       p "excluded #{excluded} objects"
     end
 

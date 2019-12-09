@@ -78,7 +78,7 @@ module OHOLFamilyTrees
       end
     end
 
-    def base_tiled(logfile, basefile, zoom)
+    def base_time(logfile, basefile, zoom)
       if basefile
         candidates = spans.values
           .select {|span| basefile.timestamp <= span['start'] && span['end'] <= logfile.timestamp }
@@ -86,10 +86,16 @@ module OHOLFamilyTrees
         base_span = candidates.last
         #p base_span
         if base_span
-          cutoff = logfile.timestamp - 14 * 24 * 60 * 60
-          tile_list = read_index(base_span['end'], zoom, cutoff)
-          return read_tiles(base_span['end'], zoom, tile_list)
+          return base_span['end']
         end
+      end
+    end
+
+    def base_tileset(time, zoom)
+      if time
+        cutoff = time - 14 * 24 * 60 * 60
+        tile_list = read_index(time, zoom, cutoff)
+        return read_tiles(time, zoom, tile_list)
       end
     end
 
@@ -105,31 +111,34 @@ module OHOLFamilyTrees
       ZoomLevels.each do |zoom|
         tile_width = 2**(32 - zoom)
 
+        time = base_time(logfile, basefile, zoom)
+
         TiledPlacementLog.read(logfile, tile_width, {
             :floor_removal => objects.floor_removal,
             :object_over => objects.object_over,
-            :base => base_tiled(logfile, basefile, zoom),
-          }) do |tiled|
+            :base_time => time,
+            :base_tiles => base_tileset(time, zoom),
+          }) do |span, arc, tileset|
 
-          arcs[tiled.arc.s_start.to_s] = {
-            'start' => tiled.arc.s_start,
-            'end' => tiled.arc.s_end,
-            'seed' => tiled.arc.seed,
+          arcs[arc.s_start.to_s] = {
+            'start' => arc.s_start,
+            'end' => arc.s_end,
+            'seed' => arc.seed,
           }
           #p arcs
 
-          spans[tiled.s_start.to_s] = {
-            'start' => tiled.s_start,
-            'end' => tiled.s_end,
-            'base' => tiled.s_base,
-            'seed' => tiled.seed,
+          spans[span.s_start.to_s] = {
+            'start' => span.s_start,
+            'end' => span.s_end,
+            'base' => span.s_base,
+            'seed' => span.seed,
           }
           #p spans
 
-          write_tiles(tiled.updated_tiles, tiled.s_end, zoom)
-          write_index(tiled.tile_index, tiled.s_end, zoom)
+          write_tiles(tileset.updated_tiles, span.s_end, zoom)
+          write_index(tileset.tile_index(span.s_end), span.s_end, zoom)
 
-          processed[logfile.path]['paths'] << tiled.s_end.to_s
+          processed[logfile.path]['paths'] << span.s_end.to_s
           #p processed
         end
       end
@@ -160,14 +169,13 @@ module OHOLFamilyTrees
     def read_tiles(dir, zoom, tile_list)
       #p dir, zoom
       bar = ProgressBar.new(tile_list.length)
-      tiled = TiledPlacementLog.new(0, 0, 0)
-      tiled.s_end = dir
+      tiles = TileSet.new
       tile_list.each do |triple|
         tilex, tiley, timestamp = *triple
         bar.increment!
         #p coords
         path = "#{output_path}/#{timestamp}/#{zoom}/#{tilex}/#{tiley}.txt"
-        tile = tiled.tiles.at(*triple)
+        tile = tiles.at(*triple)
         #p path
         filesystem.read(path) do |file|
           file.each_line do |line|
@@ -180,7 +188,7 @@ module OHOLFamilyTrees
           end
         end
       end
-      return tiled
+      return tiles
     end
 
     def list_tiles(dir, zoom)
