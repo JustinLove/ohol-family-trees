@@ -34,9 +34,9 @@ module OHOLFamilyTrees
     end
 
     def tile_index(s_end)
-      tiles.values.reject(&:empty?).map {|tile|
-        [tile.tilex,tile.tiley,(tile.updated ? s_end : tile.time)]
-      }
+      index.merge(tiles.values.reject(&:empty?).map {|tile|
+        [tile.coords,(tile.updated ? s_end : tile.time)]
+      }.to_h).map(&:flatten)
     end
 
     def placements

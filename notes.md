@@ -1,6 +1,5 @@
 - diffed keyframes
-  - tile reading should be lazy
-    - keep the total index somewhere, since it won't be just the tile list
+  - coord formats getting painful
   - split by size instead of time
   - check multi-files arcs again
 - players ids in maplogs
