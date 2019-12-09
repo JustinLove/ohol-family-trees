@@ -1,4 +1,5 @@
 require 'ohol-family-trees/arc'
+require 'ohol-family-trees/tile_set'
 require 'json'
 
 module OHOLFamilyTrees
@@ -21,7 +22,7 @@ module OHOLFamilyTrees
       @s_end = st
       @seed = sd
 
-      @tiles = Hash.new {|h,k| h[k] = Tile.new(k,s_start)}
+      @tiles = TileSet.new
       @arc = arc
     end
 
@@ -30,22 +31,20 @@ module OHOLFamilyTrees
     end
 
     def updated_tiles
-      tiles.select {|coord,tile| tile.updated}
+      tiles.updated_tiles
     end
 
     def tile_index
-      tiles.values.reject(&:empty?).map {|tile|
-        [tile.tilex,tile.tiley,(tile.updated ? s_end : tile.time)]
-      }
+      tiles.tile_index(s_end)
     end
 
     def placements
-      tiles.transform_values {|tile| tile.placements}
+      tiles.placements
     end
 
     def copy_key(previous)
       @s_base = previous.s_end
-      previous.tiles.each_pair {|coords, tile| tiles[coords] = tile.copy }
+      tiles.copy_key(previous.tiles)
       self
     end
 
@@ -208,75 +207,6 @@ module OHOLFamilyTrees
         end
         return [overx, overy]
       end
-    end
-  end
-
-  class Tile
-    attr_reader :floors
-    attr_reader :objects
-    attr_reader :placements
-
-    attr_reader :updated
-    attr_reader :coords
-    attr_reader :time
-
-    def initialize(cor, t)
-      @updated = false
-      @coords = cor
-      @time = t
-      @floors = {}
-      @objects = {}
-      @placements = []
-    end
-
-    def copy_key(tile)
-      @coords = tile.coords
-      @floors = tile.floors
-      @objects = tile.objects
-      self
-    end
-
-    def copy
-      self.class.new(coords, time).copy_key(self)
-    end
-
-    def empty?
-      floors.empty? && objects.empty?
-    end
-
-    def tilex
-      coords[0]
-    end
-
-    def tiley
-      coords[1]
-    end
-
-    def floor(x, y)
-      floors["#{x} #{y}"]
-    end
-
-    def remove_floor(x, y)
-      @updated = true
-      floors.delete("#{x} #{y}")
-    end
-
-    def set_floor(x, y, object)
-      @updated = true
-      floors["#{x} #{y}"] = object
-    end
-
-    def object(x, y)
-      objects["#{x} #{y}"]
-    end
-
-    def set_object(x, y, object)
-      @updated = true
-      objects["#{x} #{y}"] = object
-    end
-
-    def add_placement(log)
-      placements << log
     end
   end
 end

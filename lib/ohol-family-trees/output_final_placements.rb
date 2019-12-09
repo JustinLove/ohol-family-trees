@@ -164,11 +164,10 @@ module OHOLFamilyTrees
       tiled.s_end = dir
       tile_list.each do |triple|
         tilex, tiley, timestamp = *triple
-        coords = [tilex,tiley]
         bar.increment!
         #p coords
         path = "#{output_path}/#{timestamp}/#{zoom}/#{tilex}/#{tiley}.txt"
-        tile = tiled.tiles[coords] = TiledPlacementLog::Tile.new(coords, timestamp)
+        tile = tiled.tiles.at(*triple)
         #p path
         filesystem.read(path) do |file|
           file.each_line do |line|
