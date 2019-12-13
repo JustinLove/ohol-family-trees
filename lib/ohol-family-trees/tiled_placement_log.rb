@@ -20,6 +20,10 @@ module OHOLFamilyTrees
       span = Span.new(server, 0, seed)
       arc = Arc.new(server, 0, 0, seed)
       tiles = TileSet.new
+      if options[:base_arc]
+        arc = options[:base_arc]
+        p "resume arc #{arc.s_start}-#{arc.s_end} #{arc.seed}"
+      end
       if options[:base_tiles]
         tiles = tiles.copy_key(options[:base_tiles])
       end

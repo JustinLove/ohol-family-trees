@@ -1,5 +1,4 @@
 - diffed keyframes
-  - check multi-files arcs again
 - players ids in maplogs
   - redundant -1s
 - batch reprocess ranges

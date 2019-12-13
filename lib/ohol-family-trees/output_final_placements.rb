@@ -79,7 +79,20 @@ module OHOLFamilyTrees
       end
     end
 
-    def base_time(logfile, basefile, zoom)
+    def base_arc(logfile, basefile)
+      if basefile
+        candidates = arcs.values
+          .select {|arc| basefile.timestamp <= arc['start']}
+          .sort_by {|arc| arc['end']}
+        arc = candidates.last
+        #p arc
+        if arc
+          return Arc.new(logfile.server, arc['start'], arc['end'], logfile.seed)
+        end
+      end
+    end
+
+    def base_time(logfile, basefile)
       if basefile
         candidates = spans.values
           .select {|span| basefile.timestamp <= span['start'] && span['end'] <= logfile.timestamp }
@@ -113,11 +126,13 @@ module OHOLFamilyTrees
       ZoomLevels.each do |zoom|
         tile_width = 2**(32 - zoom)
 
-        time = base_time(logfile, options[:basefile], zoom)
+        time = base_time(logfile, options[:basefile])
+        prior_arc = base_arc(logfile, options[:basefile])
 
         TiledPlacementLog.read(logfile, tile_width, {
             :floor_removal => objects.floor_removal,
             :object_over => objects.object_over,
+            :base_arc => prior_arc,
             :base_time => time,
             :base_tiles => base_tileset(time, zoom),
             :breakpoints => options[:breakpoints],
