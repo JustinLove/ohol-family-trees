@@ -2,7 +2,7 @@ module OHOLFamilyTrees
   class ObjectData
     def initialize
       @object_size = {}
-      @object_over = {}
+      @object_over = Hash.new {|h,k| h[k] = TiledPlacementLog::ObjectOver.new(2, 2, 2, 4)}
       @floor_removal = {}
     end
 

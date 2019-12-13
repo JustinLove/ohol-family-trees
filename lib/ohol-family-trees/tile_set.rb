@@ -54,7 +54,6 @@ module OHOLFamilyTrees
   class Tile
     attr_reader :floors
     attr_reader :objects
-    attr_reader :placements
 
     attr_reader :updated
     attr_reader :coords
@@ -116,7 +115,11 @@ module OHOLFamilyTrees
     end
 
     def add_placement(log)
-      placements << log
+      @placements << log
+    end
+
+    def placements
+      @placements.reject(&:skip?)
     end
   end
 end

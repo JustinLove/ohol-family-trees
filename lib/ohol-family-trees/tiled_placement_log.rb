@@ -89,19 +89,28 @@ module OHOLFamilyTrees
 
             if object_size
               size = object_size[log.id]
-              if !size || size <= min_size
-                if size
-                  #p log.id
-                  excluded += 1
-                end
-                if occupant && occupant != "0"
-                  log.object = "0"
-                  object = "0"
-                else
+              if !size
+                #skip
+              elsif size <= min_size
+                #p log.id
+                excluded += 1
+                if occupant && occupant == "0"
                   previous = log
                   next
+                else
+                  log.object = "0"
+                  object = "0"
                 end
               end
+            end
+
+            if previous &&
+               previous.actor == -1 &&
+               previous.object == "0" &&
+               previous.x == log.x &&
+               previous.y == log.y &&
+               previous.ms_offset == log.ms_offset
+              previous.skip!
             end
 
             tile.add_placement(log)
@@ -145,8 +154,8 @@ module OHOLFamilyTrees
               tile.set_object(log.x, log.y, object)
             end
           end
+          previous = log
         end
-        previous = log
       end
       file.close
       tiles.finalize!(span.s_end)
