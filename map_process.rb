@@ -59,7 +59,9 @@ MaplogCache::Servers.new.each do |logs|
     #next unless logfile.path.match('2680185702seed') # multiple files one seed
     next unless logfile.path.match('3019284048seed') # multiple files one seed, smaller dataset
 
-    final_placements.process(logfile, base)
-    #maplog.process(logfile, base)
+    breakpoints = logfile.breakpoints
+
+    final_placements.process(logfile, {:basefile => base, :breakpoints => breakpoints})
+    #maplog.process(logfile, {:breakpoints => breakpoints})
   end
 end

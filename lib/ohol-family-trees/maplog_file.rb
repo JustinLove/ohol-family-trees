@@ -1,4 +1,6 @@
 class MaplogFile
+  MaxLog = 2_500_000
+
   def initialize(path)
     @path = path
   end
@@ -41,5 +43,17 @@ class MaplogFile
 
   def merges_with?(file)
     seed && file.seed && seed == file.seed
+  end
+
+  def breakpoints(maxlog = MaxLog)
+    file = open
+    while file.gets
+    end
+    lines = file.lineno
+    file.close
+
+    chunks = (lines.to_f / maxlog).ceil
+    chunk = lines / chunks
+    ((1...chunks).map {|i| chunk*i })
   end
 end

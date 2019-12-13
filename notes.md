@@ -1,6 +1,4 @@
 - diffed keyframes
-  - coord formats getting painful
-  - split by size instead of time
   - check multi-files arcs again
 - players ids in maplogs
   - redundant -1s

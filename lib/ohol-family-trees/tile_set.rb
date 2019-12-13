@@ -24,18 +24,17 @@ module OHOLFamilyTrees
       end
     end
 
-    def at(tilex, tiley, time)
-      coords = [tilex, tiley]
-      tiles[coords] = Tile.new(coords, time)
-    end
-
     def updated_tiles
       tiles.select {|_,tile| tile.updated}
     end
 
-    def tile_index(s_end)
+    def finalize!(s_end)
+      updated_tiles.values.each {|tile| tile.time = s_end }
+    end
+
+    def tile_index
       index.merge(tiles.values.reject(&:empty?).map {|tile|
-        [tile.coords,(tile.updated ? s_end : tile.time)]
+        [tile.coords,tile.time]
       }.to_h).map(&:flatten)
     end
 
@@ -59,7 +58,7 @@ module OHOLFamilyTrees
 
     attr_reader :updated
     attr_reader :coords
-    attr_reader :time
+    attr_accessor :time
 
     def initialize(cor, t)
       @updated = false

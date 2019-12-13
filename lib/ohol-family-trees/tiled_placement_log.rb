@@ -5,24 +5,13 @@ require 'json'
 
 module OHOLFamilyTrees
   class TiledPlacementLog
-    MaxLog = 24*60*60
-
-    def self.breakpoints(logfile)
-      Arc.load_log(logfile).flat_map do |arc|
-        length = arc.s_end - arc.s_start
-        chunks = (length.to_f / MaxLog).ceil
-        chunk = length / chunks
-        (1...chunks).map {|i| arc.s_start + chunk*i }
-      end
-    end
-
     def self.read(logfile, tile_width, options = {})
       excluded = 0
       floor_removal = options[:floor_removal] || {}
       min_size = options[:min_size] || 0
       object_size = options[:object_size]
       object_over = options[:object_over] || Hash.new {|h,k| h[k] = ObjectOver.new(2, 2, 2, 4)}
-      breakpoints = breakpoints(logfile)
+      breakpoints = (options[:breakpoints] || []).dup
       start = nil
       file = logfile.open
       previous = nil
@@ -42,9 +31,11 @@ module OHOLFamilyTrees
         log = Maplog.create(line)
         if log.kind_of?(Maplog::ArcStart)
           if start && log.s_start < Arc::SplitArcsBefore
+            tiles.finalize!(span.s_end)
             yield [span, arc, tiles]
             span = Span.new(server, log.s_start, seed)
             arc = Arc.new(server, log.s_start, log.s_start, seed)
+            tiles = TileSet.new
           end
           start = log
           if arc.s_start == 0
@@ -57,8 +48,9 @@ module OHOLFamilyTrees
           span.s_end = start.s_start
         elsif log.kind_of?(Maplog::Placement)
           log.ms_start = start.ms_start
-          if breakpoints.any? && log.s_time > breakpoints.first
+          if breakpoints.any? && file.lineno > breakpoints.first
             breakpoints.shift
+            tiles.finalize!(span.s_end)
             yield [span, arc, tiles]
             span = span.next(log.s_time)
             tiles = TileSet.new.copy_key(tiles)
@@ -153,6 +145,7 @@ module OHOLFamilyTrees
         previous = log
       end
       file.close
+      tiles.finalize!(span.s_end)
       yield [span, arc, tiles]
       p "excluded #{excluded} objects"
     end

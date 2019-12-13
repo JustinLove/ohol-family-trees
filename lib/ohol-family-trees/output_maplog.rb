@@ -38,7 +38,7 @@ module OHOLFamilyTrees
       end
     end
 
-    def process(logfile, basefile = nil)
+    def process(logfile, options = {})
       #return if processed[logfile.path] && logfile.cache_valid_at?(processed[logfile.path]['time'])
       processed[logfile.path] = {
         'time' => Time.now.to_i,
@@ -61,6 +61,7 @@ module OHOLFamilyTrees
             :min_size => min_size,
             :object_size => objects.object_size,
             :object_over => objects.object_over,
+            :breakpoints => options[:breakpoints],
           }) do |span, arc, tileset|
 
           write_tiles(tileset.placements, span.s_end, zoom)
