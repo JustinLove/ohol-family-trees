@@ -63,7 +63,7 @@ module OHOLFamilyTrees
         #p index
         MaplogServer.extract_path_list(index)
           .map do |path, log_date|
-            next unless path.match('_mapLog.txt')
+            next unless path.match(/_map(Log|Seed).txt/)
             cache_path = dir + path
             yield Logfile.new(cache_path, log_date, baseurl)
           end

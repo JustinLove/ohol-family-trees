@@ -1,5 +1,6 @@
 require 'ohol-family-trees/tiled_placement_log'
 require 'ohol-family-trees/key_plain'
+require 'ohol-family-trees/arc_list'
 require 'fileutils'
 require 'json'
 require 'progress_bar'
@@ -7,10 +8,6 @@ require 'set'
 
 module OHOLFamilyTrees
   class OutputFinalPlacements
-    def arc_path
-      "#{output_path}/arcs.json"
-    end
-
     def span_path
       "#{output_path}/spans.json"
     end
@@ -24,24 +21,13 @@ module OHOLFamilyTrees
     attr_reader :output_path
     attr_reader :filesystem
     attr_reader :objects
+    attr_reader :arcs
 
     def initialize(output_path, filesystem, objects)
       @output_path = output_path
       @filesystem = filesystem
       @objects = objects
-    end
-
-    def arcs
-      return @arcs if @arcs
-      @arcs = {}
-      filesystem.read(arc_path) do |f|
-        list = JSON.parse(f.read)
-        list.each do |arc|
-          @arcs[arc['start'].to_s] = arc
-        end
-      end
-      #p @arcs
-      @arcs
+      @arcs = ArcList.new(filesystem, output_path)
     end
 
     def spans
@@ -68,9 +54,7 @@ module OHOLFamilyTrees
     end
 
     def checkpoint
-      filesystem.write(arc_path) do |f|
-        f << JSON.pretty_generate(arcs.values.sort_by {|arc| arc['start']})
-      end
+      arcs.checkpoint
       filesystem.write(span_path) do |f|
         f << JSON.pretty_generate(spans.values.sort_by {|span| span['start']})
       end
@@ -138,22 +122,19 @@ module OHOLFamilyTrees
             :breakpoints => options[:breakpoints],
           }) do |span, arc, tileset|
 
-          arcs[arc.s_start.to_s] = {
-            'start' => arc.s_start,
-            'end' => arc.s_end,
-            'seed' => arc.seed,
-          }
+          arcs << arc
           #p arcs
 
           spans[span.s_start.to_s] = {
             'start' => span.s_start,
             'end' => span.s_end,
             'base' => span.s_base,
-            'seed' => span.seed,
+            'seed' => span.seed[0],
+            'seed2' => span.seed[1],
           }
           #p spans
 
-          write_tiles(tileset.updated_tiles, span.s_end, zoom)
+          #write_tiles(tileset.updated_tiles, span.s_end, zoom)
           write_index(tileset.tile_index, span.s_end, zoom)
 
           processed[logfile.path]['paths'] << span.s_end.to_s

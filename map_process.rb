@@ -34,9 +34,12 @@ end
 
 raise "no object data" unless objects.object_size.length > 0
 
-final_placements = OutputFinalPlacements.new(PlacementPath, filesystem, objects)
+arcs = ArcList.new(filesystem, PlacementPath)
+p arcs.arcs
 
-maplog = OutputMaplog.new(MaplogPath, filesystem, objects)
+#final_placements = OutputFinalPlacements.new(PlacementPath, filesystem, objects)
+
+#maplog = OutputMaplog.new(MaplogPath, filesystem, objects)
 
 MaplogCache::Servers.new.each do |logs|
   #p logs
@@ -46,23 +49,33 @@ MaplogCache::Servers.new.each do |logs|
   prior = nil
 
   logs.each do |logfile|
-    base = nil
-    if prior and logfile.merges_with?(prior)
-      base = prior
-    end
-    prior = logfile
-
     #next unless logfile.path.match('000seed')
     #next unless logfile.path.match('1151446675seed') # small file
     #next unless logfile.path.match('1521396640seed') # two arcs in one file
     #next unless logfile.path.match('588415882seed') # one arc with multiple start times
     #next unless logfile.path.match('2680185702seed') # multiple files one seed
     #next unless logfile.path.match('3019284048seed') # multiple files one seed, smaller dataset
-    next unless logfile.path.match('1574835680time') # small with player ids
+    #next unless logfile.path.match('1574835680time') # small with player ids
+    next unless logfile.timestamp >= 1573895673
 
-    breakpoints = logfile.breakpoints
 
-    final_placements.process(logfile, {:basefile => base, :breakpoints => breakpoints})
-    maplog.process(logfile, {:breakpoints => breakpoints})
+    base = nil
+    if logfile.placements?
+      if prior and logfile.merges_with?(prior)
+        p "#{logfile.path} merges with #{prior.path}"
+        base = prior
+      end
+      if prior
+        p (logfile.timestamp - prior.timestamp) / (60.0 * 60.0)
+      end
+      prior = logfile
+    end
+
+    p logfile.seed
+
+    #breakpoints = logfile.breakpoints
+
+    #final_placements.process(logfile, {:basefile => base, :breakpoints => breakpoints})
+    #maplog.process(logfile, {:breakpoints => breakpoints})
   end
 end

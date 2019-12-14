@@ -7,6 +7,14 @@ class MaplogFile
 
   attr_reader :path
 
+  def placements?
+    path.match('_mapLog.txt')
+  end
+
+  def seed_only?
+    path.match('_mapSeed.txt')
+  end
+
   def approx_log_time
     return date unless timestamp
 
@@ -30,22 +38,39 @@ class MaplogFile
   end
 
   def seed
+    if seed_only?
+      content_seed
+    else
+      path_seed
+    end
+  end
+
+  def content_seed
+    return [] unless seed_only?
+    file = open
+    seeds = file.read.split(' ').map(&:to_i)
+    file.close
+    return seeds
+  end
+
+  def path_seed
     if timestamp == 1571995987
-      return nil
+      return []
     elsif timestamp == 1572240860
-      return 30691433003
+      return [30691433003]
     elsif timestamp == 1572297324
-      return nil
+      return []
     end
     match = path.match(/_(\d+)seed/)
-    match && match[1].to_i
+    [match && match[1].to_i].compact
   end
 
   def merges_with?(file)
-    seed && file.seed && seed == file.seed
+    placements? && file.placements? && seed && file.seed && seed == file.seed
   end
 
   def breakpoints(maxlog = MaxLog)
+    return [] unless placements?
     file = open
     while file.gets
     end

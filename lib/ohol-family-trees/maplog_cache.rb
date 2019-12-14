@@ -38,7 +38,7 @@ module OHOLFamilyTrees
 
       def each
         Dir.foreach(File.join(cache, dir)) do |path|
-          next unless path.match('_mapLog.txt')
+          next unless path.match(/_map(Log|Seed).txt/)
           cache_path = File.join(dir, path)
           yield Logfile.new(cache_path, cache)
         end
