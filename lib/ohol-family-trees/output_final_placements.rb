@@ -65,14 +65,7 @@ module OHOLFamilyTrees
 
     def base_arc(logfile, basefile)
       if basefile
-        candidates = arcs.values
-          .select {|arc| basefile.timestamp <= arc['start']}
-          .sort_by {|arc| arc['end']}
-        arc = candidates.last
-        #p arc
-        if arc
-          return Arc.new(logfile.server, arc['start'], arc['end'], logfile.seed)
-        end
+        arcs.base_arc(basefile.timestamp)
       end
     end
 

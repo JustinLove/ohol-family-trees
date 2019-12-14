@@ -1,12 +1,17 @@
+- seed files
+  - fixup old spans and arcs
+  - arc breaks
+  - separate process for seeds?
+    - value preserving seeds scans
+  - manual tagging of previous seed ends?
+  - arcs.json -> seeds.json?
+  - check final base_arc
 - diffed keyframes
 - batch reprocess ranges
 - x overdraw missing for large natural objets
   - maplogs may skip small objects, should always write 0 if possibly unknown
   - assume unknown objects are very large
   - http://localhost:8000/public/index.html#x=5&y=2&z=29&t=1570914891
-- seed files
-  - fixup old spans and arcs
-  - arc breaks
 - two part seed
 - expired objects
 - maplog compression
