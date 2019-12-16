@@ -1,8 +1,5 @@
 - seed files
   - arc breaks
-    - x special case of two arcs one seed/file
-      - taken care of span breaks
-      - separate arcs?
     - combine seed and spans
   - x manual tagging of previous seed ends?
     - helper script
@@ -14,6 +11,7 @@
   - assume unknown objects are very large
   - http://localhost:8000/public/index.html#x=5&y=2&z=29&t=1570914891
 - two part seed
+- multiple arcs in one file, UI wise?
 - expired objects
 - maplog compression
 - running on data server

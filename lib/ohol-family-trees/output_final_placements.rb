@@ -61,10 +61,9 @@ module OHOLFamilyTrees
 
     def base_time(logfile, basefile)
       if basefile
-        candidates = spans.values
-          .select {|span| basefile.timestamp <= span['start'] && span['end'] <= logfile.timestamp }
+        base_span = processed[basefile.path]['spans']
           .sort_by {|span| span['end']}
-        base_span = candidates.last
+          .last
         #p base_span
         if base_span
           return base_span['end']

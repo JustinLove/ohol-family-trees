@@ -25,13 +25,6 @@ module OHOLFamilyTrees
       candidates.last
     end
 
-    def base_arc(timestamp)
-      candidates = arcs.values
-        .select {|arc| timestamp <= arc.s_start}
-        .sort_by {|arc| arc.s_end || arc.s_start}
-      candidates.last
-    end
-
     def load(filesystem, arc_path)
       @arcs = {}
       filesystem.read(arc_path) do |f|
