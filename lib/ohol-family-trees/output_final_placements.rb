@@ -82,10 +82,13 @@ module OHOLFamilyTrees
     end
 
     def process(logfile, options = {})
+      base_time = base_time(logfile, options[:basefile])
+
       #return if processed[logfile.path] && logfile.cache_valid_at?(processed[logfile.path]['time'])
       processed[logfile.path] = {
         'time' => Time.now.to_i,
-        'paths' => []
+        'base_time' => base_time || 0,
+        'spans' => [],
       }
 
       p logfile.path
@@ -93,13 +96,11 @@ module OHOLFamilyTrees
       ZoomLevels.each do |zoom|
         tile_width = 2**(32 - zoom)
 
-        time = base_time(logfile, options[:basefile])
-
         TiledPlacementLog.read(logfile, tile_width, {
             :floor_removal => objects.floor_removal,
             :object_over => objects.object_over,
-            :base_time => time,
-            :base_tiles => base_tileset(time, zoom),
+            :base_time => base_time,
+            :base_tiles => base_tileset(base_time, zoom),
             :breakpoints => options[:breakpoints],
           }) do |span, tileset|
 
@@ -115,8 +116,14 @@ module OHOLFamilyTrees
           #write_tiles(tileset.updated_tiles, span.s_end, zoom)
           write_index(tileset.tile_index, span.s_end, zoom)
 
-          processed[logfile.path]['paths'] << span.s_end.to_s
-          #p processed
+          processed[logfile.path]['spans'] = {
+            'start' => span.s_start,
+            'end' => span.s_end,
+            'base' => span.s_base,
+            'seed' => span.seed[0],
+            'seed2' => span.seed[1],
+          }
+          p processed
         end
       end
 
