@@ -47,6 +47,7 @@ MaplogCache::Servers.new.each do |logs|
   SeedBreak.process(logs).save(filesystem, "#{PlacementPath}/seeds.json")
 
   prior = nil
+  root = nil
   logs.each do |logfile|
     next unless logfile.placements?
 
@@ -64,6 +65,8 @@ MaplogCache::Servers.new.each do |logs|
     if prior and logfile.merges_with?(prior)
       #p "#{logfile.path} merges with #{prior.path}"
       base = prior
+    else
+      root = logfile
     end
     if prior
       #p (logfile.timestamp - prior.timestamp) / (60.0 * 60.0)
@@ -72,7 +75,10 @@ MaplogCache::Servers.new.each do |logs|
 
     breakpoints = logfile.breakpoints
 
-    final_placements.process(logfile, {:basefile => base, :breakpoints => breakpoints})
+    final_placements.process(logfile, {
+      :rootfile => root,
+      :basefile => base,
+      :breakpoints => breakpoints})
     #maplog.process(logfile, {:breakpoints => breakpoints})
   end
 end

@@ -87,6 +87,7 @@ module OHOLFamilyTrees
       #return if processed[logfile.path] && logfile.cache_valid_at?(processed[logfile.path]['time'])
       processed[logfile.path] = {
         'time' => Time.now.to_i,
+        'root_time' => (options[:rootfile] && options[:rootfile].timestamp) || 0,
         'base_time' => base_time || 0,
         'spans' => [],
       }
@@ -123,7 +124,7 @@ module OHOLFamilyTrees
             'seed' => span.seed[0],
             'seed2' => span.seed[1],
           }
-          p processed
+          #p processed
         end
       end
 
