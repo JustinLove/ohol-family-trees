@@ -3,16 +3,10 @@ require 'json'
 
 module OHOLFamilyTrees
   class ArcList
-    def arc_path
-      "#{output_path}/arcs.json"
-    end
+    attr_reader :arcs
 
-    attr_reader :filesystem
-    attr_reader :output_path
-
-    def initialize(filesystem, output_path)
-      @filesystem = filesystem
-      @output_path = output_path
+    def initialize
+      @arcs = {}
     end
 
     def [](start)
@@ -38,8 +32,7 @@ module OHOLFamilyTrees
       candidates.last
     end
 
-    def arcs
-      return @arcs if @arcs
+    def load(filesystem, arc_path)
       @arcs = {}
       filesystem.read(arc_path) do |f|
         list = JSON.parse(f.read)
@@ -52,7 +45,7 @@ module OHOLFamilyTrees
       @arcs
     end
 
-    def checkpoint
+    def save(filesystem, arc_path)
       filesystem.write(arc_path) do |f|
         f << JSON.pretty_generate(arcs.values
             .sort_by(&:s_start)

@@ -8,6 +8,10 @@ require 'set'
 
 module OHOLFamilyTrees
   class OutputFinalPlacements
+    def arc_path
+      "#{output_path}/arcs.json"
+    end
+
     def span_path
       "#{output_path}/spans.json"
     end
@@ -27,7 +31,13 @@ module OHOLFamilyTrees
       @output_path = output_path
       @filesystem = filesystem
       @objects = objects
-      @arcs = ArcList.new(filesystem, output_path)
+    end
+
+    def arcs
+      return @arcs if @arcs
+      @arcs = ArcList.new
+      @arcs.load(filesystem, arc_path)
+      @arcs
     end
 
     def spans
@@ -54,7 +64,7 @@ module OHOLFamilyTrees
     end
 
     def checkpoint
-      arcs.checkpoint
+      arcs.save(filesystem, arc_path)
       filesystem.write(span_path) do |f|
         f << JSON.pretty_generate(spans.values.sort_by {|span| span['start']})
       end

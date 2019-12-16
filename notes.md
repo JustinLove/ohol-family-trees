@@ -1,11 +1,13 @@
 - seed files
   - fixup old spans and arcs
   - arc breaks
+    - special case of two arcs one seed/file
+    - merges with needs extra information
   - separate process for seeds?
     - value preserving seeds scans
   - manual tagging of previous seed ends?
-  - arcs.json -> seeds.json?
   - check final base_arc
+  - cache remote maplog index
 - diffed keyframes
 - batch reprocess ranges
 - x overdraw missing for large natural objets
