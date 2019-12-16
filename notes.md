@@ -1,7 +1,6 @@
 - seed files
   - arc breaks
     - special case of two arcs one seed/file
-    - merges with needs extra information
     - combine seed and spans
   - manual tagging of previous seed ends?
   - cache remote maplog index

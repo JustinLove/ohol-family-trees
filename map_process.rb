@@ -37,7 +37,7 @@ raise "no object data" unless objects.object_size.length > 0
 
 final_placements = OutputFinalPlacements.new(PlacementPath, filesystem, objects)
 
-#maplog = OutputMaplog.new(MaplogPath, filesystem, objects)
+maplog = OutputMaplog.new(MaplogPath, filesystem, objects)
 
 MaplogCache::Servers.new.each do |logs|
   #p logs
@@ -47,7 +47,8 @@ MaplogCache::Servers.new.each do |logs|
   seeds = SeedBreak.process(logs)
   seeds.save(filesystem, "#{PlacementPath}/seeds.json")
 
-  prior = nil
+  prior_logfile = nil
+  prior_arc = nil
   root = nil
   logs.each do |logfile|
     next unless logfile.placements?
@@ -58,31 +59,37 @@ MaplogCache::Servers.new.each do |logs|
     #next unless logfile.path.match('588415882seed') # one arc with multiple start times
     #next unless logfile.path.match('2680185702seed') # multiple files one seed
     #next unless logfile.path.match('3019284048seed') # multiple files one seed, smaller dataset
-    next unless logfile.path.match('1574835680time') # small with player ids
-    #next unless logfile.timestamp >= 1573895673
+    #next unless logfile.path.match('1574835680time') # small with player ids
+    next unless logfile.timestamp >= 1573895673
 
     arc = seeds.arc_at(logfile.timestamp+1)
     seed = (arc && arc.seed) || []
 
     base = nil
-    if prior and logfile.merges_with?(prior)
-      #p "#{logfile.path} merges with #{prior.path}"
-      base = prior
+    if arc == prior_arc && prior_logfile && logfile.merges_with?(prior_logfile)
+      p "#{logfile.path} merges with #{prior_logfile.path}"
+      base = prior_logfile
     else
+      p "#{logfile.path} is root"
       root = logfile
     end
-    if prior
-      #p (logfile.timestamp - prior.timestamp) / (60.0 * 60.0)
+    if prior_logfile
+      #p (logfile.timestamp - prior_logfile.timestamp) / (60.0 * 60.0)
     end
-    prior = logfile
+    prior_logfile = logfile
+    prior_arc = arc
 
-    breakpoints = logfile.breakpoints
+    if false
+      breakpoints = logfile.breakpoints
 
-    final_placements.process(logfile, {
-      :rootfile => root,
-      :basefile => base,
-      :seed => seed,
-      :breakpoints => breakpoints})
-    #maplog.process(logfile, {:breakpoints => breakpoints})
+      final_placements.process(logfile, {
+        :rootfile => root,
+        :basefile => base,
+        :seed => seed,
+        :breakpoints => breakpoints})
+    end
+    if false
+      maplog.process(logfile, {:breakpoints => breakpoints})
+    end
   end
 end
