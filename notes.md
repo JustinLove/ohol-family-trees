@@ -1,6 +1,8 @@
 - seed files
   - arc breaks
-    - special case of two arcs one seed/file
+    - x special case of two arcs one seed/file
+      - taken care of span breaks
+      - separate arcs?
     - combine seed and spans
   - x manual tagging of previous seed ends?
     - helper script

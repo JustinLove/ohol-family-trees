@@ -118,7 +118,7 @@ module OHOLFamilyTrees
           #write_tiles(tileset.updated_tiles, span.s_end, zoom)
           write_index(tileset.tile_index, span.s_end, zoom)
 
-          processed[logfile.path]['spans'] = {
+          processed[logfile.path]['spans'] << {
             'start' => span.s_start,
             'end' => span.s_end,
             'base' => span.s_base,

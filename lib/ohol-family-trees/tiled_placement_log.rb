@@ -1,5 +1,6 @@
 require 'ohol-family-trees/span'
 require 'ohol-family-trees/tile_set'
+require 'ohol-family-trees/arc'
 require 'json'
 
 module OHOLFamilyTrees
@@ -31,7 +32,11 @@ module OHOLFamilyTrees
           if start && span.s_length > 0
             tiles.finalize!(span.s_end)
             yield [span, tiles]
-            span = Span.new(server, log.s_start, seed)
+            if log.s_start < Arc::SplitArcsBefore
+              span = Span.new(server, log.s_start, seed)
+            else
+              span = span.next(log.s_start)
+            end
             tiles = TileSet.new
           end
           start = log
