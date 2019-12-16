@@ -28,7 +28,7 @@ module OHOLFamilyTrees
       while line = file.gets
         log = Maplog.create(line)
         if log.kind_of?(Maplog::ArcStart)
-          if start
+          if start && span.s_length > 0
             tiles.finalize!(span.s_end)
             yield [span, tiles]
             span = Span.new(server, log.s_start, seed)

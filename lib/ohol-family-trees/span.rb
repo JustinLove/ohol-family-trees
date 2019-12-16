@@ -14,6 +14,10 @@ module OHOLFamilyTrees
       @seed = sd
     end
 
+    def s_length
+      s_end - s_start
+    end
+
     def next(st)
       n = self.class.new(server, st, seed)
       n.s_base = s_end
