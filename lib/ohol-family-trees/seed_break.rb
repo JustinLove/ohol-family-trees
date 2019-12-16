@@ -1,3 +1,5 @@
+require 'ohol-family-trees/arc_list'
+
 module OHOLFamilyTrees
   module SeedBreak
     def self.process(logs)

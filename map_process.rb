@@ -35,7 +35,7 @@ end
 
 raise "no object data" unless objects.object_size.length > 0
 
-#final_placements = OutputFinalPlacements.new(PlacementPath, filesystem, objects)
+final_placements = OutputFinalPlacements.new(PlacementPath, filesystem, objects)
 
 #maplog = OutputMaplog.new(MaplogPath, filesystem, objects)
 
@@ -55,9 +55,9 @@ MaplogCache::Servers.new.each do |logs|
     #next unless logfile.path.match('1521396640seed') # two arcs in one file
     #next unless logfile.path.match('588415882seed') # one arc with multiple start times
     #next unless logfile.path.match('2680185702seed') # multiple files one seed
-    #next unless logfile.path.match('3019284048seed') # multiple files one seed, smaller dataset
+    next unless logfile.path.match('3019284048seed') # multiple files one seed, smaller dataset
     #next unless logfile.path.match('1574835680time') # small with player ids
-    next unless logfile.timestamp >= 1573895673
+    #next unless logfile.timestamp >= 1573895673
 
 
     base = nil
@@ -70,9 +70,9 @@ MaplogCache::Servers.new.each do |logs|
     end
     prior = logfile
 
-    #breakpoints = logfile.breakpoints
+    breakpoints = logfile.breakpoints
 
-    #final_placements.process(logfile, {:basefile => base, :breakpoints => breakpoints})
+    final_placements.process(logfile, {:basefile => base, :breakpoints => breakpoints})
     #maplog.process(logfile, {:breakpoints => breakpoints})
   end
 end

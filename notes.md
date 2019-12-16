@@ -1,12 +1,10 @@
 - seed files
-  - fixup old spans and arcs
   - arc breaks
     - special case of two arcs one seed/file
     - merges with needs extra information
-  - separate process for seeds?
-    - value preserving seeds scans
+    - combine seed and spans
+    - fixup old spans and arcs
   - manual tagging of previous seed ends?
-  - check final base_arc
   - cache remote maplog index
 - diffed keyframes
 - batch reprocess ranges

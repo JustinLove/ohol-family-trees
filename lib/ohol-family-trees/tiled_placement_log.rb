@@ -1,4 +1,3 @@
-require 'ohol-family-trees/arc'
 require 'ohol-family-trees/span'
 require 'ohol-family-trees/tile_set'
 require 'json'
@@ -18,12 +17,7 @@ module OHOLFamilyTrees
       server = logfile.server
       seed = logfile.seed
       span = Span.new(server, 0, seed)
-      arc = Arc.new(server, 0, 0, seed)
       tiles = TileSet.new
-      if options[:base_arc]
-        arc = options[:base_arc]
-        p "resume arc #{arc.s_start}-#{arc.s_end} #{arc.seed}"
-      end
       if options[:base_tiles]
         tiles = tiles.copy_key(options[:base_tiles])
       end
@@ -34,34 +28,28 @@ module OHOLFamilyTrees
       while line = file.gets
         log = Maplog.create(line)
         if log.kind_of?(Maplog::ArcStart)
-          if start && log.s_start < Arc::SplitArcsBefore
+          if start
             tiles.finalize!(span.s_end)
-            yield [span, arc, tiles]
+            yield [span, tiles]
             span = Span.new(server, log.s_start, seed)
-            arc = Arc.new(server, log.s_start, log.s_start, seed)
             tiles = TileSet.new
           end
           start = log
-          if arc.s_start == 0
-            arc.s_start = start.s_start
-          end
           if span.s_start == 0
             span.s_start = start.s_start
           end
-          arc.s_end = start.s_start
           span.s_end = start.s_start
         elsif log.kind_of?(Maplog::Placement)
           log.ms_start = start.ms_start
           if breakpoints.any? && file.lineno > breakpoints.first
             breakpoints.shift
             tiles.finalize!(span.s_end)
-            yield [span, arc, tiles]
+            yield [span, tiles]
             span = span.next(log.s_time)
             tiles = TileSet.new.copy_key(tiles)
           end
 
           span.s_end = log.s_time
-          arc.s_end = log.s_time
           tilex = log.x / tile_width
           #(-tileY - 1) * tile_width = log.y
           #-tileY - 1 = log.y / tile_width
@@ -159,7 +147,7 @@ module OHOLFamilyTrees
       end
       file.close
       tiles.finalize!(span.s_end)
-      yield [span, arc, tiles]
+      yield [span, tiles]
       p "excluded #{excluded} objects"
     end
 

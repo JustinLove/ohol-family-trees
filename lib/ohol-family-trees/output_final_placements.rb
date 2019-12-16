@@ -1,6 +1,5 @@
 require 'ohol-family-trees/tiled_placement_log'
 require 'ohol-family-trees/key_plain'
-require 'ohol-family-trees/arc_list'
 require 'fileutils'
 require 'json'
 require 'progress_bar'
@@ -8,10 +7,6 @@ require 'set'
 
 module OHOLFamilyTrees
   class OutputFinalPlacements
-    def arc_path
-      "#{output_path}/arcs.json"
-    end
-
     def span_path
       "#{output_path}/spans.json"
     end
@@ -25,19 +20,11 @@ module OHOLFamilyTrees
     attr_reader :output_path
     attr_reader :filesystem
     attr_reader :objects
-    attr_reader :arcs
 
     def initialize(output_path, filesystem, objects)
       @output_path = output_path
       @filesystem = filesystem
       @objects = objects
-    end
-
-    def arcs
-      return @arcs if @arcs
-      @arcs = ArcList.new
-      @arcs.load(filesystem, arc_path)
-      @arcs
     end
 
     def spans
@@ -64,18 +51,11 @@ module OHOLFamilyTrees
     end
 
     def checkpoint
-      arcs.save(filesystem, arc_path)
       filesystem.write(span_path) do |f|
         f << JSON.pretty_generate(spans.values.sort_by {|span| span['start']})
       end
       filesystem.write(processed_path) do |f|
         f << JSON.pretty_generate(processed)
-      end
-    end
-
-    def base_arc(logfile, basefile)
-      if basefile
-        arcs.base_arc(basefile.timestamp)
       end
     end
 
@@ -114,19 +94,14 @@ module OHOLFamilyTrees
         tile_width = 2**(32 - zoom)
 
         time = base_time(logfile, options[:basefile])
-        prior_arc = base_arc(logfile, options[:basefile])
 
         TiledPlacementLog.read(logfile, tile_width, {
             :floor_removal => objects.floor_removal,
             :object_over => objects.object_over,
-            :base_arc => prior_arc,
             :base_time => time,
             :base_tiles => base_tileset(time, zoom),
             :breakpoints => options[:breakpoints],
-          }) do |span, arc, tileset|
-
-          arcs << arc
-          #p arcs
+          }) do |span, tileset|
 
           spans[span.s_start.to_s] = {
             'start' => span.s_start,

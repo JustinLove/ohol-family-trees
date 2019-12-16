@@ -62,7 +62,7 @@ module OHOLFamilyTrees
             :object_size => objects.object_size,
             :object_over => objects.object_over,
             :breakpoints => options[:breakpoints],
-          }) do |span, arc, tileset|
+          }) do |span, tileset|
 
           write_tiles(tileset.placements, span.s_end, zoom)
 
