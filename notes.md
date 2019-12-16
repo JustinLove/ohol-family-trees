@@ -2,7 +2,8 @@
   - arc breaks
     - special case of two arcs one seed/file
     - combine seed and spans
-  - manual tagging of previous seed ends?
+  - x manual tagging of previous seed ends?
+    - helper script
   - cache remote maplog index
 - diffed keyframes
 - batch reprocess ranges

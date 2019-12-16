@@ -44,7 +44,14 @@ MaplogCache::Servers.new.each do |logs|
 
   #server = logs.server.sub('.onehouronelife.com', '')
 
-  seeds = SeedBreak.process(logs)
+  manual_resets = []
+  filesystem.read("#{PlacementPath}/manual_resets.txt") do |f|
+    while line = f.gets
+      manual_resets << line.to_i
+    end
+  end
+  p manual_resets
+  seeds = SeedBreak.process(logs, manual_resets)
   seeds.save(filesystem, "#{PlacementPath}/seeds.json")
 
   prior_logfile = nil

@@ -2,7 +2,7 @@ require 'ohol-family-trees/arc_list'
 
 module OHOLFamilyTrees
   module SeedBreak
-    def self.process(logs)
+    def self.process(logs, manual_resets = [])
       arcs = ArcList.new
       prior = nil
       current_arc = nil
@@ -10,7 +10,7 @@ module OHOLFamilyTrees
         #next unless logfile.timestamp >= 1573895673
 
         if logfile.placements?
-          if prior and logfile.merges_with?(prior)
+          if !manual_resets.member?(logfile.timestamp) and prior and logfile.merges_with?(prior)
           else
             p "merge break at #{logfile.timestamp}"
             if current_arc
@@ -33,11 +33,17 @@ module OHOLFamilyTrees
 
         if logfile.seed_only?
           p "seed change at #{logfile.timestamp}"
-          if current_arc
-            current_arc.s_end = logfile.timestamp
+          if manual_resets.member?(logfile.timestamp)
+            if current_arc
+              current_arc.seed = logfile.seed
+            end
+          else
+            if current_arc
+              current_arc.s_end = logfile.timestamp
+            end
+            current_arc = Arc.new(0, logfile.timestamp+1, nil, logfile.seed)
+            arcs << current_arc
           end
-          current_arc = Arc.new(0, logfile.timestamp+1, nil, logfile.seed)
-          arcs << current_arc
         end
       end
       return arcs

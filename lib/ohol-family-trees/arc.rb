@@ -8,7 +8,7 @@ module OHOLFamilyTrees
     attr_reader :server
     attr_accessor :s_start
     attr_accessor :s_end
-    attr_reader :seed
+    attr_accessor :seed
 
     def initialize(server, st, en, sd)
       @server = server
