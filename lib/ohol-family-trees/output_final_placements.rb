@@ -83,6 +83,7 @@ module OHOLFamilyTrees
 
     def process(logfile, options = {})
       base_time = base_time(logfile, options[:basefile])
+      seed = options[:seed] || []
 
       #return if processed[logfile.path] && logfile.cache_valid_at?(processed[logfile.path]['time'])
       processed[logfile.path] = {
@@ -109,8 +110,8 @@ module OHOLFamilyTrees
             'start' => span.s_start,
             'end' => span.s_end,
             'base' => span.s_base,
-            'seed' => span.seed[0],
-            'seed2' => span.seed[1],
+            'seed' => seed[0],
+            'seed2' => seed[1],
           }
           #p spans
 
@@ -121,8 +122,8 @@ module OHOLFamilyTrees
             'start' => span.s_start,
             'end' => span.s_end,
             'base' => span.s_base,
-            'seed' => span.seed[0],
-            'seed2' => span.seed[1],
+            'seed' => seed[0],
+            'seed2' => seed[1],
           }
           #p processed
         end

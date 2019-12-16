@@ -3,7 +3,6 @@
     - special case of two arcs one seed/file
     - merges with needs extra information
     - combine seed and spans
-    - fixup old spans and arcs
   - manual tagging of previous seed ends?
   - cache remote maplog index
 - diffed keyframes
