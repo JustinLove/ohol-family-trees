@@ -50,7 +50,7 @@ MaplogCache::Servers.new.each do |logs|
       manual_resets << line.to_i
     end
   end
-  p manual_resets
+  #p manual_resets
   seeds = SeedBreak.process(logs, manual_resets)
   seeds.save(filesystem, "#{PlacementPath}/seeds.json")
 
@@ -69,7 +69,7 @@ MaplogCache::Servers.new.each do |logs|
     #next unless logfile.path.match('1574835680time') # small with player ids
     #next unless logfile.path.match('1576038671time') # double start times at beginning
     #next unless logfile.timestamp >= 1573895673
-    next unless logfile.timestamp >= 1576038671
+    #next unless logfile.timestamp >= 1576038671
 
     arc = seeds.arc_at(logfile.timestamp+1)
     seed = (arc && arc.seed) || []
@@ -89,16 +89,13 @@ MaplogCache::Servers.new.each do |logs|
     prior_arc = arc
 
     if true
-      breakpoints = logfile.breakpoints
-
       final_placements.process(logfile, {
         :rootfile => root,
         :basefile => base,
-        :seed => seed,
-        :breakpoints => breakpoints})
+        :seed => seed})
     end
-    if false
-      maplog.process(logfile, {:breakpoints => breakpoints})
+    if true
+      maplog.process(logfile)
     end
   end
 end

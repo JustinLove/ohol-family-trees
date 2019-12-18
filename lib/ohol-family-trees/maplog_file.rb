@@ -70,6 +70,7 @@ class MaplogFile
   end
 
   def breakpoints(maxlog = MaxLog)
+    return @breakpoints.dup if @breakpoints
     return [] unless placements?
     file = open
     while file.gets
@@ -79,6 +80,7 @@ class MaplogFile
 
     chunks = (lines.to_f / maxlog).ceil
     chunk = lines / chunks
-    ((1...chunks).map {|i| chunk*i })
+    @breakpoints = ((1...chunks).map {|i| chunk*i })
+    return @breakpoints.dup
   end
 end

@@ -11,7 +11,7 @@ module OHOLFamilyTrees
       min_size = options[:min_size] || 0
       object_size = options[:object_size]
       object_over = options[:object_over] || Hash.new {|h,k| h[k] = ObjectOver.new(2, 2, 2, 4)}
-      breakpoints = (options[:breakpoints] || []).dup
+      breakpoints = logfile.breakpoints
       start = nil
       file = logfile.open
       previous = nil

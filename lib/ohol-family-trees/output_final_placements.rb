@@ -84,7 +84,13 @@ module OHOLFamilyTrees
       base_time = base_time(logfile, options[:basefile])
       seed = options[:seed] || []
 
-      #return if processed[logfile.path] && logfile.cache_valid_at?(processed[logfile.path]['time'])
+      if processed[logfile.path] &&
+        logfile.cache_valid_at?(processed[logfile.path]['time']) && 
+        processed[logfile.path]['root_time'] == ((options[:rootfile] && options[:rootfile].timestamp) || 0) &&
+        processed[logfile.path]['base_time'] == (base_time || 0)
+        return
+      end
+
       processed[logfile.path] = {
         'time' => Time.now.to_i,
         'root_time' => (options[:rootfile] && options[:rootfile].timestamp) || 0,
@@ -102,7 +108,6 @@ module OHOLFamilyTrees
             :object_over => objects.object_over,
             :base_time => base_time,
             :base_tiles => base_tileset(base_time, zoom),
-            :breakpoints => options[:breakpoints],
           }) do |span, tileset|
 
           spans[span.s_start.to_s] = {
@@ -114,7 +119,7 @@ module OHOLFamilyTrees
           }
           #p spans
 
-          #write_tiles(tileset.updated_tiles, span.s_end, zoom)
+          write_tiles(tileset.updated_tiles, span.s_end, zoom)
           write_index(tileset.tile_index, span.s_end, zoom)
 
           processed[logfile.path]['spans'] << {
