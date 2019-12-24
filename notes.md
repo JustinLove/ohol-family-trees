@@ -1,9 +1,11 @@
 - seed files
   - arc breaks
     - combine seed and spans
+    - seed change without wipe circa 2019-11-16 03:14
   - x manual tagging of previous seed ends?
     - helper script
   - cache remote maplog index
+- missing data 2019-11-08 to 2019-11-16
 - diffed keyframes
 - batch reprocess ranges
 - x overdraw missing for large natural objets

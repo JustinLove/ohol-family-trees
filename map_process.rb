@@ -14,7 +14,8 @@ include OHOLFamilyTrees
 PlacementPath = "kptest"
 MaplogPath = "mltest"
 
-OutputDir = 'output'
+#OutputDir = 'output'
+OutputDir = 'd:/games/ohol-map/public'
 OutputBucket = 'wondible-com-ohol-tiles'
 
 
