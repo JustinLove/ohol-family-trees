@@ -1,5 +1,3 @@
-- two part seed
-  - rename
 - server in data urls
 - seed files
   - arc breaks

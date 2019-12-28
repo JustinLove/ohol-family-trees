@@ -51,12 +51,12 @@ module OHOLFamilyTrees
         'start' => arc.s_start,
         'end' => arc.s_end,
         'seed' => arc.seed[0],
-        'seed2' => arc.seed[1],
+        'seedB' => arc.seed[1],
       }
     end
 
     def decode(jarc)
-      Arc.new(0, jarc['start'], jarc['end'], [jarc['seed'], jarc['seed2']].compact)
+      Arc.new(0, jarc['start'], jarc['end'], [jarc['seed'], jarc['seedB']].compact)
     end
   end
 end
