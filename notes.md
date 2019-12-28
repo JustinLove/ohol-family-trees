@@ -1,3 +1,10 @@
+- microspan at 1572968386 startTime at end of file
+  bigserver2.onehouronelife.com/1572783606time_2085226784seed_mapLog.txt
+  - looks like nosaj locations, in a couple files
+  - data overwrites previous tile, then next log overwrites span in spans
+- two part seed
+  - rename
+- server in data urls
 - seed files
   - arc breaks
     - combine seed and spans
@@ -5,14 +12,12 @@
   - x manual tagging of previous seed ends?
     - helper script
   - cache remote maplog index
-- missing data 2019-11-08 to 2019-11-16
-- diffed keyframes
-- batch reprocess ranges
-- x overdraw missing for large natural objets
+- overdraw missing for large natural objets
   - maplogs may skip small objects, should always write 0 if possibly unknown
   - assume unknown objects are very large
-  - http://localhost:8000/public/index.html#x=5&y=2&z=29&t=1570914891
-- two part seed
+  - x http://localhost:8000/public/index.html#x=5&y=2&z=29&t=1570914891
+- diffed keyframes
+- batch reprocess ranges
 - multiple arcs in one file, UI wise?
 - expired objects
 - maplog compression
