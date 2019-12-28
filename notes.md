@@ -1,19 +1,8 @@
-- seed files
-  - arc breaks
-    - combine seed and spans
-    - seed change without wipe circa 2019-11-16 03:14
-  - x manual tagging of previous seed ends?
-    - helper script
-  - cache remote maplog index
-- overdraw missing for large natural objets
-  - maplogs may skip small objects, should always write 0 if possibly unknown
-  - assume unknown objects are very large
-  - x http://localhost:8000/public/index.html#x=5&y=2&z=29&t=1570914891
-- diffed keyframes
-- batch reprocess ranges
-- multiple arcs in one file, UI wise?
-- expired objects
 - maplog compression
+- batch reprocess ranges
+- x manual tagging of previous seed ends?
+  - helper script
+- expired objects??
 - running on data server
   - failures on heroku
   - split by tiles to temp and then process each tile?
@@ -74,3 +63,11 @@ problems:
   bigserver2.onehouronelife.com/1572783606time_2085226784seed_mapLog.txt
   - looks like nosaj locations, in a couple files
   - data overwrites previous tile, then next log overwrites span in spans
+
+
+- overdraw missing for large natural objets
+  - maplogs may skip small objects, should always write 0 if possibly unknown
+  - assume unknown objects are very large
+  - x http://localhost:8000/public/index.html#x=5&y=2&z=29&t=1570914891
+
+- seed change without wipe circa 2019-11-16 03:14

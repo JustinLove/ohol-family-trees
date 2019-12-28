@@ -68,7 +68,7 @@ MaplogCache::Servers.new.each do |logs|
     #next unless logfile.path.match('2680185702seed') # multiple files one seed
     #next unless logfile.path.match('3019284048seed') # multiple files one seed, smaller dataset
     #next unless logfile.path.match('1124586729seed') # microspan at end
-    next unless logfile.path.match('1574835680time') # small with player ids
+    #next unless logfile.path.match('1574835680time') # small with player ids
     #next unless logfile.path.match('1576038671time') # double start times at beginning
     #next unless logfile.timestamp >= 1573895673
     #next unless logfile.timestamp >= 1576038671
@@ -76,7 +76,7 @@ MaplogCache::Servers.new.each do |logs|
     arc = seeds.arc_at(logfile.timestamp+1)
 
     base = nil
-    if arc == prior_arc && prior_logfile && logfile.merges_with?(prior_logfile)
+    if (arc == prior_arc || logfile.timestamp == 1574102503) && prior_logfile && logfile.merges_with?(prior_logfile)
       p "#{logfile.path} merges with #{prior_logfile.path}"
       base = prior_logfile
     else
@@ -89,12 +89,12 @@ MaplogCache::Servers.new.each do |logs|
     prior_logfile = logfile
     prior_arc = arc
 
-    if true
+    if false
       final_placements.process(logfile, {
         :rootfile => root,
         :basefile => base})
     end
-    if true
+    if false
       maplog.process(logfile)
     end
   end
