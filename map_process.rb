@@ -11,9 +11,6 @@ require 'json'
 
 include OHOLFamilyTrees
 
-PlacementPath = "kptest"
-MaplogPath = "mltest"
-
 OutputDir = 'output'
 #OutputDir = 'd:/games/ohol-map/public'
 OutputBucket = 'wondible-com-ohol-tiles'
@@ -36,24 +33,27 @@ end
 
 raise "no object data" unless objects.object_size.length > 0
 
-final_placements = OutputFinalPlacements.new(PlacementPath, filesystem, objects)
-
-maplog = OutputMaplog.new(MaplogPath, filesystem, objects)
-
 MaplogCache::Servers.new.each do |logs|
   #p logs
+  servercode = logs.servercode
 
-  #server = logs.server.sub('.onehouronelife.com', '')
+  placement_path = "pl/#{servercode}"
+  maplog_path = "pl/#{servercode}"
+
+  final_placements = OutputFinalPlacements.new(placement_path, filesystem, objects)
+
+  maplog = OutputMaplog.new(maplog_path, filesystem, objects)
+
 
   manual_resets = []
-  filesystem.read("#{PlacementPath}/manual_resets.txt") do |f|
+  filesystem.read("#{placement_path}/manual_resets.txt") do |f|
     while line = f.gets
       manual_resets << line.to_i
     end
   end
   #p manual_resets
   seeds = SeedBreak.process(logs, manual_resets)
-  seeds.save(filesystem, "#{PlacementPath}/seeds.json")
+  seeds.save(filesystem, "#{placement_path}/seeds.json")
 
   prior_logfile = nil
   prior_arc = nil
@@ -94,7 +94,7 @@ MaplogCache::Servers.new.each do |logs|
         :rootfile => root,
         :basefile => base})
     end
-    if false
+    if true
       maplog.process(logfile)
     end
   end

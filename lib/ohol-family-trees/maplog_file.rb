@@ -29,6 +29,12 @@ class MaplogFile
     path.match(/(.*onehouronelife.com)\//)[1]
   end
 
+  def servercode
+    code = path.match(/(.*).onehouronelife.com\//)[1]
+    code = code&.replace('bigserver', 'bs')
+    code = code&.replace('server', 's')
+  end
+
   def timestamp
     path.match(/(\d{10})time_/)[1].to_i
   end

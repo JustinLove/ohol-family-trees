@@ -12,7 +12,7 @@ module OHOLFamilyTrees
     end
 
     def processed_path
-      "#{output_path}/processed.json"
+      "#{output_path}/processed_keyplace.json"
     end
 
     ZoomLevels = 24..24
@@ -157,25 +157,8 @@ module OHOLFamilyTrees
       return tiles
     end
 
-    def list_tiles(dir, zoom)
-      #p dir, zoom
-      prefix = "#{output_path}/#{dir}/#{zoom}"
-      p "list #{prefix}"
-      paths = filesystem.list(prefix)
-      tiles = []
-      paths.each do |path|
-        next unless path.match('.txt')
-        #p path
-        parts = path.split(/[\/\.]/)
-        coords = [parts[3].to_i,parts[4].to_i]
-        #p coords
-        tiles << coords
-      end
-      return tiles
-    end
-
     def write_index(triples, dir, zoom)
-      path = "#{output_path}/#{dir}/#{zoom}/index.txt"
+      path = "#{output_path}/#{dir}/kp/#{zoom}/index.txt"
       p "write #{path}"
       filesystem.write(path) do |out|
         lasty = nil
@@ -203,7 +186,7 @@ module OHOLFamilyTrees
     end
 
     def read_index(dir, zoom, cutoff)
-      path = "#{output_path}/#{dir}/#{zoom}/index.txt"
+      path = "#{output_path}/#{dir}/kp/#{zoom}/index.txt"
       p "read #{path}"
       tile_list = []
       timestamp = dir

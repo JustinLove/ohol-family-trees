@@ -12,8 +12,8 @@ module OHOLFamilyTrees
       @zoom = zoom
     end
 
-    def write(tile, dir)
-      path = "#{output_path}/#{dir}/#{zoom}/#{tile.tilex}/#{tile.tiley}.txt"
+    def write(tile, timestamp)
+      path = "#{output_path}/#{timestamp}/kp/#{zoom}/#{tile.tilex}/#{tile.tiley}.txt"
       #p path
       filesystem.write(path) do |out|
         tile.floors.each do |key,value|
@@ -27,7 +27,7 @@ module OHOLFamilyTrees
 
     def read(coords, timestamp)
       tilex,tiley = *coords
-      path = "#{output_path}/#{timestamp}/#{zoom}/#{tilex}/#{tiley}.txt"
+      path = "#{output_path}/#{timestamp}/kp/#{zoom}/#{tilex}/#{tiley}.txt"
       tile = Tile.new(coords, timestamp)
       #p path
       filesystem.read(path) do |file|

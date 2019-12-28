@@ -6,7 +6,7 @@ require 'progress_bar'
 module OHOLFamilyTrees
   class OutputMaplog
     def processed_path
-      "#{output_path}/processed.json"
+      "#{output_path}/processed_maplog.json"
     end
 
     ZoomLevels = 24..27
@@ -80,7 +80,7 @@ module OHOLFamilyTrees
         bar.increment!
         next if tile.empty?
         tilex, tiley = *coords
-        path = "#{output_path}/#{dir}/#{zoom}/#{tilex}/#{tiley}.txt"
+        path = "#{output_path}/#{dir}/ml/#{zoom}/#{tilex}/#{tiley}.txt"
         filesystem.write(path) do |out|
           last_x = 0
           last_y = 0
