@@ -14,8 +14,8 @@ include OHOLFamilyTrees
 PlacementPath = "kptest"
 MaplogPath = "mltest"
 
-#OutputDir = 'output'
-OutputDir = 'd:/games/ohol-map/public'
+OutputDir = 'output'
+#OutputDir = 'd:/games/ohol-map/public'
 OutputBucket = 'wondible-com-ohol-tiles'
 
 
@@ -67,6 +67,7 @@ MaplogCache::Servers.new.each do |logs|
     #next unless logfile.path.match('588415882seed') # one arc with multiple start times
     #next unless logfile.path.match('2680185702seed') # multiple files one seed
     #next unless logfile.path.match('3019284048seed') # multiple files one seed, smaller dataset
+    next unless logfile.path.match('1124586729seed') # microspan at end
     #next unless logfile.path.match('1574835680time') # small with player ids
     #next unless logfile.path.match('1576038671time') # double start times at beginning
     #next unless logfile.timestamp >= 1573895673
@@ -95,7 +96,7 @@ MaplogCache::Servers.new.each do |logs|
         :basefile => base,
         :seed => seed})
     end
-    if true
+    if false
       maplog.process(logfile)
     end
   end

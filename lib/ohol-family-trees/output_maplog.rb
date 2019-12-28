@@ -39,7 +39,7 @@ module OHOLFamilyTrees
     end
 
     def process(logfile, options = {})
-      return if processed[logfile.path] && logfile.cache_valid_at?(processed[logfile.path]['time'])
+      #return if processed[logfile.path] && logfile.cache_valid_at?(processed[logfile.path]['time'])
       processed[logfile.path] = {
         'time' => Time.now.to_i,
         'paths' => []

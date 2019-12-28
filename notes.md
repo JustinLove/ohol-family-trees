@@ -1,7 +1,3 @@
-- microspan at 1572968386 startTime at end of file
-  bigserver2.onehouronelife.com/1572783606time_2085226784seed_mapLog.txt
-  - looks like nosaj locations, in a couple files
-  - data overwrites previous tile, then next log overwrites span in spans
 - two part seed
   - rename
 - server in data urls
@@ -75,3 +71,9 @@ problems:
 - suspect golive: 2019-10-26 00:48:51
 - fixed: 2019-10-28 16:57
 - released: ?
+
+
+- x microspan at 1572968386 startTime at end of file
+  bigserver2.onehouronelife.com/1572783606time_2085226784seed_mapLog.txt
+  - looks like nosaj locations, in a couple files
+  - data overwrites previous tile, then next log overwrites span in spans

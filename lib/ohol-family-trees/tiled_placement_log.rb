@@ -151,8 +151,10 @@ module OHOLFamilyTrees
         end
       end
       file.close
-      tiles.finalize!(span.s_end)
-      yield [span, tiles]
+      if span.s_length > 1
+        tiles.finalize!(span.s_end)
+        yield [span, tiles]
+      end
       p "excluded #{excluded} objects"
     end
 
