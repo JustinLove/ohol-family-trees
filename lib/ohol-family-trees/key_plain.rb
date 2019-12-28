@@ -17,10 +17,10 @@ module OHOLFamilyTrees
       #p path
       filesystem.write(path) do |out|
         tile.floors.each do |key,value|
-          out << "#{key} #{value}\n"
+          out << "#{key.join(' ')} #{value}\n"
         end
         tile.objects.each do |key,value|
-          out << "#{key} #{value}\n"
+          out << "#{key.join(' ')} #{value}\n"
         end
       end
     end

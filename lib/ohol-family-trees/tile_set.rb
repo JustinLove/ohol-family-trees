@@ -92,26 +92,26 @@ module OHOLFamilyTrees
     end
 
     def floor(x, y)
-      floors["#{x} #{y}"]
+      floors[[x,y]]
     end
 
     def remove_floor(x, y)
       @updated = true
-      floors.delete("#{x} #{y}")
+      floors.delete([x,y])
     end
 
     def set_floor(x, y, object)
       @updated = true
-      floors["#{x} #{y}"] = object
+      floors[[x,y]] = object
     end
 
     def object(x, y)
-      objects["#{x} #{y}"]
+      objects[[x,y]]
     end
 
     def set_object(x, y, object)
       @updated = true
-      objects["#{x} #{y}"] = object
+      objects[[x,y]] = object
     end
 
     def add_placement(log)
