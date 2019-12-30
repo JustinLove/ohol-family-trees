@@ -1,4 +1,3 @@
-- maplog compression
 - batch reprocess ranges
 - x manual tagging of previous seed ends?
   - helper script

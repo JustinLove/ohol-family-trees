@@ -1,6 +1,7 @@
 require 'ohol-family-trees/tiled_placement_log'
 #require 'ohol-family-trees/key_plain'
-require 'ohol-family-trees/key_value_y_x'
+#require 'ohol-family-trees/key_value_y_x'
+require 'ohol-family-trees/key_value_y_x_first'
 require 'fileutils'
 require 'json'
 require 'progress_bar'
@@ -76,7 +77,7 @@ module OHOLFamilyTrees
       if time
         cutoff = time - 14 * 24 * 60 * 60
         tile_list = read_index(time, zoom, cutoff)
-        loader = KeyValueYX.new(filesystem, output_path, zoom)
+        loader = KeyValueYXFirst.new(filesystem, output_path, zoom)
         return TileSet.new(tile_list, loader)
       end
     end
@@ -134,7 +135,7 @@ module OHOLFamilyTrees
 
     def write_tiles(tiles, dir, zoom)
       p "write #{dir}/#{zoom}"
-      writer = KeyValueYX.new(filesystem, output_path, zoom)
+      writer = KeyValueYXFirst.new(filesystem, output_path, zoom)
       bar = ProgressBar.new(tiles.length)
       tiles.each_pair do |coords,tile|
         bar.increment!

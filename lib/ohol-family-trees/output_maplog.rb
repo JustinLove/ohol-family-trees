@@ -1,6 +1,6 @@
 require 'ohol-family-trees/tiled_placement_log'
-require 'ohol-family-trees/log_diff'
-require 'ohol-family-trees/log_value_y_x_t'
+#require 'ohol-family-trees/log_diff'
+#require 'ohol-family-trees/log_value_y_x_t'
 require 'ohol-family-trees/log_value_y_x_t_first'
 require 'fileutils'
 require 'json'
