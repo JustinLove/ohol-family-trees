@@ -66,9 +66,9 @@ MaplogCache::Servers.new.each do |logs|
     #next unless logfile.path.match('1521396640seed') # two arcs in one file
     #next unless logfile.path.match('588415882seed') # one arc with multiple start times
     #next unless logfile.path.match('2680185702seed') # multiple files one seed
-    next unless logfile.path.match('3019284048seed') # multiple files one seed, smaller dataset
+    #next unless logfile.path.match('3019284048seed') # multiple files one seed, smaller dataset
     #next unless logfile.path.match('1124586729seed') # microspan at end
-    #next unless logfile.path.match('1574835680time') # small with player ids
+    next unless logfile.path.match('1574835680time') # small with player ids
     #next unless logfile.path.match('1576038671time') # double start times at beginning
     #next unless logfile.timestamp >= 1573895673
     #next unless logfile.timestamp >= 1576038671
@@ -89,12 +89,12 @@ MaplogCache::Servers.new.each do |logs|
     prior_logfile = logfile
     prior_arc = arc
 
-    if true
+    if false
       final_placements.process(logfile, {
         :rootfile => root,
         :basefile => base})
     end
-    if false
+    if true
       maplog.process(logfile)
     end
   end

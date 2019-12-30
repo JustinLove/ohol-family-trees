@@ -143,21 +143,6 @@ module OHOLFamilyTrees
       end
     end
 
-    def read_tiles(dir, zoom, tile_list)
-      #p dir, zoom
-      reader = KeyValueYX.new(filesystem, output_path, zoom)
-      bar = ProgressBar.new(tile_list.length)
-      tiles = TileSet.new
-      tile_list.each do |triple|
-        tilex, tiley, timestamp = *triple
-        coords = [tilex, tiley]
-        bar.increment!
-        #p coords
-        tiles[coords] = reader.read(coords, timestamp)
-      end
-      return tiles
-    end
-
     def write_index(triples, dir, zoom)
       path = "#{output_path}/#{dir}/kp/#{zoom}/index.txt"
       p "write #{path}"

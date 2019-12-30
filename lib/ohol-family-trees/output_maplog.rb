@@ -1,4 +1,5 @@
 require 'ohol-family-trees/tiled_placement_log'
+require 'ohol-family-trees/log_diff'
 require 'fileutils'
 require 'json'
 require 'progress_bar'
@@ -63,7 +64,7 @@ module OHOLFamilyTrees
             :object_over => objects.object_over,
           }) do |span, tileset|
 
-          write_tiles(tileset.placements, span.s_end, zoom)
+          write_tiles(tileset.tiles, span.s_end, zoom)
 
           processed[logfile.path]['paths'] << "#{span.s_end.to_s}/#{zoom}"
           #p processed
@@ -73,25 +74,14 @@ module OHOLFamilyTrees
       checkpoint
     end
 
-    def write_tiles(map, dir, zoom)
+    def write_tiles(tiles, dir, zoom)
       p "write #{dir} #{zoom}"
-      bar = ProgressBar.new(map.length)
-      map.each do |coords,tile|
+      writer = LogDiff.new(filesystem, output_path, zoom)
+      bar = ProgressBar.new(tiles.length)
+      tiles.each do |coords,tile|
         bar.increment!
         next if tile.empty?
-        tilex, tiley = *coords
-        path = "#{output_path}/#{dir}/ml/#{zoom}/#{tilex}/#{tiley}.txt"
-        filesystem.write(path) do |out|
-          last_x = 0
-          last_y = 0
-          last_time = 0
-          tile.each do |logline|
-            out << "#{(logline.ms_time - last_time)/10} #{logline.x - last_x} #{logline.y - last_y} #{logline.object}\n"
-            last_time = logline.ms_time
-            last_x = logline.x
-            last_y = logline.y
-          end
-        end
+        writer.write(tile, dir)
       end
     end
   end
