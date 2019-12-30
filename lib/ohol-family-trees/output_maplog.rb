@@ -1,5 +1,6 @@
 require 'ohol-family-trees/tiled_placement_log'
 require 'ohol-family-trees/log_diff'
+require 'ohol-family-trees/log_value_y_x_t'
 require 'fileutils'
 require 'json'
 require 'progress_bar'
@@ -76,7 +77,7 @@ module OHOLFamilyTrees
 
     def write_tiles(tiles, dir, zoom)
       p "write #{dir} #{zoom}"
-      writer = LogDiff.new(filesystem, output_path, zoom)
+      writer = LogValueYXT.new(filesystem, output_path, zoom)
       bar = ProgressBar.new(tiles.length)
       tiles.each do |coords,tile|
         bar.increment!
