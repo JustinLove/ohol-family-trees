@@ -11,8 +11,8 @@ require 'json'
 
 include OHOLFamilyTrees
 
-OutputDir = 'output'
-#OutputDir = 'd:/games/ohol-map/public'
+#OutputDir = 'output'
+OutputDir = 'd:/games/ohol-map/public'
 OutputBucket = 'wondible-com-ohol-tiles'
 
 
@@ -66,7 +66,7 @@ MaplogCache::Servers.new.each do |logs|
     #next unless logfile.path.match('1521396640seed') # two arcs in one file
     #next unless logfile.path.match('588415882seed') # one arc with multiple start times
     #next unless logfile.path.match('2680185702seed') # multiple files one seed
-    next unless logfile.path.match('3019284048seed') # multiple files one seed, smaller dataset
+    #next unless logfile.path.match('3019284048seed') # multiple files one seed, smaller dataset
     #next unless logfile.path.match('1124586729seed') # microspan at end
 #    next unless logfile.path.match('1574835680time') # small with player ids
     #next unless logfile.path.match('1576038671time') # double start times at beginning
@@ -94,7 +94,7 @@ MaplogCache::Servers.new.each do |logs|
         :rootfile => root,
         :basefile => base})
     end
-    if false
+    if true
       maplog.process(logfile)
     end
   end

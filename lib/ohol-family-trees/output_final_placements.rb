@@ -89,7 +89,7 @@ module OHOLFamilyTrees
         logfile.cache_valid_at?(processed[logfile.path]['time']) && 
         processed[logfile.path]['root_time'] == ((options[:rootfile] && options[:rootfile].timestamp) || 0) &&
         processed[logfile.path]['base_time'] == (base_time || 0)
-        #return
+        return
       end
 
       processed[logfile.path] = {
