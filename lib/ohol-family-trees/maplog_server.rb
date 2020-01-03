@@ -57,13 +57,6 @@ module OHOLFamilyTrees
         dir
       end
 
-      def servercode
-        match = dir.match(/(.*).onehouronelife.com/)
-        code = match && match[1]
-        code = code&.sub('bigserver', 'bs')
-        code = code&.sub('server', 's')
-      end
-
       def each
         p baseurl + dir
         index = Client.get_content(baseurl + dir)

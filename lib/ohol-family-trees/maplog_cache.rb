@@ -36,13 +36,6 @@ module OHOLFamilyTrees
         dir
       end
 
-      def servercode
-        match = dir.match(/(.*).onehouronelife.com/)
-        code = match && match[1]
-        code = code&.sub('bigserver', 'bs')
-        code = code&.sub('server', 's')
-      end
-
       def each
         Dir.foreach(File.join(cache, dir)) do |path|
           next unless path.match(/_map(Log|Seed).txt/)

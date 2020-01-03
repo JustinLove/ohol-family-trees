@@ -35,7 +35,7 @@ raise "no object data" unless objects.object_size.length > 0
 
 MaplogCache::Servers.new.each do |logs|
   #p logs
-  servercode = logs.servercode
+  servercode = "17"
 
   placement_path = "pl/#{servercode}"
   maplog_path = "pl/#{servercode}"
