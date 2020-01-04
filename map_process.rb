@@ -11,8 +11,8 @@ require 'json'
 
 include OHOLFamilyTrees
 
-#OutputDir = 'output'
-OutputDir = 'd:/games/ohol-map/public'
+OutputDir = 'output'
+#OutputDir = 'd:/games/ohol-map/public'
 OutputBucket = 'wondible-com-ohol-tiles'
 
 
@@ -44,14 +44,7 @@ MaplogCache::Servers.new.each do |logs|
 
   maplog = OutputMaplog.new(maplog_path, filesystem, objects)
 
-
-  manual_resets = []
-  filesystem.read("#{placement_path}/manual_resets.txt") do |f|
-    while line = f.gets
-      manual_resets << line.to_i
-    end
-  end
-  #p manual_resets
+  manual_resets = SeedBreak.read_manual_resets(filesystem, "#{placement_path}/manual_resets.txt")
   seeds = SeedBreak.process(logs, manual_resets)
   seeds.save(filesystem, "#{placement_path}/seeds.json")
 
@@ -68,6 +61,7 @@ MaplogCache::Servers.new.each do |logs|
     #next unless logfile.path.match('2680185702seed') # multiple files one seed
     #next unless logfile.path.match('3019284048seed') # multiple files one seed, smaller dataset
     #next unless logfile.path.match('1124586729seed') # microspan at end
+    #next unless logfile.path.match('4088407786seed') # single zero byte file
 #    next unless logfile.path.match('1574835680time') # small with player ids
     #next unless logfile.path.match('1576038671time') # double start times at beginning
     #next unless logfile.timestamp >= 1573895673
@@ -89,12 +83,12 @@ MaplogCache::Servers.new.each do |logs|
     prior_logfile = logfile
     prior_arc = arc
 
-    if true
+    if false
       final_placements.process(logfile, {
         :rootfile => root,
         :basefile => base})
     end
-    if true
+    if false
       maplog.process(logfile)
     end
   end

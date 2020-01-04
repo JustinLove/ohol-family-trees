@@ -2,6 +2,16 @@ require 'ohol-family-trees/arc_list'
 
 module OHOLFamilyTrees
   module SeedBreak
+    def self.read_manual_resets(filesystem, path)
+      manual_resets = []
+      filesystem.read(path) do |f|
+        while line = f.gets
+          manual_resets << line.to_i
+        end
+      end
+      return manual_resets
+    end
+
     def self.process(logs, manual_resets = [])
       arcs = ArcList.new
       prior = nil
