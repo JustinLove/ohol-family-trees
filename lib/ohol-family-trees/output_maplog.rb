@@ -82,7 +82,7 @@ module OHOLFamilyTrees
       bar = ProgressBar.new(tiles.length)
       tiles.each do |coords,tile|
         bar.increment!
-        next if tile.empty?
+        next if tile.placements.empty?
         writer.write(tile, dir)
       end
     end

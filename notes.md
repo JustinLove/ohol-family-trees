@@ -1,4 +1,3 @@
-- zero byte files
 - proper server id lookup
 - batch reprocess ranges
 - x manual tagging of previous seed ends?
