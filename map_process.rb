@@ -3,6 +3,7 @@ require 'ohol-family-trees/object_data'
 require 'ohol-family-trees/output_final_placements'
 require 'ohol-family-trees/output_maplog'
 require 'ohol-family-trees/seed_break'
+require 'ohol-family-trees/logfile_context'
 require 'ohol-family-trees/filesystem_local'
 require 'ohol-family-trees/filesystem_s3'
 require 'ohol-family-trees/filesystem_group'
@@ -48,9 +49,8 @@ MaplogCache::Servers.new.each do |logs|
   seeds = SeedBreak.process(logs, manual_resets)
   seeds.save(filesystem, "#{placement_path}/seeds.json")
 
-  prior_logfile = nil
-  prior_arc = nil
-  root = nil
+  context = LogfileContext.new(seeds)
+
   logs.each do |logfile|
     next unless logfile.placements?
 
@@ -67,26 +67,12 @@ MaplogCache::Servers.new.each do |logs|
     #next unless logfile.timestamp >= 1573895673
     #next unless logfile.timestamp >= 1576038671
 
-    arc = seeds.arc_at(logfile.timestamp+1)
-
-    base = nil
-    if (arc == prior_arc || logfile.timestamp == 1574102503) && prior_logfile && logfile.merges_with?(prior_logfile)
-      p "#{logfile.path} merges with #{prior_logfile.path}"
-      base = prior_logfile
-    else
-      p "#{logfile.path} is root"
-      root = logfile
-    end
-    if prior_logfile
-      #p (logfile.timestamp - prior_logfile.timestamp) / (60.0 * 60.0)
-    end
-    prior_logfile = logfile
-    prior_arc = arc
+    context.update!(logfile)
 
     if false
       final_placements.process(logfile, {
-        :rootfile => root,
-        :basefile => base})
+        :rootfile => context.root,
+        :basefile => context.base})
     end
     if false
       maplog.process(logfile)
