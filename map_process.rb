@@ -12,8 +12,8 @@ require 'json'
 
 include OHOLFamilyTrees
 
-OutputDir = 'output'
-#OutputDir = 'd:/games/ohol-map/public'
+#OutputDir = 'output'
+OutputDir = 'd:/games/ohol-map/public'
 OutputBucket = 'wondible-com-ohol-tiles'
 
 
@@ -69,12 +69,12 @@ MaplogCache::Servers.new.each do |logs|
 
     context.update!(logfile)
 
-    if false
+    if true
       final_placements.process(logfile, {
         :rootfile => context.root,
         :basefile => context.base})
     end
-    if false
+    if true
       maplog.process(logfile)
     end
   end
