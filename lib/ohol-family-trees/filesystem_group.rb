@@ -17,5 +17,13 @@ module OHOLFamilyTrees
         return if fs.read(path, &block)
       end
     end
+
+    def list(path)
+      filesystems.each do |fs|
+        paths = fs.list(path)
+        return paths if paths.length > 0
+      end
+      return []
+    end
   end
 end

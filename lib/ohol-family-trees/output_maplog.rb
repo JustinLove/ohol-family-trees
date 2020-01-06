@@ -1,4 +1,7 @@
 require 'ohol-family-trees/tiled_placement_log'
+#require 'ohol-family-trees/log_diff'
+#require 'ohol-family-trees/log_value_y_x_t'
+require 'ohol-family-trees/log_value_y_x_t_first'
 require 'fileutils'
 require 'json'
 require 'progress_bar'
@@ -6,7 +9,7 @@ require 'progress_bar'
 module OHOLFamilyTrees
   class OutputMaplog
     def processed_path
-      "#{output_path}/processed.json"
+      "#{output_path}/processed_maplog.json"
     end
 
     ZoomLevels = 24..27
@@ -38,7 +41,7 @@ module OHOLFamilyTrees
       end
     end
 
-    def process(logfile)
+    def process(logfile, options = {})
       return if processed[logfile.path] && logfile.cache_valid_at?(processed[logfile.path]['time'])
       processed[logfile.path] = {
         'time' => Time.now.to_i,
@@ -56,18 +59,16 @@ module OHOLFamilyTrees
           min_size = 1.5 * (128/cellSize)
         end
 
-        p zoom
-
         TiledPlacementLog.read(logfile, tile_width, {
             :floor_removal => objects.floor_removal,
             :min_size => min_size,
             :object_size => objects.object_size,
             :object_over => objects.object_over,
-          }).each do |tiled|
+          }) do |span, tileset|
 
-          write_tiles(tiled.placements, tiled.arc.s_end, zoom)
+          write_tiles(tileset.tiles, span.s_end, zoom)
 
-          processed[logfile.path]['paths'] << "#{tiled.arc.s_end.to_s}/#{zoom}"
+          processed[logfile.path]['paths'] << "#{span.s_end.to_s}/#{zoom}"
           #p processed
         end
       end
@@ -75,25 +76,14 @@ module OHOLFamilyTrees
       checkpoint
     end
 
-    def write_tiles(map, dir, zoom)
-      p dir
-      bar = ProgressBar.new(map.length)
-      map.each do |coords,tile|
+    def write_tiles(tiles, dir, zoom)
+      p "write #{dir} #{zoom}"
+      writer = LogValueYXTFirst.new(filesystem, output_path, zoom)
+      bar = ProgressBar.new(tiles.length)
+      tiles.each do |coords,tile|
         bar.increment!
-        next if tile.empty?
-        tilex, tiley = *coords
-        path = "#{output_path}/#{dir}/#{zoom}/#{tilex}/#{tiley}.txt"
-        filesystem.write(path) do |out|
-          last_x = 0
-          last_y = 0
-          last_time = 0
-          tile.each do |logline|
-            out << "#{(logline.ms_time - last_time)/10} #{logline.x - last_x} #{logline.y - last_y} #{logline.object}\n"
-            last_time = logline.ms_time
-            last_x = logline.x
-            last_y = logline.y
-          end
-        end
+        next if tile.placements.empty?
+        writer.write(tile, dir)
       end
     end
   end

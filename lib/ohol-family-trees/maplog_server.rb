@@ -1,4 +1,4 @@
-require 'ohol-family-trees/combined_logfile'
+require 'ohol-family-trees/maplog_file'
 require 'httpclient'
 require 'nokogiri'
 
@@ -61,84 +61,29 @@ module OHOLFamilyTrees
         p baseurl + dir
         index = Client.get_content(baseurl + dir)
         #p index
-        path_list = MaplogServer.extract_path_list(index)
-        buffer = []
-        loop do
-          while buffer.length < 2 || buffer[-1].merges_with?(buffer[-2])
-            path,log_date = *path_list.shift
-            break unless path
-            next unless path.match('_mapLog.txt')
+        MaplogServer.extract_path_list(index)
+          .map do |path, log_date|
+            next unless path.match(/_map(Log|Seed).txt/)
             cache_path = dir + path
-            buffer << Logfile.new(cache_path, log_date, baseurl)
+            yield Logfile.new(cache_path, log_date, baseurl)
           end
-          if buffer.length < 1
-            break
-          elsif buffer.length == 1
-            # just yield below
-          elsif buffer[-1].merges_with?(buffer[-2])
-            buffer = [CombinedLogfile.new(buffer)]
-          elsif buffer.length == 2
-            # just yield below
-          else
-            buffer = [CombinedLogfile.new(buffer[0..-2]), buffer[-1]]
-          end
-          yield buffer.shift
-        end
       end
     end
 
-    class Logfile
+    class Logfile < MaplogFile
       def initialize(path, date, baseurl = BaseUrl)
-        @path = path
+        super path
         @date = date
         @baseurl = baseurl
         @contents = nil
       end
 
-      attr_reader :path
       attr_reader :date
       attr_reader :baseurl
       attr_reader :contents
 
       def url
         baseurl + path
-      end
-
-      def approx_log_time
-        return date unless timestamp
-
-        Time.at(timestamp)
-      end
-
-      def within(time_range = (Time.at(0)..Time.now))
-        time_range.cover?(approx_log_time)
-      end
-
-      def server
-        path.match(/(.*onehouronelife.com)\//)[1]
-      end
-
-      def timestamp
-        path.match(/(\d{10})time_/)[1].to_i
-      end
-
-      def cache_valid_at?(at_time)
-        date.to_i <= at_time && (at_time < 1571853427 || 1572325200 < at_time)
-      end
-
-      def seed
-        if timestamp == 1571995987
-          return nil
-        elsif timestamp == 1572240860
-          return 30691433003
-        elsif timestamp == 1572297324
-          return nil
-        end
-        path.match(/_(\d+)seed/)[1].to_i
-      end
-
-      def merges_with?(file)
-        seed && file.seed && seed == file.seed
       end
 
       def open

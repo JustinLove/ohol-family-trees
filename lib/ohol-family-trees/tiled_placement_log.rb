@@ -1,92 +1,113 @@
+require 'ohol-family-trees/span'
+require 'ohol-family-trees/tile_set'
 require 'ohol-family-trees/arc'
 require 'json'
 
 module OHOLFamilyTrees
   class TiledPlacementLog
-    attr_reader :floors
-    attr_reader :objects
-    attr_reader :placements
-    attr_reader :arc
-
-    def initialize(arc)
-      @objects = Hash.new {|h,k| h[k] = {}}
-      @floors = Hash.new {|h,k| h[k] = {}}
-      @placements = Hash.new {|h,k| h[k] = []}
-      @arc = arc
-    end
-
     def self.read(logfile, tile_width, options = {})
       excluded = 0
       floor_removal = options[:floor_removal] || {}
       min_size = options[:min_size] || 0
       object_size = options[:object_size]
       object_over = options[:object_over] || Hash.new {|h,k| h[k] = ObjectOver.new(2, 2, 2, 4)}
+      breakpoints = logfile.breakpoints
       start = nil
       file = logfile.open
       previous = nil
-      tiled = []
       server = logfile.server
       seed = logfile.seed
-      out = new(Arc.new(server, 0, 0, seed))
-      tiled << out
+      span = Span.new(server, 0, seed)
+      tiles = TileSet.new
+      if options[:base_tiles]
+        tiles = tiles.copy_key(options[:base_tiles])
+      end
+      if options[:base_time]
+        p "resume from #{options[:base_time]}"
+        span.s_base = options[:base_time]
+      end
       while line = file.gets
         log = Maplog.create(line)
         if log.kind_of?(Maplog::ArcStart)
-          if start && log.s_start < Arc::SplitArcsBefore
-            out = new(Arc.new(server, log.s_start, log.s_start, seed))
-            tiled << out
+          if start && span.s_length > 0
+            tiles.finalize!(span.s_end)
+            yield [span, tiles]
+            if log.s_start < Arc::SplitArcsBefore
+              span = Span.new(server, log.s_start, seed)
+            else
+              span = span.next(log.s_start)
+            end
+            tiles = TileSet.new
           end
           start = log
-          if out.arc.s_start == 0
-            out.arc.s_start = start.s_start
+          if span.s_start == 0
+            span.s_start = start.s_start
           end
-          out.arc.s_end = start.s_start
+          span.s_end = start.s_start
         elsif log.kind_of?(Maplog::Placement)
           log.ms_start = start.ms_start
-          out.arc.s_end = log.s_time
+          if breakpoints.any? && file.lineno > breakpoints.first
+            breakpoints.shift
+            tiles.finalize!(span.s_end)
+            yield [span, tiles]
+            span = span.next(log.s_time)
+            tiles = TileSet.new.copy_key(tiles)
+          end
+
+          span.s_end = log.s_time
           tilex = log.x / tile_width
           #(-tileY - 1) * tile_width = log.y
           #-tileY - 1 = log.y / tile_width
           #-tileY = log.y / tile_width + 1
           tiley = -(log.y / tile_width + 1)
+          tile = tiles[[tilex,tiley]]
           object = log.object
           if log.floor?
-            occupant = out.floors[[tilex,tiley]]["#{log.x} #{log.y}"]
-            out.placements[[tilex,tiley]] << log
-            out.floors[[tilex,tiley]]["#{log.x} #{log.y}"] = object
+            occupant = tile.floor(log.x, log.y)
+            tile.add_placement(log)
+            tile.set_floor(log.x, log.y, object)
           else
-            occupant = out.objects[[tilex,tiley]]["#{log.x} #{log.y}"]
+            occupant = tile.object(log.x, log.y)
             removes = floor_removal[object]
             if removes
-              if out.floors[[tilex,tiley]]["#{log.x} #{log.y}"] == removes &&
+              if tile.floor(log.x, log.y) == removes &&
                  previous.object == "0" &&
                  previous.x == log.x &&
                  previous.y == log.y &&
                  previous.ms_offset == log.ms_offset
-                out.floors[[tilex,tiley]].delete("#{log.x} #{log.y}")
+                tile.remove_floor(log.x, log.y)
                 previous.object = "f0"
               end
             end
 
             if object_size
               size = object_size[log.id]
-              if !size || size <= min_size
-                if size
-                  #p log.id
-                  excluded += 1
-                end
-                if occupant && occupant != "0"
-                  log.object = "0"
-                  object = "0"
-                else
+              if !size
+                #skip
+              elsif size <= min_size
+                #p log.id
+                excluded += 1
+                if occupant && occupant == "0"
                   previous = log
                   next
+                else
+                  log.object = "0"
+                  object = "0"
                 end
               end
             end
 
-            out.placements[[tilex,tiley]] << log
-            out.objects[[tilex,tiley]]["#{log.x} #{log.y}"] = object
+            if previous &&
+               previous.actor == -1 &&
+               previous.object == "0" &&
+               previous.x == log.x &&
+               previous.y == log.y &&
+               previous.ms_offset == log.ms_offset
+              previous.skip!
+            end
+
+            tile.add_placement(log)
+            tile.set_object(log.x, log.y, object)
           end
           tx = log.x % tile_width
           ty = log.y % tile_width
@@ -116,21 +137,25 @@ module OHOLFamilyTrees
           if overx != 0 && overy != 0
             overs << [tilex+overx,tiley+overy]
           end
-          overs.each do |tile|
-            out.placements[tile] << log
+          overs.each do |coord|
+            tile = tiles[coord]
+            tile.add_placement(log)
             if log.floor?
               # overkill, but I don't want separate bounds for floors, bearskin can hang over
-              out.floors[tile]["#{log.x} #{log.y}"] = object
+              tile.set_floor(log.x, log.y, object)
             else
-              out.objects[tile]["#{log.x} #{log.y}"] = object
+              tile.set_object(log.x, log.y, object)
             end
           end
+          previous = log
         end
-        previous = log
       end
       file.close
+      if span.s_length > 1
+        tiles.finalize!(span.s_end)
+        yield [span, tiles]
+      end
       p "excluded #{excluded} objects"
-      tiled
     end
 
     ObjectOver = Struct.new(:left, :bottom, :right, :top) do

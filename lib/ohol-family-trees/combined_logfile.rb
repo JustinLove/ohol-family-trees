@@ -33,6 +33,14 @@ module OHOLFamilyTrees
       return true
     end
 
+    def placements?
+      logsfiles.last.placements?
+    end
+
+    def seed_only?
+      logsfiles.last.placements?
+    end
+
     def seed
       logfiles.last.seed
     end

@@ -8,7 +8,7 @@ module OHOLFamilyTrees
     attr_reader :server
     attr_accessor :s_start
     attr_accessor :s_end
-    attr_reader :seed
+    attr_accessor :seed
 
     def initialize(server, st, en, sd)
       @server = server
@@ -32,7 +32,7 @@ module OHOLFamilyTrees
             s_end = s_start = log.s_start
           end
           if start && log.s_start < SplitArcsBefore
-            p [s_start, s_end]
+            #p [s_start, s_end]
             arcs << Arc.new(server, start.s_start, s_end, seed)
             s_start = log.s_start
             s_end = s_start
@@ -44,7 +44,7 @@ module OHOLFamilyTrees
         end
       end
       if s_start != 0
-        p [s_start, s_end]
+        #p [s_start, s_end]
         arcs << Arc.new(server, s_start, s_end, seed)
       end
       arcs

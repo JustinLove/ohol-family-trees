@@ -33,5 +33,26 @@ module OHOLFamilyTrees
       p ['not found', path]
       return false
     end
+
+    def list(path)
+      paths = []
+      response = client.list_objects_v2({
+        :bucket => bucket,
+        :prefix => path,
+      })
+      crazy = 0
+      token = nil
+      begin
+        response = client.list_objects_v2({
+          :bucket => bucket,
+          :prefix => path,
+          :continuation_token => token
+        })
+        token = response.next_continuation_token
+        paths += response.contents.map { |entry| entry.key }
+        crazy += 1
+      end while response.is_truncated && crazy <= 200
+      return paths
+    end
   end
 end
