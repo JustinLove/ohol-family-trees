@@ -53,8 +53,9 @@ module OHOLFamilyTrees
     end
 
     def checkpoint
+      x = JSON.pretty_generate(spans.values.sort_by {|span| span['start']})
       filesystem.write(span_path) do |f|
-        f << JSON.pretty_generate(spans.values.sort_by {|span| span['start']})
+        f << x
       end
       filesystem.write(processed_path) do |f|
         f << JSON.pretty_generate(processed)

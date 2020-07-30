@@ -78,6 +78,11 @@ class MaplogFile
     lines = file.lineno
     file.close
 
+    if lines < 1
+      @breakpoints = []
+      return []
+    end
+
     chunks = (lines.to_f / maxlog).ceil
     chunk = lines / chunks
     @breakpoints = ((1...chunks).map {|i| chunk*i })

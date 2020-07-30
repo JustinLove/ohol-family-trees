@@ -13,7 +13,7 @@ require 'json'
 include OHOLFamilyTrees
 
 #OutputDir = 'output'
-OutputDir = 'd:/games/ohol-map/public'
+OutputDir = 'd:/dev/ohol-map/public'
 OutputBucket = 'wondible-com-ohol-tiles'
 
 
