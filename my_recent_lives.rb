@@ -6,10 +6,10 @@ require 'date'
 require 'csv'
 
 include OHOLFamilyTrees
+#target = 'e45aa4e489b35b6b0fd9f59f0049c688237a9a86' #wondible
 
-wondible = 'e45aa4e489b35b6b0fd9f59f0049c688237a9a86'
 from_time = (Date.today - 3).to_time
-to_time = (Date.today - 0).to_time
+to_time = (Date.today + 1).to_time
 
 known_players = {}
 CSV.foreach("known-players.csv") do |row|
@@ -32,7 +32,7 @@ LifelogCache::Servers.new.each do |logs|
   to = to_time.to_i
 
   lives.select do |life|
-    if life.hash == wondible
+    if life.hash == target
       life.highlight = true
       p [life.key, life.name, Time.at(life.time)]
       if life.time > from && life.time < to && life.lifetime > 3
