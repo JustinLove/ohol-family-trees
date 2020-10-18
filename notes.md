@@ -1,3 +1,14 @@
+- reestablish test environment
+- base/root is defined while iterating available files
+  - even if we fix base/root for available files, the damaged entries no longer have available files
+  - pure updates of only latest file can't account for late publishing of roots
+
+- x file list cache that fixes seeds.json
+- ideal base/root data structure - stop damaging this data
+- establish a maplog archive
+- copy new log files as it processes them
+- check older logs/spans and reprocess from archive
+
 - batch reprocess ranges
 - x manual tagging of previous seed ends?
   - helper script

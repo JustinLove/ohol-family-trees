@@ -1,4 +1,5 @@
 require 'ohol-family-trees/maplog_cache'
+require 'ohol-family-trees/maplog_list'
 require 'ohol-family-trees/object_data'
 require 'ohol-family-trees/output_final_placements'
 require 'ohol-family-trees/output_maplog'
@@ -41,12 +42,19 @@ MaplogCache::Servers.new.each do |logs|
   placement_path = "pl/#{servercode}"
   maplog_path = "pl/#{servercode}"
 
+  list = MaplogList::Logs.new(filesystem, "#{placement_path}/file_list.json")
+  p list.files.length
+  list.update_from(logs)
+  p list.files.length
+  #p list.files
+  list.checkpoint
+
   final_placements = OutputFinalPlacements.new(placement_path, filesystem, objects)
 
   maplog = OutputMaplog.new(maplog_path, filesystem, objects)
 
   manual_resets = SeedBreak.read_manual_resets(filesystem, "#{placement_path}/manual_resets.txt")
-  seeds = SeedBreak.process(logs, manual_resets)
+  seeds = SeedBreak.process(list, manual_resets)
   seeds.save(filesystem, "#{placement_path}/seeds.json")
 
   context = LogfileContext.new(seeds)
