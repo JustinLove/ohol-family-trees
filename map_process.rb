@@ -57,7 +57,7 @@ MaplogCache::Servers.new.each do |logs|
   seeds = SeedBreak.process(list, manual_resets)
   seeds.save(filesystem, "#{placement_path}/seeds.json")
 
-  context = LogfileContext.new(seeds)
+  context = LogfileContext.process(seeds, list)
 
   logs.each do |logfile|
     next unless logfile.placements?
@@ -75,12 +75,8 @@ MaplogCache::Servers.new.each do |logs|
     #next unless logfile.timestamp >= 1573895673
     #next unless logfile.timestamp >= 1576038671
 
-    context.update!(logfile)
-
     if true
-      final_placements.process(logfile, {
-        :rootfile => context.root,
-        :basefile => context.base})
+      final_placements.process(logfile, context[logfile.path])
     end
     if true
       maplog.process(logfile)
