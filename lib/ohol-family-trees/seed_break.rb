@@ -22,7 +22,7 @@ module OHOLFamilyTrees
         if logfile.placements?
           if !manual_resets.member?(logfile.timestamp) and prior and logfile.merges_with?(prior)
           else
-            p "merge break at #{logfile.timestamp}"
+            #p "merge break at #{logfile.timestamp}"
             if current_arc
               current_arc.s_end = logfile.timestamp
             end
@@ -32,7 +32,7 @@ module OHOLFamilyTrees
 
           if prior and false
             gap = (logfile.timestamp - prior.timestamp) / (60.0 * 60.0)
-            p "#{prior.approx_log_time} #{gap} #{logfile.approx_log_time}"
+            #p "#{prior.approx_log_time} #{gap} #{logfile.approx_log_time}"
             unless (23.99..24.01).member?(gap)
               p "#{gap} gap at #{logfile.timestamp}"
             end
@@ -42,7 +42,7 @@ module OHOLFamilyTrees
         end
 
         if logfile.seed_only?
-          p "seed change at #{logfile.timestamp}"
+          #p "seed change at #{logfile.timestamp}"
           if manual_resets.member?(logfile.timestamp)
             if current_arc
               current_arc.seed = logfile.seed

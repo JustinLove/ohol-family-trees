@@ -10,12 +10,14 @@ require 'ohol-family-trees/filesystem_s3'
 require 'ohol-family-trees/filesystem_group'
 require 'fileutils'
 require 'json'
+require 'set'
 
 include OHOLFamilyTrees
 
 #OutputDir = 'output'
 OutputDir = 'd:/dev/ohol-map/public'
 OutputBucket = 'wondible-com-ohol-tiles'
+MaplogArchive = 'publicMapChangeData'
 
 
 filesystem = FilesystemGroup.new([
@@ -43,11 +45,14 @@ MaplogCache::Servers.new.each do |logs|
   maplog_path = "pl/#{servercode}"
 
   list = MaplogList::Logs.new(filesystem, "#{placement_path}/file_list.json")
-  p list.files.length
-  list.update_from(logs)
-  p list.files.length
+  #p list.files.length
+  updated_files = Set.new
+  list.update_from(logs) do |logfile|
+    updated_files << logfile.path
+  end
+  #p updated_files
+  #p list.files.length
   #p list.files
-  list.checkpoint
 
   final_placements = OutputFinalPlacements.new(placement_path, filesystem, objects)
 
@@ -76,10 +81,20 @@ MaplogCache::Servers.new.each do |logs|
     #next unless logfile.timestamp >= 1576038671
 
     if true
+      if updated_files.member?(logfile.path)
+        p 'updated file', logfile.path
+        filesystem.write(MaplogArchive + '/' + logfile.path) do |archive|
+          IO::copy_stream(logfile.open, archive)
+        end
+      end
+    end
+    if true
       final_placements.process(logfile, context[logfile.path])
     end
     if true
       maplog.process(logfile)
     end
   end
+
+  list.checkpoint
 end

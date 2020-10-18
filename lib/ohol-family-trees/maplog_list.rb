@@ -43,11 +43,14 @@ module OHOLFamilyTrees
       def update_from(source)
         source.each do |sourcefile|
           if logfile = files[sourcefile.path]
-            if sourcefile.date > logfile.date
+            # 1 second, to allow for differing sub-second precision
+            if sourcefile.date > logfile.date + 1
               files[sourcefile.path] = Logfile.from_source(sourcefile)
+              yield sourcefile if block_given?
             end
           else
             files[sourcefile.path] = Logfile.from_source(sourcefile)
+            yield sourcefile if block_given?
           end
         end
       end

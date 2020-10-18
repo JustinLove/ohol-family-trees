@@ -5,8 +5,9 @@
 
 - x file list cache that fixes seeds.json
 - x ideal base/root data structure - stop damaging this data
-- establish a maplog archive
-- copy new log files as it processes them
+- x establish a maplog archive
+- x copy new log files as it processes them
+- interface to access maplog archive
 - check older logs/spans and reprocess from archive
   - local file dates vs online file dates
 - force reprocess of all since damaged data

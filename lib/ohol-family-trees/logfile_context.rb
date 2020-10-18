@@ -14,10 +14,10 @@ module OHOLFamilyTrees
         arc = seeds.arc_at(logfile.timestamp+1)
 
         if (arc == prior_arc || logfile.timestamp == 1574102503) && prior_logfile && logfile.merges_with?(prior_logfile)
-          p "#{logfile.path} merges with #{prior_logfile.path}"
+          #p "#{logfile.path} merges with #{prior_logfile.path}"
           context[logfile.path][:basefile] = prior_logfile
         else
-          p "#{logfile.path} is root"
+          #p "#{logfile.path} is root"
           root = logfile
         end
         context[logfile.path][:rootfile] = root
