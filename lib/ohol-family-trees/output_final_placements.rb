@@ -134,6 +134,15 @@ module OHOLFamilyTrees
       checkpoint
     end
 
+    def timestamp_fixup(logfile)
+      if processed[logfile.path]
+        unless logfile.cache_valid_at?(processed[logfile.path]['time'])
+          processed[logfile.path]['time'] = logfile.date.to_i
+          checkpoint
+        end
+      end
+    end
+
     def write_tiles(tiles, dir, zoom)
       p "write #{dir}/#{zoom}"
       writer = KeyValueYXFirst.new(filesystem, output_path, zoom)

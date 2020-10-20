@@ -48,10 +48,12 @@ module OHOLFamilyTrees
       def initialize(dir, baseurl = BaseUrl)
         @dir = dir
         @baseurl = baseurl
+        @contents = nil
       end
 
       attr_reader :dir
       attr_reader :baseurl
+      attr_reader :contents
 
       def server
         dir
@@ -59,9 +61,9 @@ module OHOLFamilyTrees
 
       def each
         p baseurl + dir
-        index = Client.get_content(baseurl + dir)
-        #p index
-        MaplogServer.extract_path_list(index)
+        @contents ||= Client.get_content(baseurl + dir)
+        #p contents
+        MaplogServer.extract_path_list(contents)
           .map do |path, log_date|
             next unless path.match(/_map(Log|Seed).txt/)
             cache_path = dir + path
