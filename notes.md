@@ -8,11 +8,18 @@
 - x establish a maplog archive
 - x copy new log files as it processes them
 - interface to access maplog archive
-  - local
-  - remote
+  - implementation
+    - x maplog.has?
+    - x maplog.get
+    - x filesystem.open
+    - x list.open ?
+  - x local
+  - x remote
+  - x file copies as we manipulate logfile objects
 - check older logs/spans and reprocess from archive
-  - local file dates vs online file dates
+  - x local file dates vs online file dates
   - add timestamp fixup task
+  - update data server processing
 - force reprocess of all since damaged data
   - first error: bigserver2.onehouronelife.com/1600825174time_mapLog.txt
 

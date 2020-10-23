@@ -34,6 +34,17 @@ module OHOLFamilyTrees
       return false
     end
 
+    def open(path, &block)
+      response = client.get_object({
+        :bucket => bucket,
+        :key => path,
+      })
+      return response.body
+    rescue Aws::S3::Errors::NoSuchKey
+      p ['not found', path]
+      nil
+    end
+
     def list(path)
       paths = []
       response = client.list_objects_v2({

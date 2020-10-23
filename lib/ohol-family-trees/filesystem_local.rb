@@ -22,6 +22,13 @@ module OHOLFamilyTrees
       end
     end
 
+    def open(path)
+      filepath = "#{output_dir}/#{path}"
+      if File.exist?(filepath)
+        return File.open(filepath, 'rb')
+      end
+    end
+
     def list(path)
       filepath = "#{output_dir}/#{path}"
       notprefix = ("#{output_dir}/".length)..-1

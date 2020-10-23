@@ -49,6 +49,7 @@ module OHOLFamilyTrees
         @dir = dir
         @baseurl = baseurl
         @contents = nil
+        @path_list = nil
       end
 
       attr_reader :dir
@@ -59,16 +60,33 @@ module OHOLFamilyTrees
         dir
       end
 
-      def each
+      def path_list
+        return @path_list if @path_list
         p baseurl + dir
-        @contents ||= Client.get_content(baseurl + dir)
+        contents ||= Client.get_content(baseurl + dir)
         #p contents
+        @path_list = {}
         MaplogServer.extract_path_list(contents)
-          .map do |path, log_date|
+          .each do |path, log_date|
             next unless path.match(/_map(Log|Seed).txt/)
             cache_path = dir + path
-            yield Logfile.new(cache_path, log_date, baseurl)
+            @path_list[cache_path] = log_date
           end
+        @path_list
+      end
+
+      def each
+        path_list.map do |cache_path, log_date|
+          yield Logfile.new(cache_path, log_date, baseurl)
+        end
+      end
+
+      def has?(cache_path)
+        path_list.include?(cache_path)
+      end
+
+      def get(cache_path)
+        Logfile.new(cache_path, path_list[cache_path], baseurl)
       end
     end
 

@@ -43,6 +43,14 @@ module OHOLFamilyTrees
           yield Logfile.new(cache_path, cache)
         end
       end
+
+      def has?(cache_path)
+        File.exist?(File.join(cache, cache_path))
+      end
+
+      def get(cache_path)
+        Logfile.new(cache_path, cache)
+      end
     end
 
     class Logfile < MaplogFile

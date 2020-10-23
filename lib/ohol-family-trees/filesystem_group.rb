@@ -18,6 +18,13 @@ module OHOLFamilyTrees
       end
     end
 
+    def open(path)
+      filesystems.each do |fs|
+        f = fs.open(path)
+        return f if f
+      end
+    end
+
     def list(path)
       filesystems.each do |fs|
         paths = fs.list(path)

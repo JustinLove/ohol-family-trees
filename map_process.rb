@@ -37,6 +37,7 @@ end
 
 raise "no object data" unless objects.object_size.length > 0
 
+#MaplogCache::Servers.new('cache/mapfake/').each do |logs|
 MaplogCache::Servers.new.each do |logs|
   #p logs
   servercode = "17"
@@ -44,7 +45,7 @@ MaplogCache::Servers.new.each do |logs|
   placement_path = "pl/#{servercode}"
   maplog_path = "pl/#{servercode}"
 
-  list = MaplogList::Logs.new(filesystem, "#{placement_path}/file_list.json")
+  list = MaplogList::Logs.new(filesystem, "#{placement_path}/file_list.json", "publicMapChangeData/")
   #p list.files.length
   updated_files = Set.new
   list.update_from(logs) do |logfile|
@@ -64,8 +65,12 @@ MaplogCache::Servers.new.each do |logs|
 
   context = LogfileContext.process(seeds, list)
 
-  logs.each do |logfile|
+  list.each do |logfile|
     next unless logfile.placements?
+
+    if logs.has?(logfile.path)
+      logfile = logs.get(logfile.path)
+    end
 
     #next unless logfile.path.match('000seed')
     #next unless logfile.path.match('1151446675seed') # small file
@@ -75,7 +80,7 @@ MaplogCache::Servers.new.each do |logs|
     #next unless logfile.path.match('3019284048seed') # multiple files one seed, smaller dataset
     #next unless logfile.path.match('1124586729seed') # microspan at end
     #next unless logfile.path.match('4088407786seed') # single zero byte file
-#    next unless logfile.path.match('1574835680time') # small with player ids
+    #next unless logfile.path.match('1574835680time') # small with player ids
     #next unless logfile.path.match('1576038671time') # double start times at beginning
     #next unless logfile.timestamp >= 1573895673
     #next unless logfile.timestamp >= 1576038671
@@ -91,8 +96,14 @@ MaplogCache::Servers.new.each do |logs|
     if true
       final_placements.process(logfile, context[logfile.path])
     end
+    if false
+      final_placements.timestamp_fixup(logfile)
+    end
     if true
       maplog.process(logfile)
+    end
+    if false
+      maplog.timestamp_fixup(logfile)
     end
   end
 

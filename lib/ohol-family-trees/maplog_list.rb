@@ -6,13 +6,15 @@ module OHOLFamilyTrees
     class Logs
       include Enumerable
 
-      def initialize(filesystem, list_path)
+      def initialize(filesystem, list_path, archive_path)
         @filesystem = filesystem
         @list_path = list_path
+        @archive_path = archive_path
       end
 
       attr_reader :filesystem
       attr_reader :list_path
+      attr_reader :archive_path
 
       def files
         return @files if @files
@@ -20,7 +22,7 @@ module OHOLFamilyTrees
         filesystem.read(list_path) do |f|
           list = JSON.parse(f.read)
           list.each do |file|
-            @files[file['path']] = Logfile.new(file['path'], Time.at(file['date']), file['seed'])
+            @files[file['path']] = Logfile.new(file['path'], Time.at(file['date']), file['seed'], filesystem, archive_path)
           end
         end
         @files
@@ -36,6 +38,14 @@ module OHOLFamilyTrees
         files.values.sort_by(&:path).each(&block)
       end
 
+      def has?(cache_path)
+        files.include?(cache_path)
+      end
+
+      def get(cache_path)
+        files[cache_path]
+      end
+
       def to_a
         files.values.sort_by(&:path)
       end
@@ -45,11 +55,11 @@ module OHOLFamilyTrees
           if logfile = files[sourcefile.path]
             # 1 second, to allow for differing sub-second precision
             if sourcefile.date > logfile.date + 1
-              files[sourcefile.path] = Logfile.from_source(sourcefile)
+              files[sourcefile.path] = Logfile.from_source(sourcefile, filesystem, archive_path)
               yield sourcefile if block_given?
             end
           else
-            files[sourcefile.path] = Logfile.from_source(sourcefile)
+            files[sourcefile.path] = Logfile.from_source(sourcefile, filesystem, archive_path)
             yield sourcefile if block_given?
           end
         end
@@ -57,22 +67,25 @@ module OHOLFamilyTrees
     end
 
     class Logfile < MaplogFile
-      def initialize(path, date, seed)
+      def initialize(path, date, seed, filesystem, archive_path)
         super path
         @date = date
         @seed = seed
+        @filesystem = filesystem
+        @archive_path = archive_path
       end
 
-      def self.from_source(sourcefile)
-        new(sourcefile.path, sourcefile.date, sourcefile.seed)
+      def self.from_source(sourcefile, filesystem, archive_path)
+        new(sourcefile.path, sourcefile.date, sourcefile.seed, filesystem, archive_path)
       end
 
       attr_reader :date
       attr_reader :seed
+      attr_reader :filesystem
+      attr_reader :archive_path
 
       def open
-        raise "list logfile don't support opening"
-        #StringIO.new(contents)
+        filesystem.open(archive_path + path)
       end
 
       def to_h
