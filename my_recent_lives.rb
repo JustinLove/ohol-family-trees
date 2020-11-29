@@ -6,8 +6,7 @@ require 'date'
 require 'csv'
 
 include OHOLFamilyTrees
-#target = 'e45aa4e489b35b6b0fd9f59f0049c688237a9a86' #wondible
-
+target = 'e45aa4e489b35b6b0fd9f59f0049c688237a9a86' #wondible
 from_time = (Date.today - 3).to_time
 to_time = (Date.today + 1).to_time
 

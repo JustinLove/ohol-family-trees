@@ -1,28 +1,11 @@
-- x reestablish test environment
-- base/root is defined while iterating available files
-  - even if we fix base/root for available files, the damaged entries no longer have available files
-  - pure updates of only latest file can't account for late publishing of roots
-
-- x file list cache that fixes seeds.json
-- x ideal base/root data structure - stop damaging this data
-- x establish a maplog archive
-- x copy new log files as it processes them
-- interface to access maplog archive
-  - implementation
-    - x maplog.has?
-    - x maplog.get
-    - x filesystem.open
-    - x list.open ?
-  - x local
-  - x remote
-  - x file copies as we manipulate logfile objects
-- check older logs/spans and reprocess from archive
-  - x local file dates vs online file dates
-  - add timestamp fixup task
-  - update data server processing
-- force reprocess of all since damaged data
-  - first error: bigserver2.onehouronelife.com/1600825174time_mapLog.txt
-
+- higher zoom levels
+  - math for summary buckets
+  - scale for counts
+  - leaflet additional url factors
+  - png misses - index
+- precalculate default map center
+- server search indexes
+- pavers
 - batch reprocess ranges
 - x manual tagging of previous seed ends?
   - helper script
