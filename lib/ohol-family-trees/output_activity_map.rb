@@ -12,7 +12,7 @@ module OHOLFamilyTrees
       "#{output_path}/processed_actmap.json"
     end
 
-    ZoomLevels = 2..24
+    ZoomLevels = 2..23
 
     attr_reader :output_path
     attr_reader :filesystem
@@ -28,8 +28,7 @@ module OHOLFamilyTrees
       filesystem.read(processed_path) do |f|
         @processed = JSON.parse(f.read)
       end
-      #@processed
-      p @processed
+      @processed
     end
 
     def checkpoint
@@ -53,10 +52,10 @@ module OHOLFamilyTrees
 
         read(logfile, tile_width, sample_size) do |span, tileset|
 
-          write_tiles(tileset, span.s_end, zoom)
+          write_tiles(tileset, span.s_end, zoom, span.s_end - span.s_start)
 
           processed[logfile.path]['paths'] << "#{span.s_end.to_s}/#{zoom}"
-          p processed
+          #p processed
         end
       end
 
@@ -71,6 +70,7 @@ module OHOLFamilyTrees
       seed = logfile.seed
       span = Span.new(server, 0, seed)
       tiles = {}
+      max = 0
       while line = file.gets
         log = Maplog.create(line)
         if log.kind_of?(Maplog::ArcStart)
@@ -103,18 +103,20 @@ module OHOLFamilyTrees
           tile = tiles[[tilex,tiley]] ||= Hash.new {|h,k| h[k] = 0}
           tx = (log.x % tile_width) / sample_size
           ty = (log.y % tile_width) / sample_size
-          tile[[tx,ty]] += 1
+          value = (tile[[tx,ty]] += 1)
+          max = [value, max].max
         end
       end
       file.close
       if span.s_length > 1
         yield [span, tiles]
       end
+      #p ['max', max]
     end
 
-    def write_tiles(tiles, dir, zoom)
+    def write_tiles(tiles, dir, zoom, period)
       p "write #{dir} #{zoom}"
-      writer = ActPng.new(filesystem, output_path, zoom)
+      writer = ActPng.new(filesystem, output_path, zoom, period)
       bar = ProgressBar.new(tiles.length)
       tiles.each do |coords,tile|
         bar.increment!

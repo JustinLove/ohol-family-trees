@@ -78,6 +78,8 @@ MaplogCache::Servers.new.each do |logs|
 
     #next unless logfile.path.match('000seed')
     next unless logfile.path.match('1151446675seed') # small file
+      # 2: 59459
+      # 24: 550
     #next unless logfile.path.match('1521396640seed') # two arcs in one file
     #next unless logfile.path.match('588415882seed') # one arc with multiple start times
     #next unless logfile.path.match('2680185702seed') # multiple files one seed
@@ -88,6 +90,9 @@ MaplogCache::Servers.new.each do |logs|
     #next unless logfile.path.match('1576038671time') # double start times at beginning
     #next unless logfile.timestamp >= 1573895673
     #next unless logfile.timestamp >= 1576038671
+    #next unless logfile.path.match('1606608255time') # tiktok
+      # 2: 1884961
+      # 24: 3334
 
     if false
       if updated_files.member?(logfile.path)

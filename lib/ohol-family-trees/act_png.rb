@@ -5,14 +5,17 @@ module OHOLFamilyTrees
     attr_reader :filesystem
     attr_reader :output_path
     attr_reader :zoom
+    attr_reader :period
 
-    def initialize(filesystem, output_path, zoom)
+    def initialize(filesystem, output_path, zoom, period)
       @output_path = output_path
       @filesystem = filesystem
       @zoom = zoom
+      @period = period
     end
 
     def write(tile, timestamp, coords)
+      color_scale = 240*10.0/period
       path = "#{output_path}/#{timestamp}/am/#{zoom}/#{coords[0]}/#{coords[1]}.png"
       #p path
       filesystem.write(path) do |out|
@@ -21,7 +24,7 @@ module OHOLFamilyTrees
           x = key[0]
           y = 255 - key[1]
           #p ['sample', x, y]
-          png[x,y] = ChunkyPNG::Color.from_hsv(240 - [value, 240].min, 1, 0.5)
+          png[x,y] = ChunkyPNG::Color.from_hsv(240 - [(value*color_scale).to_i, 240].min, 1, 0.5)
         end
         png.write(out)
       end
