@@ -12,7 +12,9 @@ module OHOLFamilyTrees
       "#{output_path}/processed_actmap.json"
     end
 
-    ZoomLevels = 2..23
+    ZoomLevels = 2..24
+    SampleSize = 4
+    TileSize = 256/SampleSize
 
     attr_reader :output_path
     attr_reader :filesystem
@@ -48,7 +50,7 @@ module OHOLFamilyTrees
 
       ZoomLevels.each do |zoom|
         tile_width = 2**(32 - zoom)
-        sample_size = 2**(24 - zoom)
+        sample_size = tile_width/TileSize
 
         read(logfile, tile_width, sample_size) do |span, tileset|
 
@@ -116,7 +118,7 @@ module OHOLFamilyTrees
 
     def write_tiles(tiles, dir, zoom, period)
       p "write #{dir} #{zoom}"
-      writer = ActPng.new(filesystem, output_path, zoom, period)
+      writer = ActPng.new(filesystem, output_path, zoom, TileSize, period)
       bar = ProgressBar.new(tiles.length)
       tiles.each do |coords,tile|
         bar.increment!

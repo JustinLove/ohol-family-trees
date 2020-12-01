@@ -1,7 +1,4 @@
 - higher zoom levels
-  - math for summary buckets
-  - scale for counts
-  - leaflet additional url factors
   - png misses - index
 - precalculate default map center
 - server search indexes
