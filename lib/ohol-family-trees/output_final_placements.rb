@@ -155,52 +155,13 @@ module OHOLFamilyTrees
     end
 
     def write_index(triples, dir, zoom)
-      path = "#{output_path}/#{dir}/kp/#{zoom}/index.txt"
-      p "write #{path}"
-      filesystem.write(path) do |out|
-        lasty = nil
-        lastt = nil
-        triples.sort {|a,b|
-            (a[2] <=> b[2])*4 +
-              (b[1] <=> a[1])*2 +
-              (a[0] <=> b[0])
-          }.each do |tilex, tiley, time|
-          if time != lastt
-            if lastt
-              out << "\n"
-            end
-            lastt = time
-            lasty = nil
-            out << "t#{time}"
-          end
-          if tiley != lasty
-            lasty = tiley
-            out << "\n#{tiley}"
-          end
-          out << " #{tilex}"
-        end
-      end
+      writer = TileIndex.new(filesystem, output_path, "kp")
+      writer.write_index(triples, dir, zoom)
     end
 
     def read_index(dir, zoom, cutoff)
-      path = "#{output_path}/#{dir}/kp/#{zoom}/index.txt"
-      p "read #{path}"
-      tile_list = []
-      timestamp = dir
-      filesystem.read(path) do |file|
-        file.each_line do |line|
-          if line[0] == 't'
-            timestamp = line[1..-1].to_i
-          end
-          next if timestamp < cutoff
-          parts = line.split(' ').map(&:to_i)
-          tiley = parts.shift
-          parts.each do |tilex|
-            tile_list << [tilex,tiley,timestamp]
-          end
-        end
-      end
-      return tile_list
+      reader = TileIndex.new(filesystem, output_path, "kp")
+      reader.read_index(dir, zoom, cutoff)
     end
   end
 end

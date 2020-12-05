@@ -1,9 +1,9 @@
 require 'ohol-family-trees/act_png'
+require 'ohol-family-trees/tile_index'
 require 'fileutils'
 require 'json'
 require 'progress_bar'
 require 'ohol-family-trees/span'
-#require 'ohol-family-trees/tile_set'
 require 'ohol-family-trees/arc'
 
 module OHOLFamilyTrees
@@ -13,7 +13,7 @@ module OHOLFamilyTrees
     end
 
     ZoomLevels = 2..24
-    SampleSize = 4
+    SampleSize = 1
     TileSize = 256/SampleSize
 
     attr_reader :output_path
@@ -52,9 +52,10 @@ module OHOLFamilyTrees
         tile_width = 2**(32 - zoom)
         sample_size = tile_width/TileSize
 
-        read(logfile, tile_width, sample_size) do |span, tileset|
+        read(logfile, tile_width, sample_size) do |span, tiles|
 
-          write_tiles(tileset, span.s_end, zoom, span.s_end - span.s_start)
+          write_tiles(tiles, span.s_end, zoom, span.s_end - span.s_start)
+          write_index(tiles, span.s_end, zoom)
 
           processed[logfile.path]['paths'] << "#{span.s_end.to_s}/#{zoom}"
           #p processed
@@ -125,6 +126,12 @@ module OHOLFamilyTrees
         next if tile.empty?
         writer.write(tile, dir, coords)
       end
+    end
+
+    def write_index(tiles, dir, zoom)
+      triples = tiles.keys.map {|coords| [coords,dir] }.map(&:flatten)
+      writer = TileIndex.new(filesystem, output_path, "am")
+      writer.write_index(triples, dir, zoom)
     end
   end
 end
