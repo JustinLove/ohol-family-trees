@@ -90,9 +90,10 @@ MaplogCache::Servers.new.each do |logs|
     #next unless logfile.path.match('1576038671time') # double start times at beginning
     #next unless logfile.timestamp >= 1573895673
     #next unless logfile.timestamp >= 1576038671
-    next unless logfile.path.match('1606608255time') # tiktok
+    #next unless logfile.path.match('1606608255time') # tiktok
       # 2: 1884961
       # 24: 3334
+    next unless logfile.path.match('1607109883time')
 
     if false
       if updated_files.member?(logfile.path)
