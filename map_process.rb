@@ -93,9 +93,9 @@ MaplogCache::Servers.new.each do |logs|
     #next unless logfile.path.match('1606608255time') # tiktok
       # 2: 1884961
       # 24: 3334
-    next unless logfile.path.match('1607109883time')
+    #next unless logfile.path.match('1607109883time')
 
-    if false
+    if true
       if updated_files.member?(logfile.path)
         p 'updated file', logfile.path
         filesystem.write(MaplogArchive + '/' + logfile.path) do |archive|
@@ -103,13 +103,13 @@ MaplogCache::Servers.new.each do |logs|
         end
       end
     end
-    if false
+    if true
       final_placements.process(logfile, context[logfile.path])
     end
     if false
       final_placements.timestamp_fixup(logfile)
     end
-    if false
+    if true
       maplog.process(logfile)
     end
     if false
@@ -120,5 +120,5 @@ MaplogCache::Servers.new.each do |logs|
     end
   end
 
-  #list.checkpoint
+  list.checkpoint
 end
