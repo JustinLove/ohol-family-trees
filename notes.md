@@ -1,4 +1,6 @@
 - higher zoom levels
+  - add actmap processing to server
+  - set up to copy archives to s3
   - png misses - index
 - precalculate default map center
 - server search indexes
