@@ -1,7 +1,8 @@
 - higher zoom levels
-  - add actmap processing to server
-  - set up to copy archives to s3
-  - png misses - index
+  - x add actmap processing to server
+  - * set up to copy archives to s3
+  - upload actmap index file
+  - release automatic server updates
 - precalculate default map center
 - server search indexes
 - pavers
