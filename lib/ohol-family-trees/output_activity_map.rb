@@ -85,6 +85,7 @@ module OHOLFamilyTrees
               span = span.next(log.s_start)
             end
             tiles = {}
+            GC.start
           end
           start = log
           if span.s_start == 0
@@ -98,6 +99,7 @@ module OHOLFamilyTrees
             yield [span, tiles]
             span = span.next(log.s_time)
             tiles = {}
+            GC.start
           end
 
           span.s_end = log.s_time
@@ -113,6 +115,9 @@ module OHOLFamilyTrees
       file.close
       if span.s_length > 1
         yield [span, tiles]
+        span = nil
+        tiles = nil
+        GC.start
       end
       #p ['max', max]
     end

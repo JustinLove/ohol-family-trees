@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'ohol-family-trees/tile_set'
 
 module OHOLFamilyTrees

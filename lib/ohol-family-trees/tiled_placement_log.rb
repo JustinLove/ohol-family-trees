@@ -38,6 +38,7 @@ module OHOLFamilyTrees
               span = span.next(log.s_start)
             end
             tiles = TileSet.new
+            GC.start
           end
           start = log
           if span.s_start == 0
@@ -52,6 +53,7 @@ module OHOLFamilyTrees
             yield [span, tiles]
             span = span.next(log.s_time)
             tiles = TileSet.new.copy_key(tiles)
+            GC.start
           end
 
           span.s_end = log.s_time
@@ -154,6 +156,9 @@ module OHOLFamilyTrees
       if span.s_length > 1
         tiles.finalize!(span.s_end)
         yield [span, tiles]
+        span = nil
+        tiles = nil
+        GC.start
       end
       p "excluded #{excluded} objects"
     end

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module OHOLFamilyTrees
   class Maplog
     def self.create(line)
