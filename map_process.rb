@@ -104,6 +104,9 @@ MaplogCache::Servers.new.each do |logs|
       end
     end
     if true
+      actmap.process(logfile)
+    end
+    if true
       final_placements.process(logfile, context[logfile.path])
     end
     if false
@@ -114,9 +117,6 @@ MaplogCache::Servers.new.each do |logs|
     end
     if false
       maplog.timestamp_fixup(logfile)
-    end
-    if true
-      actmap.process(logfile)
     end
   end
 
