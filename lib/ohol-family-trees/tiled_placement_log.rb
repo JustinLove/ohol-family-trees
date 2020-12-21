@@ -9,6 +9,7 @@ module OHOLFamilyTrees
       excluded = 0
       floor_removal = options[:floor_removal] || {}
       min_size = options[:min_size] || 0
+      record_placements = options[:record_placements]
       object_size = options[:object_size]
       object_over = options[:object_over] || Hash.new {|h,k| h[k] = ObjectOver.new(2, 2, 2, 4)}
       breakpoints = logfile.breakpoints
@@ -66,7 +67,7 @@ module OHOLFamilyTrees
           object = log.object
           if log.floor?
             occupant = tile.floor(log.x, log.y)
-            tile.add_placement(log)
+            tile.add_placement(log) if record_placements
             tile.set_floor(log.x, log.y, object)
           else
             occupant = tile.object(log.x, log.y)
@@ -108,7 +109,7 @@ module OHOLFamilyTrees
               previous.skip!
             end
 
-            tile.add_placement(log)
+            tile.add_placement(log) if record_placements
             tile.set_object(log.x, log.y, object)
           end
           tx = log.x % tile_width
@@ -141,7 +142,7 @@ module OHOLFamilyTrees
           end
           overs.each do |coord|
             tile = tiles[coord]
-            tile.add_placement(log)
+            tile.add_placement(log) if record_placements
             if log.floor?
               # overkill, but I don't want separate bounds for floors, bearskin can hang over
               tile.set_floor(log.x, log.y, object)

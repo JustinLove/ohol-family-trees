@@ -62,6 +62,7 @@ module OHOLFamilyTrees
         TiledPlacementLog.read(logfile, tile_width, {
             :floor_removal => objects.floor_removal,
             :min_size => min_size,
+            :record_placements => true,
             :object_size => objects.object_size,
             :object_over => objects.object_over,
           }) do |span, tileset|

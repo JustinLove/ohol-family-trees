@@ -63,7 +63,7 @@ module OHOLFamilyTrees
     end
 
     def base_time(logfile, basefile)
-      if basefile
+      if basefile && processed[basefile.path]
         base_span = processed[basefile.path]['spans']
           .sort_by {|span| span['end']}
           .last
