@@ -81,6 +81,10 @@ module OHOLFamilyTrees
       def self.id(object)
         object.sub('f', '').split(/\D/).first
       end
+
+      def self.base_id(object)
+        id(object).to_i & ObjectIDMask
+      end
     end
   end
 end

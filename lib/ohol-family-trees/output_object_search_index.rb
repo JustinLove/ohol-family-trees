@@ -56,7 +56,7 @@ module OHOLFamilyTrees
         #end
         #p sorted.reverse.take(5)
 
-        write_index(triples, span.s_end)
+        write_object_index(triples, span.s_end)
         write_objects(triples, span.s_end)
 
         processed[logfile.path]['paths'] << "#{span.s_end.to_s}"
@@ -101,9 +101,10 @@ module OHOLFamilyTrees
           end
 
           span.s_end = log.s_time
-          if log.id != "0"
-            index[log.base_id] ||= []
-            index[log.base_id] << log
+          id = log.base_id
+          if id != 0
+            index[id] ||= []
+            index[id] << log
           end
         end
       end
@@ -127,7 +128,7 @@ module OHOLFamilyTrees
       end
     end
 
-    def write_index(triples, dir)
+    def write_object_index(triples, dir)
       writer = IdIndex.new(filesystem, output_path, "ls")
       writer.write_index(triples, dir)
     end

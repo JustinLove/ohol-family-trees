@@ -81,7 +81,7 @@ MaplogCache::Servers.new.each do |logs|
     end
 
     #next unless logfile.path.match('000seed')
-    next unless logfile.path.match('1151446675seed') # small file
+    #next unless logfile.path.match('1151446675seed') # small file
       # 2: 59459
       # 24: 550
     #next unless logfile.path.match('1521396640seed') # two arcs in one file
@@ -98,7 +98,8 @@ MaplogCache::Servers.new.each do |logs|
       # 2: 1884961
       # 24: 3334
     #next unless logfile.path.match('1607109883time')
-    #next unless logfile.path.match('1608233083time')
+    #next unless logfile.path.match('1608146683time')
+    next unless logfile.path.match('1608233083time')
 
     if false
       if updated_files.member?(logfile.path)
@@ -114,7 +115,7 @@ MaplogCache::Servers.new.each do |logs|
     if false
       actmap.process(logfile)
     end
-    if false
+    if true
       final_placements.process(logfile, context[logfile.path])
     end
     if false

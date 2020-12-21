@@ -1,10 +1,9 @@
-- higher zoom levels
-  - x add actmap processing to server
-  - * set up to copy archives to s3
-  - upload actmap index file
-  - release automatic server updates
-- precalculate default map center
 - server search indexes
+  - number of objects dispairity between key and log
+  - frontend support
+  - separate processed check for key search index
+  - consider cutoff levels
+- precalculate default map center
 - pavers
 - batch reprocess ranges
 - x manual tagging of previous seed ends?

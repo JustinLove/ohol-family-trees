@@ -1,3 +1,5 @@
+require 'ohol-family-trees/maplog'
+
 module OHOLFamilyTrees
   class TileSet
     attr_reader :tiles
@@ -40,6 +42,20 @@ module OHOLFamilyTrees
 
     def placements
       tiles.transform_values {|tile| tile.placements}
+    end
+
+    def object_index(tile_width)
+      index = {}
+      tiles.values.each do |tile|
+        tile.in_bounds(tile_width) do |coords, sid|
+          id = Maplog::Placement.base_id(sid)
+          if id != 0
+            index[id] ||= []
+            index[id] << coords
+          end
+        end
+      end
+      index
     end
 
     def copy_key(previous)
@@ -120,6 +136,20 @@ module OHOLFamilyTrees
 
     def placements
       @placements.reject(&:skip?)
+    end
+
+    def in_bounds(tile_width)
+      offsetx = tilex * tile_width
+      boundx = offsetx...(offsetx+tile_width)
+      offsety = (-tiley - 1) * tile_width
+      boundy = offsety...(offsety+tile_width)
+      #p [boundx, boundy]
+      floors.each do |coords, id|
+        yield [coords, id] if boundx.include?(coords[0]) && boundy.include?(coords[1])
+      end
+      objects.each do |coords, id|
+        yield [coords, id] if boundx.include?(coords[0]) && boundy.include?(coords[1])
+      end
     end
   end
 end

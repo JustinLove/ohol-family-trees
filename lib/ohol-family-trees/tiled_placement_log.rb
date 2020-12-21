@@ -1,6 +1,7 @@
 require 'ohol-family-trees/span'
 require 'ohol-family-trees/tile_set'
 require 'ohol-family-trees/arc'
+require 'ohol-family-trees/maplog'
 require 'json'
 
 module OHOLFamilyTrees

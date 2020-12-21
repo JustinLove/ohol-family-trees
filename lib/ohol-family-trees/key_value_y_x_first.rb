@@ -38,10 +38,14 @@ module OHOLFamilyTrees
     def write(tile, timestamp)
       path = "#{output_path}/#{timestamp}/kp/#{zoom}/#{tile.tilex}/#{tile.tiley}.txt"
       #p path
+      triples =
+        tile.floors.map {|key,value| key + [value]} +
+        tile.objects.map {|key,value| key + [value]}
+      write_triples(triples, path)
+    end
+
+    def write_triples(triples, path)
       filesystem.write(path) do |out|
-        triples =
-          tile.floors.map {|key,value| key + [value]} +
-          tile.objects.map {|key,value| key + [value]}
         lastv = nil
         lasty = nil
         last_y = 0

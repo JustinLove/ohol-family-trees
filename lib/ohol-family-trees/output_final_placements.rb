@@ -2,6 +2,7 @@ require 'ohol-family-trees/tiled_placement_log'
 #require 'ohol-family-trees/key_plain'
 #require 'ohol-family-trees/key_value_y_x'
 require 'ohol-family-trees/key_value_y_x_first'
+require 'ohol-family-trees/id_index'
 require 'fileutils'
 require 'json'
 require 'progress_bar'
@@ -90,7 +91,7 @@ module OHOLFamilyTrees
         logfile.cache_valid_at?(processed[logfile.path]['time']) && 
         processed[logfile.path]['root_time'] == ((options[:rootfile] && options[:rootfile].timestamp) || 0) &&
         processed[logfile.path]['base_time'] == (base_time || 0)
-        return
+        #return
       end
 
       processed[logfile.path] = {
@@ -119,8 +120,21 @@ module OHOLFamilyTrees
           }
           #p spans
 
-          write_tiles(tileset.updated_tiles, span.s_end, zoom)
-          write_index(tileset.tile_index, span.s_end, zoom)
+          #write_tiles(tileset.updated_tiles, span.s_end, zoom)
+          #write_index(tileset.tile_index, span.s_end, zoom)
+          index = tileset.object_index(tile_width)
+
+          total = index.map {|k,v| v.length}.sum
+          cutoff = (total*0.01).to_i
+          triples = index.map {|id,list| [id,list,list.length<cutoff]}
+          #sorted = index.sort_by {|k,v| v.length}
+          #sorted.each do |id, v|
+          #  p [id, v.length, v.length.to_f/total, objects.names[id.to_s]]
+          #end
+          #p sorted.reverse.take(5)
+
+          write_object_index(triples, span.s_end)
+          write_objects(triples, span.s_end)
 
           processed[logfile.path]['spans'] << {
             'start' => span.s_start,
@@ -162,6 +176,26 @@ module OHOLFamilyTrees
     def read_index(dir, zoom, cutoff)
       reader = TileIndex.new(filesystem, output_path, "kp")
       reader.read_index(dir, zoom, cutoff)
+    end
+
+    def write_objects(object_triples, dir)
+      p "write #{dir}"
+      writer = KeyValueYXFirst.new(filesystem, output_path, 0)
+      bar = ProgressBar.new(object_triples.length)
+      object_triples.each do |id,list_coords,inc|
+        bar.increment!
+        next if list_coords.empty?
+        next unless inc
+        path = "#{output_path}/#{dir}/ks/#{id}.txt"
+        #p path
+        triples = list_coords.map {|coords| coords + [id]}
+        writer.write_triples(triples, path)
+      end
+    end
+
+    def write_object_index(triples, dir)
+      writer = IdIndex.new(filesystem, output_path, "ks")
+      writer.write_index(triples, dir)
     end
   end
 end
