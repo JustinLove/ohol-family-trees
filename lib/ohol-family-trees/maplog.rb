@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 module OHOLFamilyTrees
   class Maplog
+    ObjectIDMask = 0x0001FFFF;
+
     def self.create(line)
       parts = line.split(' ')
       if parts[0] == 'startTime:'
@@ -50,6 +52,10 @@ module OHOLFamilyTrees
 
       def id
         object.sub('f', '').split(/\D/).first
+      end
+
+      def base_id
+        id.to_i & ObjectIDMask
       end
 
       def s_offset

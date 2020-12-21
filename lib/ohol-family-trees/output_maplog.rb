@@ -88,12 +88,14 @@ module OHOLFamilyTrees
 
     def write_tiles(tiles, dir, zoom)
       p "write #{dir} #{zoom}"
-      writer = LogValueYXTFirst.new(filesystem, output_path, zoom)
+      writer = LogValueYXTFirst.new(filesystem)
       bar = ProgressBar.new(tiles.length)
       tiles.each do |coords,tile|
         bar.increment!
         next if tile.placements.empty?
-        writer.write(tile, dir)
+        path = "#{output_path}/#{dir}/ml/#{zoom}/#{tile.tilex}/#{tile.tiley}.txt"
+        #p path
+        writer.write(tile.placements, path)
       end
     end
   end

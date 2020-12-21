@@ -1,13 +1,9 @@
 module OHOLFamilyTrees
   class LogValueYXTFirst
     attr_reader :filesystem
-    attr_reader :output_path
-    attr_reader :zoom
 
-    def initialize(filesystem, output_path, zoom)
-      @output_path = output_path
+    def initialize(filesystem)
       @filesystem = filesystem
-      @zoom = zoom
     end
 
     def encode(x)
@@ -21,9 +17,7 @@ module OHOLFamilyTrees
       s
     end
 
-    def write(tile, timestamp)
-      path = "#{output_path}/#{timestamp}/ml/#{zoom}/#{tile.tilex}/#{tile.tiley}.txt"
-      #p path
+    def write(placements, path)
       filesystem.write(path) do |out|
         last_x = 0
         last_y = 0
@@ -31,7 +25,7 @@ module OHOLFamilyTrees
         current_v = nil
         current_y = nil
         current_x = nil
-        tile.placements.sort {|a,b|
+        placements.sort {|a,b|
             (a.object <=> b.object)*8 +
               (a.y <=> b.y)*4 +
               (a.x <=> b.x)*2 +

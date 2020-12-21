@@ -4,6 +4,7 @@ require 'ohol-family-trees/object_data'
 require 'ohol-family-trees/output_final_placements'
 require 'ohol-family-trees/output_maplog'
 require 'ohol-family-trees/output_activity_map'
+require 'ohol-family-trees/output_object_search_index'
 require 'ohol-family-trees/seed_break'
 require 'ohol-family-trees/logfile_context'
 require 'ohol-family-trees/filesystem_local'
@@ -15,8 +16,8 @@ require 'set'
 
 include OHOLFamilyTrees
 
-#OutputDir = 'output'
-OutputDir = 'd:/dev/ohol-map/public'
+OutputDir = 'output'
+#OutputDir = 'd:/dev/ohol-map/public'
 OutputBucket = 'wondible-com-ohol-tiles'
 MaplogArchive = 'publicMapChangeData'
 
@@ -46,6 +47,7 @@ MaplogCache::Servers.new.each do |logs|
   placement_path = "pl/#{servercode}"
   maplog_path = "pl/#{servercode}"
   actmap_path = "pl/#{servercode}"
+  objsearch_path = "pl/#{servercode}"
 
   list = MaplogList::Logs.new(filesystem, "#{placement_path}/file_list.json", "publicMapChangeData/")
   #p list.files.length
@@ -63,6 +65,8 @@ MaplogCache::Servers.new.each do |logs|
 
   actmap = OutputActivityMap.new(actmap_path, filesystem)
 
+  objsearch = OutputObjectSearchIndex.new(objsearch_path, filesystem, objects)
+
   manual_resets = SeedBreak.read_manual_resets(filesystem, "#{placement_path}/manual_resets.txt")
   seeds = SeedBreak.process(list, manual_resets)
   seeds.save(filesystem, "#{placement_path}/seeds.json")
@@ -77,7 +81,7 @@ MaplogCache::Servers.new.each do |logs|
     end
 
     #next unless logfile.path.match('000seed')
-    #next unless logfile.path.match('1151446675seed') # small file
+    next unless logfile.path.match('1151446675seed') # small file
       # 2: 59459
       # 24: 550
     #next unless logfile.path.match('1521396640seed') # two arcs in one file
@@ -94,8 +98,9 @@ MaplogCache::Servers.new.each do |logs|
       # 2: 1884961
       # 24: 3334
     #next unless logfile.path.match('1607109883time')
+    #next unless logfile.path.match('1608233083time')
 
-    if true
+    if false
       if updated_files.member?(logfile.path)
         p 'updated file', logfile.path
         filesystem.write(MaplogArchive + '/' + logfile.path) do |archive|
@@ -104,15 +109,18 @@ MaplogCache::Servers.new.each do |logs|
       end
     end
     if true
+      objsearch.process(logfile)
+    end
+    if false
       actmap.process(logfile)
     end
-    if true
+    if false
       final_placements.process(logfile, context[logfile.path])
     end
     if false
       final_placements.timestamp_fixup(logfile)
     end
-    if true
+    if false
       maplog.process(logfile)
     end
     if false
@@ -120,5 +128,5 @@ MaplogCache::Servers.new.each do |logs|
     end
   end
 
-  list.checkpoint
+  #list.checkpoint
 end
