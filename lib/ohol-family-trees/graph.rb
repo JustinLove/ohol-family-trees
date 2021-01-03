@@ -71,6 +71,10 @@ module OHOLFamilyTrees
 
       if life.highlight
         us[:fontsize] = '48'
+        us[:penwidth] = 12 unless life.age < 3
+      elsif life.player_name
+        us[:fontsize] = '32'
+        us[:penwidth] = 8 unless life.age < 3
       end
 
       if life.gender == "F"

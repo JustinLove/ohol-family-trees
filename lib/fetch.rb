@@ -2,8 +2,6 @@ require 'httpclient'
 require 'nokogiri'
 require 'fileutils'
 
-BaseUrl = "http://publicdata.onehouronelife.com/publicLifeLogData/"
-
 $http = HTTPClient.new
 
 def fetch_file(base, path, cache_path, date = Time.at(0))
@@ -32,6 +30,8 @@ def extract_path_list(directory)
 
   return paths
 end
+
+BaseUrl = "http://publicdata.onehouronelife.com/publicLifeLogData/"
 
 server_directory = fetch_file(BaseUrl, "", "cache/index.html", Time.now)
 

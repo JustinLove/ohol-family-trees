@@ -43,16 +43,13 @@ LifelogCache::Servers.new.each do |logs|
           #lives.outsiders(line)
           line.each do |l|
             l.player_name = known_players[l.hash]
-            if l.player_name
+            if l.hash == target
               l.highlight = true
             end
           end
           killers = lives.killers(line)
           killers.each do |l|
             l.player_name = known_players[l.hash]
-            if l.player_name
-              l.highlight = true
-            end
           end
           filename = "output/#{Time.at(eve.time).strftime('%Y-%m-%d')}_#{length}_#{eve.name}"
           p [filename, line.length]
