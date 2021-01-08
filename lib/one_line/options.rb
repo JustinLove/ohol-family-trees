@@ -71,6 +71,15 @@ class OneLine
     @known_players
   end
 
+  def headline(h = '-', s = nil)
+    if s
+      l = 76 - s.length
+      [h*(l/2), s, h*((l+1)/2)].join(' ')
+    else
+      h*78
+    end
+  end
+
   def matching_lives(term)
     log.info { "#{from_time} to #{to_time}" }
     hash = name = id = nil

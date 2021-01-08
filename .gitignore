@@ -3,5 +3,6 @@ cache
 *.svg
 *.png
 known-players.csv
+subjects.csv
 output
 scripts
