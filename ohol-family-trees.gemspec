@@ -6,14 +6,9 @@ Gem::Specification.new do |s|
   s.description = "One Hour One Lifelog parsing and family tree generation"
   s.authors     = ["wondible"]
   s.license     = 'MIT'
-  s.files       = [
-    "lib/fetch.rb",
-    "lib/graph.rb",
-    "lib/history.rb",
-    "lib/lifelog.rb",
-    "lib/monument.rb",
-    "lib/wraper.html",
-  ]
+  s.files                 = Dir.glob("lib/**/*")
+  s.test_files            = Dir.glob("{test,spec,features}/**/*")
+  s.executables           = Dir.glob("bin/*").map{ |f| File.basename(f) }
 
   s.add_runtime_dependency "httpclient"
   s.add_runtime_dependency "stringio"
