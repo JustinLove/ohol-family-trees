@@ -10,6 +10,8 @@ class OneLine
   class_option :servers, :type => :string, :desc => 'servers to search all/bsN/sN', :default => 'bs2,s1'
   class_option :a, :type => :boolean, :desc => 'all servers', :default => false
 
+  class_option :cache, :type => :string, :desc => 'local data file cache', :default => 'cache'
+
   private
   def verbose
     d = options[:d] && 'DEBUG'
@@ -56,6 +58,10 @@ class OneLine
     @servers
   end
 
+  def cache
+    options[:cache]
+  end
+
   def known_players
     return @known_players if @known_players
     @known_players = {}
@@ -75,7 +81,7 @@ class OneLine
     else
       name = term.upcase
     end
-    LifelogCache::Servers.new.each do |logs|
+    LifelogCache::Servers.new("#{cache}/publicLifeLogData/").each do |logs|
       next unless servers.include? logs.server
 
       lives = History.new

@@ -1,7 +1,7 @@
 require 'ohol-family-trees/lifelog'
 require 'ohol-family-trees/history'
 require 'ohol-family-trees/lifelog_cache'
-require 'ohol-family-trees/graph'
+require 'ohol-family-trees/mirror'
 require 'date'
 require 'set'
 require 'csv'
@@ -25,6 +25,7 @@ class OneLine < Thor
     true
   end
 
+  require 'one_line/fetch'
   require 'one_line/find'
   require 'one_line/tree'
 

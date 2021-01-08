@@ -1,6 +1,8 @@
 class OneLine
   desc 'tree [TERM]', 'output recent family trees of name/hash/id'
   def tree(target = known_players.keys.first)
+    require 'ohol-family-trees/graph'
+
     lines = {}
     matching_lives(target) do |life, lives|
       #if life.time > from && life.time < to && life.lifetime > 3
