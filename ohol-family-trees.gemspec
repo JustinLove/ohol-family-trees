@@ -18,4 +18,5 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "color"
   s.add_runtime_dependency "progress_bar"
   s.add_runtime_dependency "aws-sdk-s3", "~> 1"
+  s.add_runtime_dependency "thor"
 end
