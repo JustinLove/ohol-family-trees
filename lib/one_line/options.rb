@@ -7,6 +7,9 @@ class OneLine
   class_option :from, :type => :numeric, :desc => 'start days relative to now', :default => -3
   class_option :to, :type => :numeric, :desc => 'stop days relative to now (1 helps with rounding)', :default => 1
 
+  class_option :servers, :type => :string, :desc => 'servers to search all/bsN/sN', :default => 'bs2,s1'
+  class_option :a, :type => :boolean, :desc => 'all servers', :default => false
+
   private
   def verbose
     d = options[:d] && 'DEBUG'
@@ -35,6 +38,24 @@ class OneLine
     @to ||= to_time.to_i
   end
 
+  def servers
+    return @servers if @servers
+    @servers = Set.new
+    if options[:a]
+      (1..2).each { |n| @servers << "bigserver#{n}.onehouronelife.com" }
+      (1..15).each { |n| @servers << "server#{n}.onehouronelife.com" }
+    else
+      options[:servers].split(',').each do |s|
+        @servers << s
+          .gsub(/bs(\d)/, 'bigserver\1.onehouronelife.com')
+          .gsub(/s(\d)/, 'server\1.onehouronelife.com')
+      end
+    end
+    log.debug { "Searching" }
+    log.debug { @servers.to_a.join("\n") }
+    @servers
+  end
+
   def known_players
     return @known_players if @known_players
     @known_players = {}
@@ -55,7 +76,7 @@ class OneLine
       name = term.upcase
     end
     LifelogCache::Servers.new.each do |logs|
-      next unless logs.server.match('bigserver2') or logs.server.match(/^server1\./)
+      next unless servers.include? logs.server
 
       lives = History.new
       lives.load_server(logs, time_range)
