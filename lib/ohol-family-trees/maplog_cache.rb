@@ -5,7 +5,7 @@ module OHOLFamilyTrees
     class Servers
       include Enumerable
 
-      def initialize(cache = "cache/map/")
+      def initialize(cache = "cache/publicMapChangeData/")
         @cache = cache
       end
 
@@ -24,7 +24,7 @@ module OHOLFamilyTrees
     class Logs
       include Enumerable
 
-      def initialize(dir, cache = "cache/map/")
+      def initialize(dir, cache = "cache/publicMapChangeData/")
         @dir = dir
         @cache = cache
       end
@@ -54,7 +54,7 @@ module OHOLFamilyTrees
     end
 
     class Logfile < MaplogFile
-      def initialize(path, cache = "cache/map/")
+      def initialize(path, cache = "cache/publicMapChangeData/")
         super path
         @cache = cache
       end

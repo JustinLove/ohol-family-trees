@@ -32,7 +32,7 @@ zoom_levels.each do |zoom|
 
     p "#{server} #{zoom}"
 
-    #files = Dir.entries("cache/"+dir).reject {|path| path.match('_names.txt')}.size
+    #files = Dir.entries("cache/publicLifeLogData/"+dir).reject {|path| path.match('_names.txt')}.size
     bar = ProgressBar.new(days)
 
     chunk_size = 10000000
@@ -41,7 +41,7 @@ zoom_levels.each do |zoom|
 
     logs.each do |logfile|
       next unless logfile.within((from_time - 60*60*24*1)..(to_time + 60*60*24*1))
-    #path = "cache/lifeLog_bigserver2.onehouronelife.com/2019_05May_29_Wednesday.txt"
+    #path = "cache/publicLifeLogData/lifeLog_bigserver2.onehouronelife.com/2019_05May_29_Wednesday.txt"
     #do
       #p logfile
       next if logfile.names?

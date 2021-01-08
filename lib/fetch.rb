@@ -31,39 +31,43 @@ def extract_path_list(directory)
   return paths
 end
 
-BaseUrl = "http://publicdata.onehouronelife.com/publicLifeLogData/"
+LifeUrl = "http://publicdata.onehouronelife.com/publicLifeLogData/"
+LifePath = "cache/publicLifeLogData"
 
-server_directory = fetch_file(BaseUrl, "", "cache/index.html", Time.now)
+FileUtils.mkdir_p(LifePath)
+
+server_directory = fetch_file(LifeUrl, "", "#{LifePath}/index.html", Time.now)
 
 server_list = extract_path_list(server_directory)
 
 server_list.each do |path,date|
-  FileUtils.mkdir_p('cache/' + path)
+  FileUtils.mkdir_p("#{LifePath}/#{path}")
 
-  index = fetch_file(BaseUrl, path, "cache/#{path}/index.html", date)
+  index = fetch_file(LifeUrl, path, "#{LifePath}/#{path}/index.html", date)
 
   log_paths = extract_path_list(index)
   log_paths.each do |log_path,log_date|
-    fetch_file(BaseUrl, "#{path}#{log_path}", "cache/#{path}#{log_path}", log_date)
+    fetch_file(LifeUrl, "#{path}#{log_path}", "#{LifePath}/#{path}#{log_path}", log_date)
   end
 end
 
 MapUrl = "http://publicdata.onehouronelife.com/publicMapChangeData/"
+MapPath = "cache/publicMapChangeData"
 
-FileUtils.mkdir_p('cache/map')
+FileUtils.mkdir_p(MapPath)
 
-server_directory = fetch_file(MapUrl, "", "cache/map/index.html", Time.now)
+server_directory = fetch_file(MapUrl, "", "#{MapPath}/index.html", Time.now)
 
 server_list = extract_path_list(server_directory)
 
 server_list.each do |path,date|
-  FileUtils.mkdir_p('cache/map/' + path)
+  FileUtils.mkdir_p("#{MapPath}/#{path}")
 
-  index = fetch_file(MapUrl, path, "cache/map/#{path}/index.html", date)
+  index = fetch_file(MapUrl, path, "#{MapPath}/#{path}/index.html", date)
 
   log_paths = extract_path_list(index)
   log_paths.each do |log_path,log_date|
-    fetch_file(MapUrl, "#{path}#{log_path}", "cache/map/#{path}#{log_path}", log_date)
+    fetch_file(MapUrl, "#{path}#{log_path}", "#{MapPath}/#{path}#{log_path}", log_date)
   end
 end
 

@@ -3,7 +3,7 @@ module OHOLFamilyTrees
     class Servers
       include Enumerable
 
-      def initialize(cache = "cache/")
+      def initialize(cache = "cache/publicLifeLogData/")
         @cache = cache
       end
 
@@ -22,7 +22,7 @@ module OHOLFamilyTrees
     class Logs
       include Enumerable
 
-      def initialize(dir, cache = "cache/")
+      def initialize(dir, cache = "cache/publicLifeLogData/")
         @dir = dir
         @cache = cache
       end
@@ -45,7 +45,7 @@ module OHOLFamilyTrees
     end
 
     class Logfile
-      def initialize(path, cache = "cache/")
+      def initialize(path, cache = "cache/publicLifeLogData/")
         @path = path
         @cache = cache
       end
