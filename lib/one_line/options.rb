@@ -43,4 +43,40 @@ class OneLine
     end
     @known_players
   end
+
+  def matching_lives(term)
+    log.info { "#{from_time} to #{to_time}" }
+    hash = name = id = nil
+    if (term.length == 40)
+      hash = term
+    elsif (term.to_i != 0)
+      id = term.to_i
+    else
+      name = term.upcase
+    end
+    LifelogCache::Servers.new.each do |logs|
+      next unless logs.server.match('bigserver2') or logs.server.match(/^server1\./)
+
+      lives = History.new
+      lives.load_server(logs, time_range)
+
+      filtered = lives
+
+      if hash
+        filtered = filtered.select { |life| life.hash == hash }
+      end
+      if id
+        filtered = filtered.select { |life| life.id == id }
+      end
+      if name
+        filtered = filtered.select { |life| life.name == name }
+      end
+
+
+      filtered
+        .each { |life| life.highlight == true }
+        .select { |life| life.time > from && life.time < to }
+        .each { |life| yield life, lives }
+    end
+  end
 end
