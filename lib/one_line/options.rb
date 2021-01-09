@@ -4,8 +4,8 @@ class OneLine
   class_option :i, :type => :boolean, :desc => 'verbose=INFO'
   class_option :d, :type => :boolean, :desc => 'verbose=DEBUG'
 
-  class_option :from, :type => :numeric, :desc => 'start days relative to now', :default => -3
-  class_option :to, :type => :numeric, :desc => 'stop days relative to now (1 helps with rounding)', :default => 1
+  class_option :from, :type => :numeric, :desc => 'start days relative to now', :default => 3
+  class_option :to, :type => :numeric, :desc => 'stop days relative to now (-1 helps with rounding)', :default => -1
 
   class_option :servers, :type => :string, :desc => 'servers to search all/bsN/sN', :default => 'bs2,s1'
   class_option :a, :type => :boolean, :desc => 'all servers', :default => false
@@ -21,11 +21,11 @@ class OneLine
   end
 
   def from_time
-    @from_time ||= (Date.today + options[:from]).to_time
+    @from_time ||= (Date.today - options[:from]).to_time
   end
 
   def to_time
-    @to_time ||= (Date.today + options[:to]).to_time
+    @to_time ||= (Date.today - options[:to]).to_time
   end
 
   def life_time_range
