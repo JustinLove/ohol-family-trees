@@ -28,8 +28,12 @@ class OneLine
     @to_time ||= (Date.today + options[:to]).to_time
   end
 
-  def time_range
+  def life_time_range
     (from_time - 60*60*24*3)..(to_time + 60*60*24*3)
+  end
+
+  def map_time_range
+    (from_time..to_time)
   end
 
   def from
@@ -82,10 +86,12 @@ class OneLine
 
   def matching_lives(term)
     log.info { "#{from_time} to #{to_time}" }
-    hash = name = id = nil
-    if (term.length == 40)
+    hash = name = id = actors = nil
+    if term.kind_of?(Set)
+      actors = term
+    elsif term.length == 40
       hash = term
-    elsif (term.to_i != 0)
+    elsif term.to_i != 0
       id = term.to_i
     else
       name = term.upcase
@@ -94,15 +100,18 @@ class OneLine
       next unless servers.include? logs.server
 
       lives = History.new
-      lives.load_server(logs, time_range)
+      lives.load_server(logs, life_time_range)
 
       filtered = lives
 
+      if actors
+        filtered = filtered.select { |life| actors.member?(life.playerid) }
+      end
       if hash
         filtered = filtered.select { |life| life.hash == hash }
       end
       if id
-        filtered = filtered.select { |life| life.id == id }
+        filtered = filtered.select { |life| life.playerid == id }
       end
       if name
         filtered = filtered.select { |life| life.name == name }
