@@ -23,34 +23,18 @@ class OneLine
       "Defcon 5 lowest state",
     ]
 
-    MaplogCache::Servers.new.each do |logs|
-      log.debug logs
-
-      logs.each do |logfile|
-        next unless map_time_range.member?(logfile.approx_log_time)
-        log.info logfile.path
-        file = logfile.open
-        while line = file.gets
-          log = Maplog.create(line)
-          if log.kind_of?(Maplog::ArcStart)
-          elsif log.kind_of?(Maplog::Placement)
-            if targets.member?(log.object)
-              p [log.object, targets[log.object], log.x, log.y, log.actor]
-              defcon[[log.x,log.y]] = log.object
-              actors << log.actor
-              if targets[log.object][0] < level
-                level = targets[log.object][0]
-              end
-            end
-          end
+    matching_placements do |log|
+      if targets.member?(log.object)
+        p [log.object, targets[log.object], log.x, log.y, log.actor]
+        defcon[[log.x,log.y]] = log.object
+        actors << log.actor
+        if targets[log.object][0] < level
+          level = targets[log.object][0]
         end
       end
     end
 
-    matching_lives(actors) do |life, lives|
-      log.debug life.inspect
-      puts "#{life.playerid} #{life.hash} #{life.name} #{known_players[life.hash]}"
-    end
+    print_actors(actors)
 
     if level < 5
       log.warn headline('-', levels[level])

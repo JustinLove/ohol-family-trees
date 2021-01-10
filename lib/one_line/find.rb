@@ -27,7 +27,7 @@ class OneLine
     if tag && found.length == 1 && !known_players[found.first.hash]
       hash = found.first.hash
       known_players[hash] = tag
-      line = %Q%"#{hash}","#{tag}"%
+      line = %Q%"#{hash}","#{tag}"\n%
       log.warn "adding #{line}"
       open('known-players.csv', 'a') do |f|
         f << line

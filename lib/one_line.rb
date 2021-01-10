@@ -30,6 +30,7 @@ class OneLine < Thor
   require 'one_line/defcon'
   require 'one_line/fetch'
   require 'one_line/find'
+  require 'one_line/scan'
   require 'one_line/tree'
 
   require 'one_line/options'

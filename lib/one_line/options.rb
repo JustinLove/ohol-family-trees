@@ -84,6 +84,21 @@ class OneLine
     end
   end
 
+  def print_actors(actors)
+    found = []
+    matching_lives(actors) do |life, lives|
+      log.debug life.inspect
+      found << life
+    end
+    found.group_by {|life| life.hash}.each do |hash, chars|
+      puts "## #{hash[0,7]} #{known_players[hash]} ".ljust(76, '#')
+      chars.each do |life|
+        puts "#{life.playerid} #{life.name}"
+      end
+      puts ""
+    end
+  end
+
   def matching_lives(term)
     log.info { "#{from_time} to #{to_time}" }
     hash = name = id = actors = nil
@@ -117,11 +132,32 @@ class OneLine
         filtered = filtered.select { |life| life.name == name }
       end
 
-
       filtered
         .each { |life| life.highlight == true }
         .select { |life| life.time > from && life.time < to }
         .each { |life| yield life, lives }
+    end
+  end
+
+  def matching_placements
+    MaplogCache::Servers.new.each do |logs|
+      log.debug logs
+
+      logs.each do |logfile|
+        next unless map_time_range.member?(logfile.approx_log_time)
+        log.info logfile.path
+        file = logfile.open
+        start = 0
+        while line = file.gets
+          log = Maplog.create(line)
+          if log.kind_of?(Maplog::ArcStart)
+            start = log.ms_start
+          elsif log.kind_of?(Maplog::Placement)
+            log.ms_start = start
+            yield log
+          end
+        end
+      end
     end
   end
 end
