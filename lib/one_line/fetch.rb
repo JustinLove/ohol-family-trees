@@ -1,10 +1,19 @@
 class OneLine
-  desc 'fetch [all/lives/maps/monuments]', 'download logs to local cache for other commands.'
+  desc 'fetch [all/livesl/maps/monuments/bells]', 'download logs to local cache for other commands. Shorthand any combo of lmb'
   option :publicdata, :type => :string, :desc => 'public data url', :default => Mirror::PublicDataUrl
   def fetch(what='all')
-    mirror.lives if what == 'lives' || what == 'all'
-    mirror.maps if what == 'maps' || what == 'all'
-    mirror.monuments if what == 'monuments' || what == 'all'
+    l, m, b = false, false, false
+    if what.match(/^[lmb]+$/)
+      l = what.match('l')
+      m = what.match('m')
+      b = what.match('b')
+    end
+    l = true if what == 'lives' || what == 'all'
+    m = true if what == 'maps' || what == 'all'
+    b = true if what == 'monuments' || what == 'bells' || what == 'all'
+    mirror.lives if l
+    mirror.maps if m
+    mirror.monuments if b
   end
 
   private
