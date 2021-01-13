@@ -95,6 +95,16 @@ module OHOLFamilyTrees
       return lineage
     end
 
+    def children(target)
+      childs = []
+      lives.values.each do |life|
+        if life.parent == target.key
+          childs << life
+        end
+      end
+      return childs
+    end
+
     def family(target)
       cursor = target
       while cursor && lives.has_key?(cursor.parent) && cursor.parent != Lifelog::NoParent
@@ -134,6 +144,16 @@ module OHOLFamilyTrees
       victims.each do |life|
         if life.killer && !victims.has_key?(life.killer)
           focus[life.killer] = lives[life.killer]
+        end
+      end
+      return focus
+    end
+
+    def victims(killer)
+      focus = History.new
+      lives.values.each do |life|
+        if life.killer == killer.key
+          focus[life.key] = lives[life.key]
         end
       end
       return focus
