@@ -81,7 +81,7 @@ def extract_monument_path_list(directory)
   return paths
 end
 
-MonumentsUrl = "https://onehouronelife.com/monuments/"
+MonumentsUrl = "http://onehouronelife.com/monuments/"
 
 FileUtils.mkdir_p('cache/monuments')
 known = nil
@@ -90,7 +90,7 @@ if File.exists?("cache/monuments/count.txt")
 end
 known = known && known.to_i
 
-fetch_file("https://onehouronelife.com/", "monumentStats.php", "cache/monuments/monumentStats.php", Time.now)
+fetch_file("http://onehouronelife.com/", "monumentStats.php", "cache/monuments/monumentStats.php", Time.now)
 contents = File.read("cache/monuments/monumentStats.php")
 count = nil
 

@@ -3,7 +3,7 @@ require 'nokogiri'
 
 module OHOLFamilyTrees
   module MonumentServer
-    BaseUrl = "https://onehouronelife.com/"
+    BaseUrl = "http://onehouronelife.com/"
 
     Client = HTTPClient.new
 

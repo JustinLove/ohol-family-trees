@@ -5,7 +5,7 @@ require 'fileutils'
 module OHOLFamilyTrees
   class Mirror
     PublicDataUrl = 'http://publicdata.onehouronelife.com'
-    MonumentsUrl = "https://onehouronelife.com"
+    MonumentsUrl = "http://onehouronelife.com"
 
     attr_reader :log
     attr_reader :public_data
