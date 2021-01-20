@@ -1,11 +1,12 @@
 class OneLine
   desc 'tree [TERM]', 'output recent family trees of name/hash/id'
+  option :eve, :type => :boolean, :desc => 'only eves', :default => false
   def tree(target = known_players.keys.first)
     require 'ohol-family-trees/graph'
 
     lines = {}
     matching_lives(target) do |life, lives|
-      #if life.time > from && life.time < to && life.lifetime > 3
+      next unless options[:eve] == false || life.chain == 1
       log.warn {"#{Time.at(life.time)} #{life.name} #{life.key if log.info?}"}
       eve = lives.ancestors(life).last
 

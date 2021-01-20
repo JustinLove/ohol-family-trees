@@ -4,6 +4,7 @@ class OneLine
   class_option :i, :type => :boolean, :desc => 'verbose=INFO'
   class_option :d, :type => :boolean, :desc => 'verbose=DEBUG'
 
+  class_option :date, :type => :string, :desc => 'base date for date ranges, default today'
   class_option :from, :type => :numeric, :desc => 'start days relative to now', :default => 3
   class_option :to, :type => :numeric, :desc => 'stop days relative to now (-1 helps with rounding)', :default => -1
 
@@ -20,12 +21,16 @@ class OneLine
     ([d, i, v, "WARN"] & LogLevels).compact.first
   end
 
+  def date
+    (options[:date] && Date.parse(options[:date])) || Date.today
+  end
+
   def from_time
-    @from_time ||= (Date.today - options[:from]).to_time
+    @from_time ||= (date - options[:from]).to_time
   end
 
   def to_time
-    @to_time ||= (Date.today - options[:to]).to_time
+    @to_time ||= (date - options[:to]).to_time
   end
 
   def life_time_range
