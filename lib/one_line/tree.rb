@@ -8,6 +8,8 @@ class OneLine
     matching_lives(target) do |life, lives|
       next unless options[:eve] == false || life.chain == 1
       log.warn {"#{Time.at(life.time)} #{life.name} #{life.key if log.info?}"}
+      life.highlight = true
+      hash = life.hash
       eve = lives.ancestors(life).last
 
       unless lines[eve.key]
@@ -16,7 +18,7 @@ class OneLine
         #lives.outsiders(line)
         line.each do |l|
           l.player_name = known_players[l.hash]
-          if l.hash == target
+          if l.hash == hash
             l.highlight = true
           end
         end

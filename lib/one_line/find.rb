@@ -1,9 +1,11 @@
 class OneLine
   desc 'find [TERM]', 'find a recent life by character name/hash/id'
   option :t, :type => :string, :desc => 'tag for known players if only one life is found'
+  option :eve, :type => :boolean, :desc => 'only eves', :default => false
   def find(term, tag = options[:t])
     found = []
     matching_lives(term) do |life, lives|
+      next unless !options[:eve] || life.chain == 1
       print_life(life, lives)
       found << life
     end

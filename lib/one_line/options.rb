@@ -107,13 +107,15 @@ class OneLine
   def matching_lives(term)
     log.info { "#{from_time} to #{to_time}" }
     hash = name = id = actors = nil
-    if term.kind_of?(Set)
+    if term == 'all'
+      nil
+    elsif term.kind_of?(Set)
       actors = term
     elsif term.length == 40
       hash = term
-    elsif term.to_i != 0
+    elsif term.respond_to?(:to_i) && term.to_i != 0
       id = term.to_i
-    else
+    elsif term.respond_to?(:upcase)
       name = term.upcase
     end
     LifelogCache::Servers.new("#{cache}/publicLifeLogData/").each do |logs|
