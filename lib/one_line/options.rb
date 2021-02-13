@@ -102,6 +102,12 @@ class OneLine
       end
       puts ""
     end
+    if actors.kind_of?(Set) && actors.length > found.length then
+      puts headline('-', 'Not Found')
+      (actors - found.map {|life| life.playerid}).each do |id|
+        puts id
+      end
+    end
   end
 
   def matching_lives(term)
