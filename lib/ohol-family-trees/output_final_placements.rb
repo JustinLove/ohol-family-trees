@@ -87,15 +87,31 @@ module OHOLFamilyTrees
     def process(logfile, options = {})
       base_time = base_time(logfile, options[:basefile])
 
-      if processed[logfile.path] &&
-        logfile.cache_valid_at?(processed[logfile.path]['time']) && 
-        processed[logfile.path]['root_time'] == ((options[:rootfile] && options[:rootfile].timestamp) || 0) &&
-        processed[logfile.path]['base_time'] == (base_time || 0)
-        #return
+      time_processed = Time.now.to_i
+      time_tiles = time_processed
+      time_objects = time_processed
+      should_write_tiles = true
+      should_write_objects = true
+
+      record = processed[logfile.path]
+      if record &&
+        record['root_time'] == ((options[:rootfile] && options[:rootfile].timestamp) || 0) &&
+        record['base_time'] == (base_time || 0)
+        if logfile.cache_valid_at?(record['time'] || 0)
+          should_write_tiles = false
+          time_tiles = record['time']
+        end
+        if logfile.cache_valid_at?(record['time_objects'] || 0)
+          should_write_objects = false
+          time_objects = record['time_objects']
+        end
       end
 
+      return unless should_write_tiles || should_write_objects
+
       processed[logfile.path] = {
-        'time' => Time.now.to_i,
+        'time' => time_tiles,
+        'time_objects' => time_objects,
         'root_time' => (options[:rootfile] && options[:rootfile].timestamp) || 0,
         'base_time' => base_time || 0,
         'spans' => [],
@@ -120,21 +136,26 @@ module OHOLFamilyTrees
           }
           #p spans
 
-          #write_tiles(tileset.updated_tiles, span.s_end, zoom)
-          #write_index(tileset.tile_index, span.s_end, zoom)
-          index = tileset.object_index(tile_width)
+          if should_write_tiles
+            write_tiles(tileset.updated_tiles, span.s_end, zoom)
+            write_index(tileset.tile_index, span.s_end, zoom)
+          end
 
-          total = index.map {|k,v| v.length}.sum
-          cutoff = (total*0.01).to_i
-          triples = index.map {|id,list| [id,list,list.length<cutoff]}
-          #sorted = index.sort_by {|k,v| v.length}
-          #sorted.each do |id, v|
-          #  p [id, v.length, v.length.to_f/total, objects.names[id.to_s]]
-          #end
-          #p sorted.reverse.take(5)
+          if should_write_objects
+            index = tileset.object_index(tile_width)
 
-          write_object_index(triples, span.s_end)
-          write_objects(triples, span.s_end)
+            total = index.map {|k,v| v.length}.sum
+            cutoff = (total*0.01).to_i
+            triples = index.map {|id,list| [id,list,list.length<cutoff]}
+            #sorted = index.sort_by {|k,v| v.length}
+            #sorted.each do |id, v|
+            #  p [id, v.length, v.length.to_f/total, objects.names[id.to_s]]
+            #end
+            #p sorted.reverse.take(5)
+
+            write_object_index(triples, span.s_end)
+            write_objects(triples, span.s_end)
+          end
 
           processed[logfile.path]['spans'] << {
             'start' => span.s_start,
@@ -152,6 +173,7 @@ module OHOLFamilyTrees
       if processed[logfile.path]
         unless logfile.cache_valid_at?(processed[logfile.path]['time'])
           processed[logfile.path]['time'] = logfile.date.to_i
+          processed[logfile.path]['time_objects'] = logfile.date.to_i
           checkpoint
         end
       end

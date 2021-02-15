@@ -113,13 +113,13 @@ MaplogCache::Servers.new.each do |logs|
         end
       end
     end
-    if true
+    if false
       objsearch.process(logfile)
     end
     if false
       actmap.process(logfile)
     end
-    if false
+    if true
       final_placements.process(logfile, context[logfile.path])
     end
     if false

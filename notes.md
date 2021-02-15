@@ -2,7 +2,7 @@
   - x what events are notable?
   - x number of objects dispairity between key and log
   - x frontend support
-  - separate processed check for key search index
+  - x separate processed check for key search index
   - x consider cutoff levels
 - precalculate default map center
 - pavers
