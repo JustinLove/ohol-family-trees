@@ -45,16 +45,21 @@ module OHOLFamilyTrees
     end
 
     def write_triples(triples, path)
+      sorted = triples.sort {|a,b|
+          (a[2] <=> b[2])*4 +
+            (a[1] <=> b[1])*2 +
+            (a[0] <=> b[0])
+        }
+      write_sorted_triples(sorted, path)
+    end
+
+    def write_sorted_triples(triples, path)
       filesystem.write(path) do |out|
         lastv = nil
         lasty = nil
         last_y = 0
         last_x = 0
-        triples.sort {|a,b|
-            (a[2] <=> b[2])*4 +
-              (a[1] <=> b[1])*2 +
-              (a[0] <=> b[0])
-          }.each do |x, y, value|
+        triples.each do |x, y, value|
           if value != lastv
             if lastv
               out << "\n"

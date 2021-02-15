@@ -158,7 +158,7 @@ module OHOLFamilyTrees
     end
 
     def write_tiles(tiles, dir, zoom)
-      p "write #{dir}/#{zoom}"
+      p "write tiles #{dir}/#{zoom}"
       writer = KeyValueYXFirst.new(filesystem, output_path, zoom)
       bar = ProgressBar.new(tiles.length)
       tiles.each_pair do |coords,tile|
@@ -179,7 +179,7 @@ module OHOLFamilyTrees
     end
 
     def write_objects(object_triples, dir)
-      p "write #{dir}"
+      p "write objects #{dir}"
       writer = KeyValueYXFirst.new(filesystem, output_path, 0)
       bar = ProgressBar.new(object_triples.length)
       object_triples.each do |id,list_coords,inc|

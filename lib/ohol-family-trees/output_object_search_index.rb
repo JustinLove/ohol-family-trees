@@ -1,5 +1,6 @@
 require 'ohol-family-trees/log_value_y_x_t_first'
 require 'ohol-family-trees/id_index'
+require 'ohol-family-trees/key_value_y_x_first'
 require 'fileutils'
 require 'json'
 require 'progress_bar'
@@ -15,11 +16,13 @@ module OHOLFamilyTrees
     attr_reader :output_path
     attr_reader :filesystem
     attr_reader :objects
+    attr_reader :notable
 
-    def initialize(output_path, filesystem, objects)
+    def initialize(output_path, filesystem, objects, notable = [])
       @output_path = output_path
       @filesystem = filesystem
       @objects = objects
+      @notable = notable
     end
 
     def processed
@@ -46,9 +49,9 @@ module OHOLFamilyTrees
 
       p logfile.path
 
-      read(logfile) do |span, index|
+      read(logfile) do |span, index, noted|
         total = index.map {|k,v| v.length}.sum
-        cutoff = (total*0.01).to_i
+        cutoff = (total*0.005).to_i
         triples = index.map {|id,list| [id,list,list.length<cutoff]}
         #sorted = index.sort_by {|k,v| v.length}
         #sorted.each do |id, v|
@@ -58,6 +61,8 @@ module OHOLFamilyTrees
 
         write_object_index(triples, span.s_end)
         write_objects(triples, span.s_end)
+
+        write_notable_objects(noted, span.s_end)
 
         processed[logfile.path]['paths'] << "#{span.s_end.to_s}"
         #p processed
@@ -74,6 +79,7 @@ module OHOLFamilyTrees
       seed = logfile.seed
       span = Span.new(server, 0, seed)
       index = {}
+      noted = {}
       while line = file.gets
         log = Maplog.create(line)
         if log.kind_of?(Maplog::ArcStart)
@@ -95,9 +101,10 @@ module OHOLFamilyTrees
           log.ms_start = start.ms_start
           if breakpoints.any? && file.lineno > breakpoints.first
             breakpoints.shift
-            yield [span, index]
+            yield [span, index, noted]
             span = span.next(log.s_time)
             index = {}
+            noted = {}
           end
 
           span.s_end = log.s_time
@@ -105,12 +112,16 @@ module OHOLFamilyTrees
           if id != 0
             index[id] ||= []
             index[id] << log
+
+            if notable.member? id
+              noted[[log.x, log.y]] = id
+            end
           end
         end
       end
       file.close
       if span.s_length > 1
-        yield [span, index]
+        yield [span, index, noted]
       end
     end
 
@@ -131,6 +142,19 @@ module OHOLFamilyTrees
     def write_object_index(triples, dir)
       writer = IdIndex.new(filesystem, output_path, "ls")
       writer.write_index(triples, dir)
+    end
+
+    def write_notable_objects(noted, dir)
+      writer = KeyValueYXFirst.new(filesystem, output_path, 0)
+      path = "#{output_path}/#{dir}/notable.txt"
+      triples = noted
+        .map {|key,value| key + [value]}
+        .sort {|a,b|
+        (notable.index(a[2]) <=> notable.index(b[2]))*4 +
+            (a[1] <=> b[1])*2 +
+            (a[0] <=> b[0])
+        }
+      writer.write_sorted_triples(triples, path)
     end
   end
 end

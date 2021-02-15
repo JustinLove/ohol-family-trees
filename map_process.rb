@@ -1,6 +1,7 @@
 require 'ohol-family-trees/maplog_cache'
 require 'ohol-family-trees/maplog_list'
 require 'ohol-family-trees/object_data'
+require 'ohol-family-trees/notable_objects'
 require 'ohol-family-trees/output_final_placements'
 require 'ohol-family-trees/output_maplog'
 require 'ohol-family-trees/output_activity_map'
@@ -37,6 +38,8 @@ filesystem.read('static/objects.json') do |f|
   objects.read!(f.read)
 end
 
+notable = NotableObjects.read_notable_objects(filesystem, 'data/onehouronelife_notable_objects.txt')
+
 raise "no object data" unless objects.object_size.length > 0
 
 #MaplogCache::Servers.new('cache/mapfake/').each do |logs|
@@ -65,7 +68,7 @@ MaplogCache::Servers.new.each do |logs|
 
   actmap = OutputActivityMap.new(actmap_path, filesystem)
 
-  objsearch = OutputObjectSearchIndex.new(objsearch_path, filesystem, objects)
+  objsearch = OutputObjectSearchIndex.new(objsearch_path, filesystem, objects, notable)
 
   manual_resets = SeedBreak.read_manual_resets(filesystem, "#{placement_path}/manual_resets.txt")
   seeds = SeedBreak.process(list, manual_resets)
@@ -99,7 +102,8 @@ MaplogCache::Servers.new.each do |logs|
       # 24: 3334
     #next unless logfile.path.match('1607109883time')
     #next unless logfile.path.match('1608146683time')
-    next unless logfile.path.match('1608233083time')
+    #next unless logfile.path.match('1608233083time')
+    next unless logfile.path.match('1613089246time')
 
     if false
       if updated_files.member?(logfile.path)
@@ -115,7 +119,7 @@ MaplogCache::Servers.new.each do |logs|
     if false
       actmap.process(logfile)
     end
-    if true
+    if false
       final_placements.process(logfile, context[logfile.path])
     end
     if false

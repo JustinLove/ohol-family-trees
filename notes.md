@@ -1,8 +1,9 @@
 - server search indexes
-  - number of objects dispairity between key and log
-  - frontend support
+  - x what events are notable?
+  - x number of objects dispairity between key and log
+  - x frontend support
   - separate processed check for key search index
-  - consider cutoff levels
+  - x consider cutoff levels
 - precalculate default map center
 - pavers
 - batch reprocess ranges

@@ -4,12 +4,14 @@ module OHOLFamilyTrees
       @object_size = {}
       @object_over = Hash.new {|h,k| h[k] = TiledPlacementLog::ObjectOver.new(2, 2, 2, 4)}
       @floor_removal = {}
+      @notable = []
       @names = {}
     end
 
     attr_reader :object_size
     attr_reader :object_over
     attr_reader :floor_removal
+    attr_reader :notable
     attr_reader :names
 
     def read!(contents)
@@ -24,6 +26,12 @@ module OHOLFamilyTrees
 
       object_master['floorRemovals'].each do |transition|
         floor_removal[transition['newTargetID']] = 'f' + transition['targetID']
+      end
+
+      if object_master['notable']
+        object_master['notable'].each do |object|
+          @notable = notable.union(object['ids'].map(&:to_i))
+        end
       end
       self
     end
