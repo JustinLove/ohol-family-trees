@@ -84,13 +84,14 @@ module OHOLFamilyTrees
         log = Maplog.create(line)
         if log.kind_of?(Maplog::ArcStart)
           if start && span.s_length > 0
-            yield [span, index]
+            yield [span, index, noted]
             if log.s_start < Arc::SplitArcsBefore
               span = Span.new(server, log.s_start, seed)
             else
               span = span.next(log.s_start)
             end
             index = {}
+            noted = {}
           end
           start = log
           if span.s_start == 0

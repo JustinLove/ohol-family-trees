@@ -1,10 +1,11 @@
 - server search indexes
+  - update online processing
   - x what events are notable?
   - x number of objects dispairity between key and log
   - x frontend support
   - x separate processed check for key search index
   - x consider cutoff levels
-- precalculate default map center
+- x precalculate default map center
 - pavers
 - batch reprocess ranges
 - x manual tagging of previous seed ends?

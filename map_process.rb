@@ -17,8 +17,8 @@ require 'set'
 
 include OHOLFamilyTrees
 
-OutputDir = 'output'
-#OutputDir = 'd:/dev/ohol-map/public'
+#OutputDir = 'output'
+OutputDir = 'd:/dev/ohol-map/public'
 OutputBucket = 'wondible-com-ohol-tiles'
 MaplogArchive = 'publicMapChangeData'
 
@@ -103,7 +103,7 @@ MaplogCache::Servers.new.each do |logs|
     #next unless logfile.path.match('1607109883time')
     #next unless logfile.path.match('1608146683time')
     #next unless logfile.path.match('1608233083time')
-    next unless logfile.path.match('1613089246time')
+    #next unless logfile.path.match('1613089246time')
 
     if false
       if updated_files.member?(logfile.path)
@@ -113,10 +113,10 @@ MaplogCache::Servers.new.each do |logs|
         end
       end
     end
-    if false
+    if true
       objsearch.process(logfile)
     end
-    if false
+    if true
       actmap.process(logfile)
     end
     if true
@@ -125,7 +125,7 @@ MaplogCache::Servers.new.each do |logs|
     if false
       final_placements.timestamp_fixup(logfile)
     end
-    if false
+    if true
       maplog.process(logfile)
     end
     if false
@@ -133,5 +133,5 @@ MaplogCache::Servers.new.each do |logs|
     end
   end
 
-  #list.checkpoint
+  list.checkpoint
 end
