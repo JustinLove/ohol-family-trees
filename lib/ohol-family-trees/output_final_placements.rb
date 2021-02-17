@@ -171,8 +171,11 @@ module OHOLFamilyTrees
 
     def timestamp_fixup(logfile)
       if processed[logfile.path]
-        unless logfile.cache_valid_at?(processed[logfile.path]['time'])
+        unless logfile.cache_valid_at?(processed[logfile.path]['time'] || 0)
           processed[logfile.path]['time'] = logfile.date.to_i
+          checkpoint
+        end
+        unless logfile.cache_valid_at?(processed[logfile.path]['time_objects'] || 0)
           processed[logfile.path]['time_objects'] = logfile.date.to_i
           checkpoint
         end

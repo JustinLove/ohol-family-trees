@@ -34,6 +34,7 @@ class MaplogFile
   end
 
   def cache_valid_at?(at_time)
+    at_time ||= 0
     date.to_i <= at_time && (at_time < 1571853427 || 1572325200 < at_time)
   end
 
