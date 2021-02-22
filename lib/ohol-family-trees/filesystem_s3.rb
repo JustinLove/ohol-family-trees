@@ -4,13 +4,19 @@ module OHOLFamilyTrees
   class FilesystemS3
     attr_reader :bucket
     attr_reader :client
+    attr_reader :default_metadata
 
-    def initialize(bucket)
+    def initialize(bucket, metadata = {})
       @bucket = bucket
       @client = Aws::S3::Client.new
+      @default_metadata = metadata
     end
 
-    def write(path, &block)
+    def with_metadata(metadata)
+      FileSystemS3.new(bucket, client, default_metadata.merge(metadata))
+    end
+
+    def write(path, metadata = {}, &block)
       out = StringIO.new
       yield out
       #p [bucket, path]
@@ -19,6 +25,7 @@ module OHOLFamilyTrees
         :body => out,
         :bucket => bucket,
         :key => path,
+        :metadata => default_metadata.merge(metadata),
       })
     end
 

@@ -1,4 +1,5 @@
 require 'ohol-family-trees/arc'
+require 'ohol-family-trees/cache_control'
 require 'json'
 
 module OHOLFamilyTrees
@@ -39,7 +40,7 @@ module OHOLFamilyTrees
     end
 
     def save(filesystem, arc_path)
-      filesystem.write(arc_path) do |f|
+      filesystem.write(arc_path, CacheControl::OneHour) do |f|
         f << JSON.pretty_generate(arcs.values
             .sort_by(&:s_start)
             .map {|arc| encode(arc) })

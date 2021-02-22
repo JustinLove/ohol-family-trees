@@ -6,9 +6,13 @@ module OHOLFamilyTrees
       @filesystems = filesystems
     end
 
-    def write(path, &block)
+    def with_metadata(metadata)
+      FilesystemGroup.new(filesystems.map {|fs| fs.with_metadata(metadata)})
+    end
+
+    def write(path, metadata = {}, &block)
       filesystems.each do |fs|
-        fs.write(path, &block)
+        fs.write(path, metadata, &block)
       end
     end
 

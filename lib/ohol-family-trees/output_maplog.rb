@@ -2,6 +2,7 @@ require 'ohol-family-trees/tiled_placement_log'
 #require 'ohol-family-trees/log_diff'
 #require 'ohol-family-trees/log_value_y_x_t'
 require 'ohol-family-trees/log_value_y_x_t_first'
+require 'ohol-family-trees/cache_control'
 require 'fileutils'
 require 'json'
 require 'progress_bar'
@@ -36,7 +37,7 @@ module OHOLFamilyTrees
     end
 
     def checkpoint
-      filesystem.write(processed_path) do |f|
+      filesystem.write(processed_path, CacheControl::NoCache) do |f|
         f << JSON.pretty_generate(processed)
       end
     end
@@ -88,7 +89,7 @@ module OHOLFamilyTrees
 
     def write_tiles(tiles, dir, zoom)
       p "write #{dir} #{zoom}"
-      writer = LogValueYXTFirst.new(filesystem)
+      writer = LogValueYXTFirst.new(filesystem.with_metadata(CacheControl::OneMonth))
       bar = ProgressBar.new(tiles.length)
       tiles.each do |coords,tile|
         bar.increment!

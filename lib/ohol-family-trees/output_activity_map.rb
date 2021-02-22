@@ -1,5 +1,6 @@
 require 'ohol-family-trees/act_png'
 require 'ohol-family-trees/tile_index'
+require 'ohol-family-trees/cache_control'
 require 'fileutils'
 require 'json'
 require 'progress_bar'
@@ -34,7 +35,7 @@ module OHOLFamilyTrees
     end
 
     def checkpoint
-      filesystem.write(processed_path) do |f|
+      filesystem.write(processed_path, CacheControl::NoCache) do |f|
         f << JSON.pretty_generate(processed)
       end
     end
@@ -124,7 +125,7 @@ module OHOLFamilyTrees
 
     def write_tiles(tiles, dir, zoom, period)
       p "write #{dir} #{zoom}"
-      writer = ActPng.new(filesystem, output_path, zoom, TileSize, period)
+      writer = ActPng.new(filesystem.with_metadata(CacheControl::OneMonth), output_path, zoom, TileSize, period)
       bar = ProgressBar.new(tiles.length)
       tiles.each do |coords,tile|
         bar.increment!
@@ -135,7 +136,7 @@ module OHOLFamilyTrees
 
     def write_index(tiles, dir, zoom)
       triples = tiles.keys.map {|coords| [coords,dir] }.map(&:flatten)
-      writer = TileIndex.new(filesystem, output_path, "am")
+      writer = TileIndex.new(filesystem.with_metadata(CacheControl::OneMonth), output_path, "am")
       writer.write_index(triples, dir, zoom)
     end
   end

@@ -8,7 +8,11 @@ module OHOLFamilyTrees
       @output_dir = output_dir
     end
 
-    def write(path, &block)
+    def with_metadata(metadata)
+      self
+    end
+
+    def write(path, metadata = {}, &block)
       filepath = "#{output_dir}/#{path}"
       FileUtils.mkdir_p(File.dirname(filepath))
       File.open(filepath, 'wb', &block)

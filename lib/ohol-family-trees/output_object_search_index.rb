@@ -1,6 +1,7 @@
 require 'ohol-family-trees/log_value_y_x_t_first'
 require 'ohol-family-trees/id_index'
 require 'ohol-family-trees/key_value_y_x_first'
+require 'ohol-family-trees/cache_control'
 require 'fileutils'
 require 'json'
 require 'progress_bar'
@@ -35,7 +36,7 @@ module OHOLFamilyTrees
     end
 
     def checkpoint
-      filesystem.write(processed_path) do |f|
+      filesystem.write(processed_path, CacheControl::NoCache) do |f|
         f << JSON.pretty_generate(processed)
       end
     end
@@ -128,7 +129,7 @@ module OHOLFamilyTrees
 
     def write_objects(triples, dir)
       p "write #{dir}"
-      writer = LogValueYXTFirst.new(filesystem)
+      writer = LogValueYXTFirst.new(filesystem.with_metadata(CacheControl::OneMonth))
       bar = ProgressBar.new(triples.length)
       triples.each do |id,placements,inc|
         bar.increment!
@@ -141,12 +142,12 @@ module OHOLFamilyTrees
     end
 
     def write_object_index(triples, dir)
-      writer = IdIndex.new(filesystem, output_path, "ls")
+      writer = IdIndex.new(filesystem.with_metadata(CacheControl::OneMonth), output_path, "ls")
       writer.write_index(triples, dir)
     end
 
     def write_notable_objects(noted, dir)
-      writer = KeyValueYXFirst.new(filesystem, output_path, 0)
+      writer = KeyValueYXFirst.new(filesystem.with_metadata(CacheControl::OneWeek), output_path, 0)
       path = "#{output_path}/#{dir}/notable.txt"
       triples = noted
         .map {|key,value| key + [value]}
