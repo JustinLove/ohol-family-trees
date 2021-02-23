@@ -1,16 +1,6 @@
 - s3 cache headers
-  - update code
-  - generate file lists for batch operations
+  - x generate file lists for batch operations
     printf 'wondible-com-ohol-tiles,%s\n' tiles/24/*/*.png > tiles24.csv
-    - x original tiles 24+ - one year
-    - job running - activity map tiles - one month
-    - job ready - activity map tiles indexes - one month
-    - list generated static tiles - one week
-    - job ready static index - one week
-    - list generating - static objects - one week - static objects index - one week
-    - list generating - log tiles - one month
-    - list generating - log objects - one month - log object index - one month
-    - job ready - notable objects - one week
 - pavers
 - batch reprocess ranges
 - x manual tagging of previous seed ends?
