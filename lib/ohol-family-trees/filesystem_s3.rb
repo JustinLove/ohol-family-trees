@@ -13,7 +13,7 @@ module OHOLFamilyTrees
     end
 
     def with_metadata(metadata)
-      FileSystemS3.new(bucket, client, default_metadata.merge(metadata))
+      self.class.new(bucket, default_metadata.merge(metadata))
     end
 
     def write(path, metadata = {}, &block)
