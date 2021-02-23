@@ -59,7 +59,7 @@ class OneLine
       options[:servers].split(',').each do |s|
         @servers << s
           .gsub(/bs(\d)/, 'bigserver\1.onehouronelife.com')
-          .gsub(/s(\d)/, 'server\1.onehouronelife.com')
+          .gsub(/s(\d+)/, 'server\1.onehouronelife.com')
       end
     end
     log.debug { "Searching" }
