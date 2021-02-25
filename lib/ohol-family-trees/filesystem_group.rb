@@ -7,7 +7,7 @@ module OHOLFamilyTrees
     end
 
     def with_metadata(metadata)
-      FilesystemGroup.new(filesystems.map {|fs| fs.with_metadata(metadata)})
+      self.class.new(filesystems.map {|fs| fs.with_metadata(metadata)})
     end
 
     def write(path, metadata = {}, &block)
@@ -26,6 +26,12 @@ module OHOLFamilyTrees
       filesystems.each do |fs|
         f = fs.open(path)
         return f if f
+      end
+    end
+
+    def delete(path)
+      filesystems.each do |fs|
+        fs.delete(path)
       end
     end
 

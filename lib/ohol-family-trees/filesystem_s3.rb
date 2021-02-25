@@ -17,6 +17,8 @@ module OHOLFamilyTrees
     end
 
     def write(path, metadata = {}, &block)
+      meta = default_metadata.merge(metadata)
+      cache_control = meta.delete(:cache_control)
       out = StringIO.new
       yield out
       #p [bucket, path]
@@ -25,7 +27,8 @@ module OHOLFamilyTrees
         :body => out,
         :bucket => bucket,
         :key => path,
-        :metadata => default_metadata.merge(metadata),
+        :cache_control => cache_control,
+        :metadata => meta,
       })
     end
 
@@ -47,6 +50,16 @@ module OHOLFamilyTrees
         :key => path,
       })
       return response.body
+    rescue Aws::S3::Errors::NoSuchKey
+      p ['not found', path]
+      nil
+    end
+
+    def delete(path)
+      client.delete_object({
+        :bucket => bucket,
+        :key => path,
+      })
     rescue Aws::S3::Errors::NoSuchKey
       p ['not found', path]
       nil

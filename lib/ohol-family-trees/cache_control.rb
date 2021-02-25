@@ -1,8 +1,8 @@
 module CacheControl
-  NoCache = {'Cache-Control' => "no-cache"}
-  OneHour = {'Cache-Control' => "max-age=8600"}
-  OneDay = {'Cache-Control' => "max-age=86400"}
-  OneWeek = {'Cache-Control' => "max-age=604800"}
-  OneMonth = {'Cache-Control' => "max-age=2592000"}
-  OneYear = {'Cache-Control' => "max-age=31536000"}
+  NoCache = {:cache_control => "no-cache"}
+  OneHour = {:cache_control => "max-age=8600"}
+  OneDay = {:cache_control => "max-age=86400"}
+  OneWeek = {:cache_control => "max-age=604800"}
+  OneMonth = {:cache_control => "max-age=2592000"}
+  OneYear = {:cache_control => "max-age=31536000"}
 end

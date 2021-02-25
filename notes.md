@@ -1,6 +1,8 @@
 - s3 cache headers
   - x generate file lists for batch operations
     printf 'wondible-com-ohol-tiles,%s\n' tiles/24/*/*.png > tiles24.csv
+  - bad timestamps:
+    - 1614212447
 - pavers
 - batch reprocess ranges
 - x manual tagging of previous seed ends?

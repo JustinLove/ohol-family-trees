@@ -33,6 +33,14 @@ module OHOLFamilyTrees
       end
     end
 
+    def delete(path)
+      filepath = "#{output_dir}/#{path}"
+      if File.exist?(filepath)
+        File.delete(filepath)
+        return true
+      end
+    end
+
     def list(path)
       filepath = "#{output_dir}/#{path}"
       notprefix = ("#{output_dir}/".length)..-1
