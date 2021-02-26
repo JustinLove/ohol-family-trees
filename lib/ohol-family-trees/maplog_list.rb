@@ -1,5 +1,6 @@
 require 'ohol-family-trees/maplog_file'
 require 'ohol-family-trees/cache_control'
+require 'ohol-family-trees/content_type'
 require 'json'
 
 module OHOLFamilyTrees
@@ -30,7 +31,7 @@ module OHOLFamilyTrees
       end
 
       def checkpoint
-        filesystem.write(list_path, CacheControl::NoCache) do |f|
+        filesystem.write(list_path, CacheControl::NoCache.merge(ContentType::Json)) do |f|
           f << JSON.pretty_generate(to_a.map(&:to_h))
         end
       end

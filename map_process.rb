@@ -12,6 +12,7 @@ require 'ohol-family-trees/filesystem_local'
 require 'ohol-family-trees/filesystem_s3'
 require 'ohol-family-trees/filesystem_group'
 require 'ohol-family-trees/cache_control'
+require 'ohol-family-trees/content_type'
 require 'fileutils'
 require 'json'
 require 'set'
@@ -109,7 +110,7 @@ MaplogCache::Servers.new.each do |logs|
     if false
       if updated_files.member?(logfile.path)
         p 'updated file', logfile.path
-        filesystem.write(MaplogArchive + '/' + logfile.path, CacheControl::OneYear) do |archive|
+        filesystem.write(MaplogArchive + '/' + logfile.path, CacheControl::OneYear.merge(ContentType::Text)) do |archive|
           IO::copy_stream(logfile.open, archive)
         end
       end

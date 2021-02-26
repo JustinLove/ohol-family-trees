@@ -19,6 +19,7 @@ module OHOLFamilyTrees
     def write(path, metadata = {}, &block)
       meta = default_metadata.merge(metadata)
       cache_control = meta.delete(:cache_control)
+      content_type = meta.delete(:content_type)
       out = StringIO.new
       yield out
       #p [bucket, path]
@@ -28,6 +29,7 @@ module OHOLFamilyTrees
         :bucket => bucket,
         :key => path,
         :cache_control => cache_control,
+        :content_type => content_type,
         :metadata => meta,
       })
     end

@@ -4,6 +4,7 @@ require 'ohol-family-trees/tiled_placement_log'
 require 'ohol-family-trees/key_value_y_x_first'
 require 'ohol-family-trees/id_index'
 require 'ohol-family-trees/cache_control'
+require 'ohol-family-trees/content_type'
 require 'fileutils'
 require 'json'
 require 'progress_bar'
@@ -56,10 +57,10 @@ module OHOLFamilyTrees
 
     def checkpoint
       x = JSON.pretty_generate(spans.values.sort_by {|span| span['start']})
-      filesystem.write(span_path, CacheControl::NoCache) do |f|
+      filesystem.write(span_path, CacheControl::NoCache.merge(ContentType::Json)) do |f|
         f << x
       end
-      filesystem.write(processed_path, CacheControl::NoCache) do |f|
+      filesystem.write(processed_path, CacheControl::NoCache.merge(ContentType::Json)) do |f|
         f << JSON.pretty_generate(processed)
       end
     end
@@ -185,7 +186,7 @@ module OHOLFamilyTrees
 
     def write_tiles(tiles, dir, zoom)
       p "write tiles #{dir}/#{zoom}"
-      writer = KeyValueYXFirst.new(filesystem.with_metadata(CacheControl::OneWeek), output_path, zoom)
+      writer = KeyValueYXFirst.new(filesystem.with_metadata(CacheControl::OneWeek.merge(ContentType::Text)), output_path, zoom)
       bar = ProgressBar.new(tiles.length)
       tiles.each_pair do |coords,tile|
         bar.increment!
@@ -195,7 +196,7 @@ module OHOLFamilyTrees
     end
 
     def write_index(triples, dir, zoom)
-      writer = TileIndex.new(filesystem.with_metadata(CacheControl::OneWeek), output_path, "kp")
+      writer = TileIndex.new(filesystem.with_metadata(CacheControl::OneWeek.merge(ContentType::Text)), output_path, "kp")
       writer.write_index(triples, dir, zoom)
     end
 
@@ -206,7 +207,7 @@ module OHOLFamilyTrees
 
     def write_objects(object_triples, dir)
       p "write objects #{dir}"
-      writer = KeyValueYXFirst.new(filesystem.with_metadata(CacheControl::OneWeek), output_path, 0)
+      writer = KeyValueYXFirst.new(filesystem.with_metadata(CacheControl::OneWeek.merge(ContentType::Text)), output_path, 0)
       bar = ProgressBar.new(object_triples.length)
       object_triples.each do |id,list_coords,inc|
         bar.increment!
@@ -220,7 +221,7 @@ module OHOLFamilyTrees
     end
 
     def write_object_index(triples, dir)
-      writer = IdIndex.new(filesystem.with_metadata(CacheControl::OneWeek), output_path, "ks")
+      writer = IdIndex.new(filesystem.with_metadata(CacheControl::OneWeek.merge(ContentType::Text)), output_path, "ks")
       writer.write_index(triples, dir)
     end
   end
