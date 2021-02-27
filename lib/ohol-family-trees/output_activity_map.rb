@@ -126,7 +126,7 @@ module OHOLFamilyTrees
 
     def write_tiles(tiles, dir, zoom, period)
       p "write #{dir} #{zoom}"
-      writer = ActPng.new(filesystem.with_metadata(CacheControl::OneMonth.merge(CacheControl::Png)), output_path, zoom, TileSize, period)
+      writer = ActPng.new(filesystem.with_metadata(CacheControl::OneMonth.merge(ContentType::Png)), output_path, zoom, TileSize, period)
       bar = ProgressBar.new(tiles.length)
       tiles.each do |coords,tile|
         bar.increment!
