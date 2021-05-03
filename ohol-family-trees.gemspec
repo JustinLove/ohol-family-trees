@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.license     = 'MIT'
   s.files                 = Dir.glob("lib/**/*")
   s.test_files            = Dir.glob("{test,spec,features}/**/*")
-  s.executables           = Dir.glob("bin/*").map{ |f| File.basename(f) }
+  s.executables          << 'oneline'
 
   s.add_runtime_dependency "httpclient"
   s.add_runtime_dependency "stringio"
