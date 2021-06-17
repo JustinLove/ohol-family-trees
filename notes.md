@@ -1,12 +1,4 @@
-- s3 cache headers
-  - x generate file lists for batch operations
-    printf 'wondible-com-ohol-tiles,%s\n' tiles/24/*/*.png > tiles24.csv
-- mime types
-  - x servers.json
-  - x monuments/n.json
-  - x seeds.json
-  - x spans.json
-  - x notable.txt
+- time difference between lives and map placments: https://onemap.wondible.com/#x=-28185&y=-597&z=29&s=17&t=1621748525&preset=daily-review
 - pavers
 - batch reprocess ranges
 - x manual tagging of previous seed ends?

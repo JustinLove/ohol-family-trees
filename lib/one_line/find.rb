@@ -31,13 +31,31 @@ class OneLine
     end
   end
 
+  desc 'parent [CHILD]', 'find recent lives by child name/hash/id'
+  option :t, :type => :string, :desc => 'tag for known players if only one life is found'
+  def parent(term)
+    found = {}
+    matching_lives(term) do |life, lives|
+      if life.parent
+        mom = lives[life.parent]
+        print_life(mom, lives)
+        found[mom.key] = mom
+      end
+    end
+
+    tagem(found.values, options[:t])
+  end
+
   desc 'killers [VICTIM]', 'find recent lives by victim name/hash/id'
   option :t, :type => :string, :desc => 'tag for known players if only one life is found'
   def killers(term)
     found = {}
     matching_lives(term) do |life, lives|
-      print_life(lives[life.killer], lives) if life.killer
-      found[life.key] = life
+      if life.killer
+        kil = lives[life.killer]
+        print_life(kil, lives)
+        found[kil.key] = kil
+      end
     end
 
     tagem(found.values, options[:t])

@@ -37,6 +37,14 @@ class OneLine
     (from_time - 60*60*24*3)..(to_time + 60*60*24*3)
   end
 
+  def curselog_time_range
+    (from_time - 60*60*24*3)..(to_time + 60*60*24*3)
+  end
+
+  def cursecount_time_range
+    (from_time - 60*60*24*90)..(to_time + 60*60*24*3)
+  end
+
   def map_time_range
     (from_time..to_time)
   end
@@ -82,7 +90,7 @@ class OneLine
 
   def headline(h = '-', s = nil)
     if s
-      l = 76 - s.length
+      l = [76 - s.length, 3].max
       [h*(l/2), s, h*((l+1)/2)].join(' ')
     else
       h*78
@@ -149,6 +157,35 @@ class OneLine
         .each { |life| life.highlight == true }
         .select { |life| life.time > from && life.time < to }
         .each { |life| yield life, lives }
+    end
+  end
+
+  def matching_hashes(term)
+    return [term] if term.length == 40
+    found = []
+    matching_lives(term) do |life, lives|
+      found << life.hash
+    end
+    return found.uniq
+  end
+
+  def matching_curses(time_range = curselog_time_range)
+    log.info time_range
+    CurselogCache::Servers.new.each do |logs|
+      next unless servers.include? logs.server
+      log.debug logs
+
+      logs.each do |logfile|
+        next unless time_range.member?(logfile.approx_log_time)
+        log.info logfile.path
+        file = logfile.open
+        while line = file.gets
+          log = Curselog.create(line)
+          if log.kind_of?(Curselog::Curse)
+            yield log
+          end
+        end
+      end
     end
   end
 

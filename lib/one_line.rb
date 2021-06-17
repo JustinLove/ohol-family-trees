@@ -1,3 +1,5 @@
+require 'ohol-family-trees/curselog_cache'
+require 'ohol-family-trees/curselog'
 require 'ohol-family-trees/lifelog'
 require 'ohol-family-trees/history'
 require 'ohol-family-trees/lifelog_cache'
@@ -27,6 +29,11 @@ class OneLine < Thor
     true
   end
 
+  require 'one_line/cursecount'
+  require 'one_line/cursed'
+  require 'one_line/cursedby'
+  require 'one_line/curseleader'
+  require 'one_line/cursers'
   require 'one_line/defcon'
   require 'one_line/fetch'
   require 'one_line/find'
