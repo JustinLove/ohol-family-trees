@@ -155,13 +155,13 @@ module OHOLFamilyTrees
         end
       end
       file.close
-      if span.s_length > 1
-        tiles.finalize!(span.s_end)
-        yield [span, tiles]
-        span = nil
-        tiles = nil
-        GC.start
-      end
+
+      tiles.finalize!(span.s_end)
+      yield [span, tiles]
+      span = nil
+      tiles = nil
+      GC.start
+
       p "excluded #{excluded} objects"
     end
 

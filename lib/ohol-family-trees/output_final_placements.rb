@@ -131,39 +131,48 @@ module OHOLFamilyTrees
             :base_tiles => base_tileset(base_time, zoom),
           }) do |span, tileset|
 
-          spans[span.s_start.to_s] = {
-            'start' => span.s_start,
-            'end' => span.s_end,
-            'base' => span.s_base,
-          }
-          #p spans
+          if span.s_length > 1
+            spans[span.s_start.to_s] = {
+              'start' => span.s_start,
+              'end' => span.s_end,
+              'base' => span.s_base,
+            }
+            #p spans
 
-          if should_write_tiles
-            write_tiles(tileset.updated_tiles, span.s_end, zoom)
-            write_index(tileset.tile_index, span.s_end, zoom)
+            if should_write_tiles
+              write_tiles(tileset.updated_tiles, span.s_end, zoom)
+              write_index(tileset.tile_index, span.s_end, zoom)
+            end
+
+            if should_write_objects
+              index = tileset.object_index(tile_width)
+
+              total = index.map {|k,v| v.length}.sum
+              cutoff = (total*0.01).to_i
+              triples = index.map {|id,list| [id,list,list.length<cutoff]}
+              #sorted = index.sort_by {|k,v| v.length}
+              #sorted.each do |id, v|
+              #  p [id, v.length, v.length.to_f/total, objects.names[id.to_s]]
+              #end
+              #p sorted.reverse.take(5)
+
+              write_object_index(triples, span.s_end)
+              write_objects(triples, span.s_end)
+            end
+
+            processed[logfile.path]['spans'] << {
+              'start' => span.s_start,
+              'end' => span.s_end,
+              'base' => span.s_base,
+            }
+          elsif processed[logfile.path]['spans'].length < 1
+            processed[logfile.path]['spans'] << {
+              'start' => span.s_base,
+              'end' => span.s_base,
+              'base' => span.s_base,
+            }
           end
 
-          if should_write_objects
-            index = tileset.object_index(tile_width)
-
-            total = index.map {|k,v| v.length}.sum
-            cutoff = (total*0.01).to_i
-            triples = index.map {|id,list| [id,list,list.length<cutoff]}
-            #sorted = index.sort_by {|k,v| v.length}
-            #sorted.each do |id, v|
-            #  p [id, v.length, v.length.to_f/total, objects.names[id.to_s]]
-            #end
-            #p sorted.reverse.take(5)
-
-            write_object_index(triples, span.s_end)
-            write_objects(triples, span.s_end)
-          end
-
-          processed[logfile.path]['spans'] << {
-            'start' => span.s_start,
-            'end' => span.s_end,
-            'base' => span.s_base,
-          }
           #p processed
         end
       end

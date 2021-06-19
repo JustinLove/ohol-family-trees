@@ -68,6 +68,7 @@ module OHOLFamilyTrees
             :object_size => objects.object_size,
             :object_over => objects.object_over,
           }) do |span, tileset|
+          next unless span.s_length > 1
 
           write_tiles(tileset.tiles, span.s_end, zoom)
 
