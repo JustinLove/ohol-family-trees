@@ -19,8 +19,8 @@ require 'set'
 
 include OHOLFamilyTrees
 
-#OutputDir = 'output'
-OutputDir = 'd:/dev/ohol-map/public'
+OutputDir = 'output'
+#OutputDir = 'd:/dev/ohol-map/public'
 OutputBucket = 'wondible-com-ohol-tiles'
 MaplogArchive = 'publicMapChangeData'
 
@@ -41,6 +41,7 @@ filesystem.read('static/objects.json') do |f|
 end
 
 notable = NotableObjects.read_notable_objects(filesystem, 'data/onehouronelife_notable_objects.txt')
+resets = NotableObjects.read_notable_objects(filesystem, 'data/onehouronelife_map_reset_objects.txt')
 
 raise "no object data" unless objects.object_size.length > 0
 
@@ -70,7 +71,7 @@ MaplogCache::Servers.new.each do |logs|
 
   actmap = OutputActivityMap.new(actmap_path, filesystem)
 
-  objsearch = OutputObjectSearchIndex.new(objsearch_path, filesystem, objects, notable)
+  objsearch = OutputObjectSearchIndex.new(objsearch_path, filesystem, objects, notable, resets)
 
   manual_resets = SeedBreak.read_manual_resets(filesystem, "#{placement_path}/manual_resets.txt")
   seeds = SeedBreak.process(list, manual_resets)
@@ -106,6 +107,7 @@ MaplogCache::Servers.new.each do |logs|
     #next unless logfile.path.match('1608146683time')
     #next unless logfile.path.match('1608233083time')
     #next unless logfile.path.match('1613089246time')
+     next unless logfile.path.match('1648826252time') # rapid apoc
 
     if false
       if updated_files.member?(logfile.path)
@@ -118,16 +120,16 @@ MaplogCache::Servers.new.each do |logs|
     if true
       objsearch.process(logfile)
     end
-    if true
+    if false
       actmap.process(logfile)
     end
-    if true
+    if false
       final_placements.process(logfile, context[logfile.path])
     end
     if false
       final_placements.timestamp_fixup(logfile)
     end
-    if true
+    if false
       maplog.process(logfile)
     end
     if false

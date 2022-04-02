@@ -15,16 +15,22 @@ module OHOLFamilyTrees
       "#{output_path}/processed_logsearch.json"
     end
 
+    def automatic_resets_path
+      "#{output_path}/automatic_resets.txt"
+    end
+
     attr_reader :output_path
     attr_reader :filesystem
     attr_reader :objects
     attr_reader :notable
+    attr_reader :resets
 
-    def initialize(output_path, filesystem, objects, notable = [])
+    def initialize(output_path, filesystem, objects, notable = [], resets = [])
       @output_path = output_path
       @filesystem = filesystem
       @objects = objects
       @notable = notable
+      @resets = resets
     end
 
     def processed
@@ -36,14 +42,28 @@ module OHOLFamilyTrees
       @processed
     end
 
+    def automatic_resets
+      return @automatic_resets if @automatic_resets
+      @automatic_resets = []
+      filesystem.read(automatic_resets_path) do |f|
+        while line = f.gets
+          @automatic_resets << line.to_i
+        end
+      end
+      @automatic_resets
+    end
+
     def checkpoint
       filesystem.write(processed_path, CacheControl::NoCache.merge(ContentType::Json)) do |f|
         f << JSON.pretty_generate(processed)
       end
+      filesystem.write(automatic_resets_path, CacheControl::NoCache.merge(ContentType::Text)) do |f|
+        f << automatic_resets.join("\r")
+      end
     end
 
     def process(logfile, options = {})
-      return if processed[logfile.path] && logfile.cache_valid_at?(processed[logfile.path]['time'])
+      #return if processed[logfile.path] && logfile.cache_valid_at?(processed[logfile.path]['time'])
       processed[logfile.path] = {
         'time' => Time.now.to_i,
         'paths' => []
@@ -51,7 +71,7 @@ module OHOLFamilyTrees
 
       p logfile.path
 
-      read(logfile) do |span, index, noted|
+      read(logfile) do |span, index, noted, reset|
         total = index.map {|k,v| v.length}.sum
         cutoff = (total*0.005).to_i
         triples = index.map {|id,list| [id,list,list.length<cutoff]}
@@ -66,6 +86,10 @@ module OHOLFamilyTrees
 
         write_notable_objects(noted, span.s_end)
 
+        if reset > span.s_end - 10 and not automatic_resets.member?(reset)
+          automatic_resets << reset
+        end
+        p automatic_resets
         processed[logfile.path]['paths'] << "#{span.s_end.to_s}"
         #p processed
       end
@@ -82,11 +106,12 @@ module OHOLFamilyTrees
       span = Span.new(server, 0, seed)
       index = {}
       noted = {}
+      reset = 0
       while line = file.gets
         log = Maplog.create(line)
         if log.kind_of?(Maplog::ArcStart)
           if start && span.s_length > 0
-            yield [span, index, noted]
+            yield [span, index, noted, reset]
             if log.s_start < Arc::SplitArcsBefore
               span = Span.new(server, log.s_start, seed)
             else
@@ -94,6 +119,7 @@ module OHOLFamilyTrees
             end
             index = {}
             noted = {}
+            reset = 0
           end
           start = log
           if span.s_start == 0
@@ -104,10 +130,11 @@ module OHOLFamilyTrees
           log.ms_start = start.ms_start
           if breakpoints.any? && file.lineno > breakpoints.first
             breakpoints.shift
-            yield [span, index, noted]
+            yield [span, index, noted, reset]
             span = span.next(log.s_time)
             index = {}
             noted = {}
+            reset = 0
           end
 
           span.s_end = log.s_time
@@ -119,12 +146,16 @@ module OHOLFamilyTrees
             if notable.member? id
               noted[[log.x, log.y]] = id
             end
+
+            if resets.member? id
+              reset = log.s_time
+            end
           end
         end
       end
       file.close
       if span.s_length > 1
-        yield [span, index, noted]
+        yield [span, index, noted, reset]
       end
     end
 
