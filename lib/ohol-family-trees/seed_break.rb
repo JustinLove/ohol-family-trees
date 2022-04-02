@@ -2,25 +2,29 @@ require 'ohol-family-trees/arc_list'
 
 module OHOLFamilyTrees
   module SeedBreak
-    def self.read_manual_resets(filesystem, path)
-      manual_resets = []
+    def self.read_resets(filesystem, path)
+      resets = []
       filesystem.read(path) do |f|
         while line = f.gets
-          manual_resets << line.to_i
+          resets << line.to_i
         end
       end
-      return manual_resets
+      return resets
     end
 
-    def self.process(logs, manual_resets = [])
+    def self.process(logs, manual_resets = [], automatic_resets = [])
       arcs = ArcList.new
       prior = nil
       current_arc = nil
+      hanging_reset = automatic_resets.last || 0
+      reset_window = hanging_reset..(hanging_reset + 20)
       logs.each do |logfile|
         #next unless logfile.timestamp >= 1573895673
 
+        detected_reset = manual_resets.member?(logfile.timestamp) || reset_window.cover?(logfile.timestamp)
+
         if logfile.placements?
-          if !manual_resets.member?(logfile.timestamp) and prior and logfile.merges_with?(prior)
+          if !detected_reset and prior and logfile.merges_with?(prior)
           else
             #p "merge break at #{logfile.timestamp}"
             if current_arc
@@ -43,7 +47,7 @@ module OHOLFamilyTrees
 
         if logfile.seed_only?
           #p "seed change at #{logfile.timestamp}"
-          if manual_resets.member?(logfile.timestamp)
+          if detected_reset
             if current_arc
               current_arc.seed = logfile.seed
             end
@@ -56,6 +60,7 @@ module OHOLFamilyTrees
           end
         end
       end
+      p "hanging reset window #{reset_window}"
       return arcs
     end
   end
