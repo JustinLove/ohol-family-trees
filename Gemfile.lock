@@ -35,7 +35,7 @@ GEM
     color (1.8)
     highline (2.0.3)
     httpclient (2.8.3)
-    jmespath (1.4.0)
+    jmespath (1.6.1)
     mini_portile2 (2.5.1)
     nokogiri (1.11.1)
       mini_portile2 (~> 2.5.0)
