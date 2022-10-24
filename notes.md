@@ -1,3 +1,8 @@
+- x not check every lifelog file on every update
+- copying files to map dir
+- server date ranges - server?
+
+
 - time difference between lives and map placments: https://onemap.wondible.com/#x=-28185&y=-597&z=29&s=17&t=1621748525&preset=daily-review
 - pavers
 - batch reprocess ranges

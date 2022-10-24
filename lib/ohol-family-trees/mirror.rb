@@ -10,14 +10,16 @@ module OHOLFamilyTrees
     attr_reader :log
     attr_reader :public_data
     attr_reader :cache
+    attr_reader :check_all
     attr_reader :http
 
     attr_accessor :monuments_url
 
-    def initialize(log, public_data = PublicDataUrl, cache = 'cache')
+    def initialize(log, public_data = PublicDataUrl, cache = 'cache', check_all = false)
       @log = log
       @public_data = public_data
       @cache = cache
+      @check_all = check_all
       @http = HTTPClient.new
 
       @monuments_url = MonumentsUrl
@@ -46,9 +48,18 @@ module OHOLFamilyTrees
 
         index = fetch_file(base_url, path, "#{base_path}/#{path}/index.html", date)
 
+        unchanged = 0
         log_paths = extract_path_list(index)
-        log_paths.each do |log_path,log_date|
-          fetch_file(base_url, "#{path}#{log_path}", "#{base_path}/#{path}#{log_path}", log_date)
+        log_paths.reverse_each do |log_path,log_date|
+          if unchanged < 28 or check_all then # accounts for lives + names
+            cache_path = "#{base_path}/#{path}#{log_path}"
+            if has_file?(cache_path, log_date)
+              unchanged += 1
+            else
+              unchanged = 0
+              get_file(base_url, "#{path}#{log_path}", cache_path)
+            end
+          end
         end
       end
     end
@@ -72,18 +83,26 @@ module OHOLFamilyTrees
     end
 
     def fetch_file(base, path, cache_path, date = Time.at(0))
-      if File.exist?(cache_path) && date < File.mtime(cache_path)
+      if has_file?(cache_path, date)
         return File.open(cache_path, "r") {|f| f.read}
       else
-        log.warn path
-        contents = http.get_content(base + path)
-
-        File.open(cache_path, "w") do |f|
-          f.write(contents)
-        end
-
-        return contents
+        return get_file(base, path, cache_path)
       end
+    end
+
+    def has_file?(cache_path, date = Time.at(0))
+      File.exist?(cache_path) && date < File.mtime(cache_path)
+    end
+
+    def get_file(base, path, cache_path)
+      log.warn path
+      contents = http.get_content(base + path)
+
+      File.open(cache_path, "w") do |f|
+        f.write(contents)
+      end
+
+      return contents
     end
 
     def extract_path_list(directory)
