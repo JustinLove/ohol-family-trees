@@ -1,3 +1,4 @@
+require 'ohol-family-trees/lifelog_file'
 require 'httpclient'
 require 'nokogiri'
 
@@ -57,28 +58,44 @@ module OHOLFamilyTrees
         dir.match(/lifeLog_(.*)\//)[1]
       end
 
-      def each
+      def path_list
+        return @path_list if @path_list
         p baseurl + dir
         index = Client.get_content(baseurl + dir)
         #p index
+        @path_list = {}
         LifelogServer.extract_path_list(index)
           .map do |path, log_date|
             dateparts = path.match(/(\d{4})_(\d{2})\w+_(\d{2})/)
             next unless dateparts
             cache_path = dir + path
-            yield Logfile.new(cache_path, log_date, baseurl)
+            @path_list[cache_path] = log_date
           end
+        @path_list
+      end
+
+      def each
+        path_list.map do |cache_path, log_date|
+          yield Logfile.new(cache_path, log_date, baseurl)
+        end
+      end
+
+      def has?(cache_path)
+        path_list.include?(cache_path)
+      end
+
+      def get(cache_path)
+        Logfile.new(cache_path, path_list[cache_path], baseurl)
       end
     end
 
-    class Logfile
+    class Logfile < LifelogFile
       def initialize(path, date, baseurl = BaseUrl)
-        @path = path
+        super path
         @date = date
         @baseurl = baseurl
       end
 
-      attr_reader :path
       attr_reader :date
       attr_reader :baseurl
 
@@ -86,31 +103,11 @@ module OHOLFamilyTrees
         baseurl + path
       end
 
-      def approx_log_time
-        dateparts = path.match(/(\d{4})_(\d{2})\w+_(\d{2})/)
-        return date unless dateparts
-
-        Time.gm(dateparts[1], dateparts[2], dateparts[3])
-      end
-
-      def within(time_range = (Time.at(0)..Time.now))
-        time_range.cover?(approx_log_time)
-      end
-
-      def server
-        path.match(/lifeLog_(.*)\//)[1]
-      end
-
-      def names?
-        path.match('_names.txt')
-      end
-
       def open
-        p baseurl + path
-        contents = Client.get_content(baseurl + path)
+        p url
+        contents = Client.get_content(url)
         #p contents
         StringIO.new(contents)
-        #File.open(file_path, "r", :external_encoding => 'ASCII-8BIT')
       end
     end
   end

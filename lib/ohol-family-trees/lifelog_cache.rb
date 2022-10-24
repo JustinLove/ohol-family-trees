@@ -1,3 +1,5 @@
+require 'ohol-family-trees/lifelog_file'
+
 module OHOLFamilyTrees
   module LifelogCache
     class Servers
@@ -42,42 +44,30 @@ module OHOLFamilyTrees
           yield Logfile.new(cache_path, cache)
         end
       end
+
+      def has?(cache_path)
+        File.exist?(File.join(cache, cache_path))
+      end
+
+      def get(cache_path)
+        Logfile.new(cache_path, cache)
+      end
     end
 
-    class Logfile
+    class Logfile < LifelogFile
       def initialize(path, cache = "cache/publicLifeLogData/")
-        @path = path
+        super path
         @cache = cache
       end
 
-      attr_reader :path
       attr_reader :cache
 
       def file_path
         File.join(cache, path)
       end
 
-      def approx_log_time
-        dateparts = path.match(/(\d{4})_(\d{2})\w+_(\d{2})/)
-        return date unless dateparts
-
-        Time.gm(dateparts[1], dateparts[2], dateparts[3])
-      end
-
-      def within(time_range = (Time.at(0)..Time.now))
-        time_range.cover?(approx_log_time)
-      end
-
       def date
         File.mtime(file_path)
-      end
-
-      def server
-        path.match(/lifeLog_(.*)\//)[1]
-      end
-
-      def names?
-        path.match('_names.txt')
       end
 
       def open
