@@ -21,6 +21,14 @@ module OHOLFamilyTrees
       path.match(/lifeLog_(.*)\//)[1]
     end
 
+    def logfile?
+      path.match(/(\d{4})_(\d{2})\w+_(\d{2})/)
+    end
+
+    def lives?
+      logfile? && !names?
+    end
+
     def names?
       path.match('_names.txt')
     end
