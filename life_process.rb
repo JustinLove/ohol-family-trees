@@ -1,4 +1,5 @@
 require 'ohol-family-trees/lifelog_cache'
+require 'ohol-family-trees/lifelog_server'
 require 'ohol-family-trees/lifelog_list'
 require 'ohol-family-trees/filesystem_local'
 require 'ohol-family-trees/filesystem_s3'
@@ -14,7 +15,7 @@ LifelogArchive = 'publicLifeLogData'
 
 filesystem = FilesystemGroup.new([
   FilesystemLocal.new(OutputDir),
-  #FilesystemS3.new(OutputBucket),
+#  FilesystemS3.new(OutputBucket),
 ])
 
 LifelogCache::Servers.new.each do |logs|
