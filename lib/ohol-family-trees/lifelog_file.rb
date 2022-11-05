@@ -37,5 +37,9 @@ module OHOLFamilyTrees
       at_time ||= 0
       date.to_i <= at_time && (at_time < 1571853427 || 1572325200 < at_time)
     end
+
+    def file_probably_complete?
+      date > (approx_log_time + 24*60*60)
+    end
   end
 end

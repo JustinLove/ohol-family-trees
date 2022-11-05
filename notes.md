@@ -1,8 +1,23 @@
 - x not check every lifelog file on every update
 - x copying files to map dir
 - server date ranges - server?
+  - local task?
 - xxxlogList be combined?
-- tranfer to server tasks
+- x tranfer to server tasks
+- long term caching of partial files
+  - cloudfront
+    - invalidations
+    - multiple paths
+    - parameters
+    - * not copy partial file
+      - x not copy
+      - copy somewhere else?
+      - have frontend find somewhere else?
+  - browser
+    - multiple paths
+    - parameters
+    - * alternate location
+- lineage processing
 
 
 - time difference between lives and map placments: https://onemap.wondible.com/#x=-28185&y=-597&z=29&s=17&t=1621748525&preset=daily-review
