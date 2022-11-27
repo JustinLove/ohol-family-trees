@@ -16,8 +16,8 @@ GEM
   remote: https://rubygems.org/
   specs:
     aws-eventstream (1.2.0)
-    aws-partitions (1.656.0)
-    aws-sdk-core (3.166.0)
+    aws-partitions (1.665.0)
+    aws-sdk-core (3.168.1)
       aws-eventstream (~> 1, >= 1.0.2)
       aws-partitions (~> 1, >= 1.651.0)
       aws-sigv4 (~> 1.5)
@@ -35,12 +35,10 @@ GEM
     color (1.8)
     highline (2.0.3)
     httpclient (2.8.3)
-    jmespath (1.6.1)
+    jmespath (1.6.2)
     mini_portile2 (2.8.0)
     nokogiri (1.13.9)
       mini_portile2 (~> 2.8.0)
-      racc (~> 1.4)
-    nokogiri (1.13.9-x64-mingw32)
       racc (~> 1.4)
     options (2.3.2)
     progress_bar (1.3.3)
@@ -61,4 +59,4 @@ DEPENDENCIES
   ohol-family-trees!
 
 BUNDLED WITH
-   1.17.2
+   2.3.7

@@ -12,6 +12,7 @@
     - * not copy partial file
       - x not copy
       - copy somewhere else?
+      - remove old files - s3 policy?
       - have frontend find somewhere else?
   - browser
     - multiple paths
