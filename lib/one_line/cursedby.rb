@@ -5,7 +5,7 @@ class OneLine
       puts headline('-', "#{hash} #{known_players[hash]}")
       matching_curses(curselog_time_range) do |curse|
         if curse.from_hash == hash
-          puts "=> #{curse.to_hash[0..7]} #{known_players[curse.to_hash]}"
+          puts "=> #{curse.to_hash[0..7]} #{curse.net} #{known_players[curse.to_hash]}"
         end
       end
       puts ""

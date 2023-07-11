@@ -3,7 +3,7 @@ class OneLine
   def curseleader
     curses = Hash.new {|h,k| h[k] = 0}
     matching_curses(curselog_time_range) do |curse|
-      curses[curse.to_hash] += 1
+      curses[curse.to_hash] += curse.net
     end
     curses.to_a.sort_by {|h,c| c}.each do |h,c|
       log.debug [h, c]

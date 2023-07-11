@@ -6,7 +6,7 @@ class OneLine
       count = 0
       matching_curses(cursecount_time_range) do |curse|
         if curse.to_hash == hash
-          count += 1
+          count += curse.net
         end
       end
       puts count

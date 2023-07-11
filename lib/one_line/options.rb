@@ -181,7 +181,27 @@ class OneLine
         file = logfile.open
         while line = file.gets
           log = Curselog.create(line)
-          if log.kind_of?(Curselog::Curse)
+          if log.respond_to?(:net)
+            yield log
+          end
+        end
+      end
+    end
+  end
+
+  def matching_trusts(time_range = curselog_time_range)
+    log.info time_range
+    CurselogCache::Servers.new.each do |logs|
+      next unless servers.include? logs.server
+      log.debug logs
+
+      logs.each do |logfile|
+        next unless time_range.member?(logfile.approx_log_time)
+        log.info logfile.path
+        file = logfile.open
+        while line = file.gets
+          log = Curselog.create(line)
+          if log.kind_of?(Curselog::Trust)
             yield log
           end
         end
