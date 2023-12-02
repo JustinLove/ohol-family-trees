@@ -33,6 +33,10 @@ module OHOLFamilyTrees
       mirror('publicMapChangeData')
     end
 
+    def food
+      mirror('foodLogDetails')
+    end
+
     def mirror(subdir)
       base_url = "#{public_data}/#{subdir}/"
       base_path = "#{cache}/#{subdir}"
