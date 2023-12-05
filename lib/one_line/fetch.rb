@@ -15,9 +15,9 @@ class OneLine
     b = true if what == 'monuments' || what == 'bells' || what == 'all'
     f = true if what == 'food' || what == 'all'
     mirror.lives if l
-    mirror.maps if m
     mirror.food if f
     mirror.monuments if b
+    mirror.maps if m
   end
 
   private
