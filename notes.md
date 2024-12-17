@@ -1,3 +1,5 @@
+- status line for donkey town
+- negative age may 07
 - x not check every lifelog file on every update
 - x copying files to map dir
 - server date ranges - server?

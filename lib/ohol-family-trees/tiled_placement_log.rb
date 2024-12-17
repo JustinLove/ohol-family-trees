@@ -75,6 +75,7 @@ module OHOLFamilyTrees
             removes = floor_removal[object]
             if removes
               if tile.floor(log.x, log.y) == removes &&
+                 previous &&
                  previous.object == "0" &&
                  previous.x == log.x &&
                  previous.y == log.y &&
