@@ -86,7 +86,7 @@ module OHOLFamilyTrees
 
         write_notable_objects(noted, span.s_end)
 
-        if reset > span.s_end - 10 and not automatic_resets.member?(reset)
+        if reset > span.s_end - 20 and not automatic_resets.member?(reset)
           automatic_resets << reset
         end
         p automatic_resets
