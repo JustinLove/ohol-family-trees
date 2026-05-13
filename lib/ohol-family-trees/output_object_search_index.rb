@@ -58,7 +58,7 @@ module OHOLFamilyTrees
         f << JSON.pretty_generate(processed)
       end
       filesystem.write(automatic_resets_path, CacheControl::NoCache.merge(ContentType::Text)) do |f|
-        f << automatic_resets.join("\r")
+        f << automatic_resets.join("\n")
       end
     end
 
